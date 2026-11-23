@@ -43,17 +43,6 @@ button:disabled{opacity:.55;cursor:default}
 table.t{border-collapse:collapse;margin:10px 0;background:#fff}
 table.t th,table.t td{border:1px solid var(--line);padding:6px 12px;text-align:center}
 table.t th{background:#f3f5f9;font-weight:600}
-.places{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px}
-.place{flex:0 1 112px;max-width:100%;padding:8px;text-align:center;background:#fff;border:1px solid var(--line);border-radius:12px}
-.place.invalid{border-color:#a92620;box-shadow:inset 0 0 0 1px #a92620}
-.place .big{display:block;font-size:27px;font-weight:800;line-height:1.3}
-.place .caption{display:block;font-size:13px;color:var(--muted)}
-.tray{display:grid;grid-template-columns:repeat(var(--tray-cols),14px);justify-content:center;gap:4px;background:#f3f5f9;border:1px solid var(--line);border-radius:8px;padding:6px 3px;margin-top:6px}
-.well{display:grid;place-items:center;width:14px;height:14px;border:1px solid #cbd2de;border-radius:50%;background:#e5e9f1}
-.well.occupied::after{content:"";display:block;width:8px;height:8px;border-radius:50%;background:#2563eb}
-.well.bundle::after{width:8px;height:8px;border-radius:2px;background:#36649b;box-shadow:inset 0 0 0 1px #1d4779}
-.readout{margin:12px 0 7px;text-align:center}
-.readout b{color:var(--accent)}
 .feedback{margin:8px 0;color:#a92620}
 #csBlock{--cs-ink:#1f2430;--cs-muted:#6b7385}
 .cs-legend{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 14px}
@@ -374,19 +363,6 @@ details.explain summary{cursor:pointer;font-weight:600}
     </table></div>
     <p>Запись 263 в основании 8 обозначает большее число. Для основания 6 цифра 6 уже недопустима, поэтому прочитать в нём эту запись нельзя.</p>
   </div>
-  <section class="interactive" aria-labelledby="board-heading">
-    <span class="tag">Интерактив</span>
-    <h3 id="board-heading">Читаем те же цифры в другом основании</h3>
-    <p>Оставьте запись 263 и смените основание с 7 на 8. Проследите за изменением весов. Затем попробуйте выбрать 6. В этой модели <b>сохраняются введённые цифры</b>.</p>
-    <div class="controls">
-      <label>До четырёх цифр <input type="text" id="board-digits" value="263" maxlength="4" autocomplete="off" spellcheck="false" autocapitalize="characters"></label>
-      <label>Основание <select id="board-base"></select></label>
-    </div>
-    <p class="feedback" id="board-error" role="status" hidden></p>
-    <div class="places" id="board-places"></div>
-    <p class="readout" id="board-result" role="status"></p>
-  </section>
-
   <section class="selfcheck" aria-labelledby="check-heading">
     <span class="tag">Самопроверка</span>
     <h3 id="check-heading">Проверьте, что умеете читать и строить записи</h3>
@@ -419,13 +395,132 @@ details.explain summary{cursor:pointer;font-weight:600}
   </nav>
 </main>
 <script>
+const textbookBundleSprite = (() => {
+  const red = ['#ffb3a6', '#ec3d2d', '#a81b10'];
+  const bands = ['', '#1e8fe6', '#23b34b', '#f3c516', '#9b59e0', '#ff8a1e', '#12b5b0', '#e0508c', '#6b7a8f'];
+  const height = 34;
+  const tilt = .42;
+  const root3 = Math.sqrt(3);
+  const cache = new Map();
+
+  function pack(base, radius) {
+    const diameter = 2 * radius;
+    let best;
+    for (const [ox, oy] of [[0, 0], [.5, 0], [.5, root3 / 6]]) {
+      const lattice = [];
+      for (let row = -4; row <= 4; row += 1) {
+        for (let column = -4; column <= 4; column += 1) {
+          const x = diameter * (column + row / 2 - ox);
+          const y = diameter * (row * root3 / 2 - oy);
+          lattice.push({ x, y, distance: Math.hypot(x, y), angle: Math.atan2(y, x) });
+        }
+      }
+      const closest = lattice.sort((a, b) => a.distance - b.distance || a.angle - b.angle).slice(0, base);
+      const cx = closest.reduce((sum, p) => sum + p.x, 0) / base;
+      const cy = closest.reduce((sum, p) => sum + p.y, 0) / base;
+      const pieces = closest.map((p) => ({ x: p.x - cx, y: p.y - cy })).sort((a, b) => a.y - b.y);
+      const extent = Math.max(...pieces.map((p) => Math.hypot(p.x, p.y))) + radius;
+      if (!best || extent < best.radius) best = { radius: extent, pieces };
+    }
+    return best;
+  }
+
+  function rod(context, radius) {
+    const edge = radius * tilt;
+    const body = context.createLinearGradient(-radius, 0, radius, 0);
+    body.addColorStop(0, red[0]);
+    body.addColorStop(.4, red[1]);
+    body.addColorStop(1, red[2]);
+    context.lineWidth = .5;
+    context.strokeStyle = '#8d160c';
+    context.fillStyle = body;
+    context.beginPath();
+    context.moveTo(-radius, -height);
+    context.lineTo(-radius, 0);
+    context.ellipse(0, 0, radius, edge, 0, Math.PI, 0, true);
+    context.lineTo(radius, -height);
+    context.closePath();
+    context.fill();
+    context.stroke();
+
+    context.fillStyle = '#f26652';
+    context.beginPath();
+    context.ellipse(0, -height, radius, edge, 0, 0, 2 * Math.PI);
+    context.fill();
+    context.stroke();
+  }
+
+  function band(context, radius, level) {
+    const rx = radius - .2;
+    const bend = radius * tilt * 1.26;
+    const y = -height * .58;
+    const lower = y + height * .22;
+    context.beginPath();
+    context.moveTo(-rx, y);
+    context.bezierCurveTo(-rx * .62, y + bend, rx * .62, y + bend, rx, y);
+    context.lineTo(rx, lower);
+    context.bezierCurveTo(rx * .62, lower + bend, -rx * .62, lower + bend, -rx, lower);
+    context.closePath();
+    context.fillStyle = bands[Math.min(level, bands.length - 1)];
+    context.fill();
+    context.strokeStyle = 'rgba(35,30,26,.4)';
+    context.lineWidth = Math.max(.6, radius / 80);
+    context.stroke();
+
+    context.beginPath();
+    context.moveTo(-rx * .98, y + 1.5);
+    context.bezierCurveTo(-rx * .62, y + bend + 1.5, rx * .62, y + bend + 1.5, rx * .98, y + 1.5);
+    context.strokeStyle = 'rgba(255,255,255,.58)';
+    context.lineWidth = 1;
+    context.stroke();
+  }
+
+  function create(base, level) {
+    const key = level ? base + ':' + level : 'rod';
+    const stored = cache.get(key);
+    if (stored) return stored;
+
+    const child = level ? create(base, level - 1) : null;
+    const layout = child ? pack(base, child.radius + .5) : null;
+    const radius = layout ? layout.radius : 5;
+    const x = -radius - 2;
+    const y = -height - radius * tilt - 2;
+    const width = 2 * radius + 4;
+    const depth = height + 2 * radius * tilt + 4;
+    const scale = Math.min(4, 192 / Math.max(width, depth));
+
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.ceil(width * scale);
+    canvas.height = Math.ceil(depth * scale);
+    const context = canvas.getContext('2d');
+    context.setTransform(canvas.width / width, 0, 0, canvas.height / depth,
+      -x * canvas.width / width, -y * canvas.height / depth);
+    if (child) {
+      for (const piece of layout.pieces) {
+        context.drawImage(child.canvas, piece.x + child.x, piece.y * tilt + child.y, child.width, child.height);
+      }
+      band(context, radius, level);
+    } else {
+      rod(context, radius);
+    }
+
+    const sprite = { canvas, radius, x, y, width, height: depth, url: null };
+    cache.set(key, sprite);
+    return sprite;
+  }
+
+  return (base, level) => {
+    const sprite = create(base, level);
+    if (!sprite.url) sprite.url = sprite.canvas.toDataURL('image/png');
+    return sprite;
+  };
+})();
+
 const renderTextbookBundle = (() => {
   const namespace = 'http://www.w3.org/2000/svg';
   const tilt = .42;
   const rodRadius = 5;
-  const bundleRadius = 13;
   const rodHeight = 34;
-  const strapColors = ['', '#1e8fe6', '#23b34b', '#f3c516', '#9b59e0', '#ff8a1e', '#12b5b0', '#e0508c', '#6b7a8f'];
   const figures = new Map();
   let prefix;
   let defs;
@@ -475,38 +570,33 @@ const renderTextbookBundle = (() => {
     </radialGradient>`);
   }
 
-  function makeFigure(level, color) {
-    const strapIndex = Math.min(level, strapColors.length - 1);
-    const strap = strapColors[strapIndex];
-    const rodColor = strap ? '' : color;
-    const key = strap ? `bundle-${strapIndex}` : (rodColor ? `rod-${rodColor.slice(1)}` : 'rod');
+  function makeFigure(level, base, color) {
+    const key = level ? `bundle-${base}-${level}` : (color ? `rod-${color.slice(1)}` : 'rod');
     if (figures.has(key)) return figures.get(key);
 
     const host = getDefs();
     const group = document.createElementNS(namespace, 'g');
     const id = `${prefix}-${key}`;
     group.id = id;
-    const radius = strap ? bundleRadius : rodRadius;
-    const ellipse = round(tilt * radius);
-    const gradientId = rodColor ? id : `${prefix}-rod`;
-    if (rodColor) addRodGradients(host, id, rodColor);
-    const stroke = rodColor ? mixColor(rodColor, 0, .45) : '#8d160c';
-    group.innerHTML = `<path d="M${-radius},${-rodHeight} L${-radius},0 A${radius},${ellipse} 0 0 0 ${radius},0 L${radius},${-rodHeight} Z" fill="url(#${gradientId}-fill)" stroke="${stroke}" stroke-width=".5"/>
-      <ellipse cx="0" cy="${-rodHeight}" rx="${radius}" ry="${ellipse}" fill="url(#${gradientId}-cap)" stroke="${stroke}" stroke-width=".5"/>`;
-
-    if (strap) {
-      const rx = round(radius + .8);
-      const strapY = round(-rodHeight * .58);
-      const strapHeight = rodHeight * .22;
-      const endY = round(strapY + strapHeight);
-      const highlightY = round(strapY + strapHeight * .18);
-      group.insertAdjacentHTML('beforeend', `
-        <path d="M${-rx},${strapY} A${rx},${ellipse} 0 0 0 ${rx},${strapY} L${rx},${endY} A${rx},${ellipse} 0 0 1 ${-rx},${endY} Z" fill="${strap}" stroke="rgba(0,0,0,.4)" stroke-width=".6"/>
-        <path d="M${-rx},${highlightY} A${rx},${ellipse} 0 0 0 ${rx},${highlightY}" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="${round(strapHeight * .14)}"/>`);
+    let bounds;
+    if (level) {
+      const { url, x, y, width, height } = textbookBundleSprite(base, level);
+      bounds = { x: round(x), y: round(y), width: round(width), height: round(height) };
+      group.innerHTML = `<image href="${url}" x="${bounds.x}" y="${bounds.y}" width="${bounds.width}" height="${bounds.height}" />`;
+    } else {
+      const radius = rodRadius;
+      const ellipse = round(tilt * radius);
+      const gradientId = color ? id : `${prefix}-rod`;
+      if (color) addRodGradients(host, id, color);
+      const stroke = color ? mixColor(color, 0, .45) : '#8d160c';
+      group.innerHTML = `<path d="M${-radius},${-rodHeight} L${-radius},0 A${radius},${ellipse} 0 0 0 ${radius},0 L${radius},${-rodHeight} Z" fill="url(#${gradientId}-fill)" stroke="${stroke}" stroke-width=".5"/>
+        <ellipse cx="0" cy="${-rodHeight}" rx="${radius}" ry="${ellipse}" fill="url(#${gradientId}-cap)" stroke="${stroke}" stroke-width=".5"/>`;
+      bounds = { x: round(-radius - 2), y: round(-rodHeight - radius * tilt - 2),
+        width: 2 * radius + 4, height: round(rodHeight + 2 * radius * tilt + 4) };
     }
 
     host.appendChild(group);
-    const figure = { id, radius };
+    const figure = { id, ...bounds };
     figures.set(key, figure);
     return figure;
   }
@@ -516,12 +606,9 @@ const renderTextbookBundle = (() => {
       throw new RangeError('Для рисунка нужно целое основание от 2 до 20 и неотрицательный номер разряда.');
     }
 
-    const { id, radius } = makeFigure(level, color);
-    const x = round(-radius - 2);
-    const y = round(-rodHeight - radius * tilt - 2);
-    const width = 2 * radius + 4;
-    const height = rodHeight + 2 * radius * tilt + 4;
-    return `<svg class="ss-convert-bundle" viewBox="${x} ${y} ${round(width)} ${round(height)}" width="${round(width)}" height="${round(height)}" aria-hidden="true" focusable="false" style="display:block;overflow:visible"><use href="#${id}"/></svg>`;
+    const { id, x, y, width, height } = makeFigure(level, base, color);
+    const scale = Math.min(1, 110 / width);
+    return `<svg class="ss-convert-bundle" viewBox="${x} ${y} ${width} ${height}" width="${round(width * scale)}" height="${round(height * scale)}" aria-hidden="true" focusable="false" style="display:block;overflow:visible"><use href="#${id}"/></svg>`;
   };
 })();
 
@@ -537,19 +624,11 @@ const renderTextbookBundle = (() => {
 
   const format = (representation, base) => `<b>${representation}<sub>${base}</sub></b>`;
 
-  function drawTrays(host, representation, base, invalid = []) {
-    const columns = Math.min(5, Math.ceil(base / 2));
-    host.innerHTML = Array.from(representation, (character, index) => {
-      const place = representation.length - 1 - index;
-      const count = digits.indexOf(character);
-      const slots = Array.from({ length: base }, (_, cell) => (
-        `<span class="well${cell < count ? (place ? ' occupied bundle' : ' occupied') : ''}"></span>`
-      )).join('');
-      return `<div class="place${invalid.includes(index) ? ' invalid' : ''}">
-        <span class="big">${character}</span><span class="caption">Разряд ${place} · вес ${base ** place}</span>
-        <span class="caption">Ячейки ${count} из ${base}</span><div aria-hidden="true" class="tray" style="--tray-cols:${columns}">${slots}</div>
-      </div>`;
-    }).join('');
+  function invalidIndices(representation, base) {
+    return Array.from(representation, (character, index) => {
+      const digit = digits.indexOf(character);
+      return digit < 0 || digit >= base ? index : -1;
+    }).filter((index) => index >= 0);
   }
 
   const convertFrom = byId('convert-from');
@@ -832,52 +911,6 @@ const renderTextbookBundle = (() => {
   convertNext.addEventListener('click', () => stepConversion(1));
   resetConversion(true);
 
-  const boardBase = byId('board-base');
-  const boardDigits = byId('board-digits');
-  const boardError = byId('board-error');
-  let boardActiveBase = 7;
-  prepareBases(boardBase, boardActiveBase);
-
-  function invalidIndices(representation, base) {
-    return Array.from(representation, (character, index) => {
-      const digit = digits.indexOf(character);
-      return digit < 0 || digit >= base ? index : -1;
-    }).filter((index) => index >= 0);
-  }
-
-  function drawBoard(requestedBase) {
-    const representation = boardDigits.value.trim().toUpperCase();
-    const bad = invalidIndices(representation, requestedBase);
-    boardError.hidden = bad.length === 0;
-    if (!representation) {
-      boardActiveBase = requestedBase;
-      byId('board-places').replaceChildren();
-      byId('board-result').textContent = '';
-      boardDigits.setAttribute('aria-invalid', 'false');
-      return;
-    }
-    if (bad.length) {
-      boardError.textContent = `Цифра «${representation[bad[0]]}» недопустима в основании ${requestedBase}. Используйте цифры от 0 до ${digits[requestedBase - 1]}.`;
-      const validInActive = !invalidIndices(representation, boardActiveBase).length;
-      boardDigits.setAttribute('aria-invalid', String(!validInActive));
-      boardBase.value = String(boardActiveBase);
-      if (validInActive) drawTrays(byId('board-places'), representation, boardActiveBase, bad);
-      else {
-        byId('board-places').replaceChildren();
-        byId('board-result').textContent = '';
-      }
-      return;
-    }
-    boardActiveBase = requestedBase;
-    boardDigits.setAttribute('aria-invalid', 'false');
-    const value = parseInt(representation, boardActiveBase);
-    drawTrays(byId('board-places'), representation, boardActiveBase);
-    byId('board-result').innerHTML = `${format(representation, boardActiveBase)} = ${format(value, 10)}.`;
-  }
-
-  boardDigits.addEventListener('input', () => drawBoard(boardActiveBase));
-  boardBase.addEventListener('change', () => drawBoard(Number(boardBase.value)));
-
   for (const form of document.querySelectorAll('form.task')) {
     form.addEventListener('submit', (event) => {
       event.preventDefault();
@@ -888,7 +921,6 @@ const renderTextbookBundle = (() => {
       verdict.className = correct ? 'verdict ok' : 'verdict no';
     });
   }
-  drawBoard(boardActiveBase);
 })();
 </script>
 <script>

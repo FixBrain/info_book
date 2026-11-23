@@ -294,59 +294,176 @@ var DIG='0123456789ABCDEFGHIJ';
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
 function repeat(s,n){var r='';for(var i=0;i<n;i++)r+=s;return r;}
 
-/* ===== круглые пучки (тот же способ рисования, что на других страницах) ===== */
+const textbookBundleSprite = (() => {
+  const red = ['#ffb3a6', '#ec3d2d', '#a81b10'];
+  const bands = ['', '#1e8fe6', '#23b34b', '#f3c516', '#9b59e0', '#ff8a1e', '#12b5b0', '#e0508c', '#6b7a8f'];
+  const height = 34;
+  const tilt = .42;
+  const root3 = Math.sqrt(3);
+  const cache = new Map();
+
+  function pack(base, radius) {
+    const diameter = 2 * radius;
+    let best;
+    for (const [ox, oy] of [[0, 0], [.5, 0], [.5, root3 / 6]]) {
+      const lattice = [];
+      for (let row = -4; row <= 4; row += 1) {
+        for (let column = -4; column <= 4; column += 1) {
+          const x = diameter * (column + row / 2 - ox);
+          const y = diameter * (row * root3 / 2 - oy);
+          lattice.push({ x, y, distance: Math.hypot(x, y), angle: Math.atan2(y, x) });
+        }
+      }
+      const closest = lattice.sort((a, b) => a.distance - b.distance || a.angle - b.angle).slice(0, base);
+      const cx = closest.reduce((sum, p) => sum + p.x, 0) / base;
+      const cy = closest.reduce((sum, p) => sum + p.y, 0) / base;
+      const pieces = closest.map((p) => ({ x: p.x - cx, y: p.y - cy })).sort((a, b) => a.y - b.y);
+      const extent = Math.max(...pieces.map((p) => Math.hypot(p.x, p.y))) + radius;
+      if (!best || extent < best.radius) best = { radius: extent, pieces };
+    }
+    return best;
+  }
+
+  function rod(context, radius) {
+    const edge = radius * tilt;
+    const body = context.createLinearGradient(-radius, 0, radius, 0);
+    body.addColorStop(0, red[0]);
+    body.addColorStop(.4, red[1]);
+    body.addColorStop(1, red[2]);
+    context.lineWidth = .5;
+    context.strokeStyle = '#8d160c';
+    context.fillStyle = body;
+    context.beginPath();
+    context.moveTo(-radius, -height);
+    context.lineTo(-radius, 0);
+    context.ellipse(0, 0, radius, edge, 0, Math.PI, 0, true);
+    context.lineTo(radius, -height);
+    context.closePath();
+    context.fill();
+    context.stroke();
+
+    context.fillStyle = '#f26652';
+    context.beginPath();
+    context.ellipse(0, -height, radius, edge, 0, 0, 2 * Math.PI);
+    context.fill();
+    context.stroke();
+  }
+
+  function band(context, radius, level) {
+    const rx = radius - .2;
+    const bend = radius * tilt * 1.26;
+    const y = -height * .58;
+    const lower = y + height * .22;
+    context.beginPath();
+    context.moveTo(-rx, y);
+    context.bezierCurveTo(-rx * .62, y + bend, rx * .62, y + bend, rx, y);
+    context.lineTo(rx, lower);
+    context.bezierCurveTo(rx * .62, lower + bend, -rx * .62, lower + bend, -rx, lower);
+    context.closePath();
+    context.fillStyle = bands[Math.min(level, bands.length - 1)];
+    context.fill();
+    context.strokeStyle = 'rgba(35,30,26,.4)';
+    context.lineWidth = Math.max(.6, radius / 80);
+    context.stroke();
+
+    context.beginPath();
+    context.moveTo(-rx * .98, y + 1.5);
+    context.bezierCurveTo(-rx * .62, y + bend + 1.5, rx * .62, y + bend + 1.5, rx * .98, y + 1.5);
+    context.strokeStyle = 'rgba(255,255,255,.58)';
+    context.lineWidth = 1;
+    context.stroke();
+  }
+
+  function create(base, level) {
+    const key = level ? base + ':' + level : 'rod';
+    const stored = cache.get(key);
+    if (stored) return stored;
+
+    const child = level ? create(base, level - 1) : null;
+    const layout = child ? pack(base, child.radius + .5) : null;
+    const radius = layout ? layout.radius : 5;
+    const x = -radius - 2;
+    const y = -height - radius * tilt - 2;
+    const width = 2 * radius + 4;
+    const depth = height + 2 * radius * tilt + 4;
+    const scale = Math.min(4, 192 / Math.max(width, depth));
+
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.ceil(width * scale);
+    canvas.height = Math.ceil(depth * scale);
+    const context = canvas.getContext('2d');
+    context.setTransform(canvas.width / width, 0, 0, canvas.height / depth,
+      -x * canvas.width / width, -y * canvas.height / depth);
+    if (child) {
+      for (const piece of layout.pieces) {
+        context.drawImage(child.canvas, piece.x + child.x, piece.y * tilt + child.y, child.width, child.height);
+      }
+      band(context, radius, level);
+    } else {
+      rod(context, radius);
+    }
+
+    const sprite = { canvas, radius, x, y, width, height: depth, url: null };
+    cache.set(key, sprite);
+    return sprite;
+  }
+
+  return (base, level) => {
+    const sprite = create(base, level);
+    if (!sprite.url) sprite.url = sprite.canvas.toDataURL('image/png');
+    return sprite;
+  };
+})();
+
+/* ===== значки палочек и пучков ===== */
 var K=0.42,R0=5,H=34;
-var BAND=['','#1e8fe6','#23b34b','#f3c516','#9b59e0','#ff8a1e','#12b5b0','#e0508c','#6b7a8f'];
-var CAPW=[14,34,42,46,54];
-var DEF={},INFO={},dirty=false;
+var CAPW=[14,44,52,58,64];
+var INFO={},PENDING=[];
 function f(x){return (Math.round(x*100)/100).toString();}
 
-function ensure(level){
-  var id='b'+level;
+function ensure(level,N){
+  var id=level===0?'b0':'b'+N+'_'+level;
   if(INFO[id]) return INFO[id];
 
-  var R=level===0?R0:Math.min(24,7+3*level),e=f(R*K),r=f(R),l=f(-R);
-  var body='M'+l+','+(-H)+' L'+l+',0 A'+r+','+e+' 0 0 0 '+r+',0 L'+r+','+(-H)+' Z';
-  var top='<ellipse cx="0" cy="'+(-H)+'" rx="'+r+'" ry="'+e+'"';
-  var picture;
+  var x,y,w,h,picture;
   if(level===0){
-    picture='<path d="'+body+'" fill="url(#gStick)" stroke="#8d160c" stroke-width=".5"/>'+
-      top+' fill="url(#gCap)" stroke="#8d160c" stroke-width=".5"/>';
+    var e=f(R0*K);
+    x=-R0-2; y=-H-R0*K-2; w=2*R0+4; h=H+2*R0*K+4;
+    picture='<path d="M'+(-R0)+','+(-H)+' L'+(-R0)+',0 A'+R0+','+e+' 0 0 0 '+R0+',0 L'+R0+','+(-H)+' Z" fill="url(#gStick)" stroke="#8d160c" stroke-width=".5"/>'+
+      '<ellipse cx="0" cy="'+(-H)+'" rx="'+R0+'" ry="'+e+'" fill="url(#gCap)" stroke="#8d160c" stroke-width=".5"/>';
   }else{
-    // A bundle has a single silhouette, regardless of its mathematical weight.
-    var strap=BAND[Math.min(level,BAND.length-1)];
-    var upper=f(-H*.57),lower=f(-H*.36),glint=f(-H*.53);
-    picture='<path d="'+body+'" fill="#f2cab6" stroke="#845748" stroke-width=".65"/>'+
-      '<path d="M'+f(-R*.46)+','+f(-H*.85)+' V-3 M0,'+f(-H*.78)+' V-1 M'+f(R*.46)+','+f(-H*.85)+' V-3" fill="none" stroke="#a87662" stroke-width=".65" opacity=".54"/>'+
-      top+' fill="#ffe9d9" stroke="#845748" stroke-width=".65"/>'+
-      '<path d="M'+l+','+upper+' A'+r+','+e+' 0 0 0 '+r+','+upper+
-        ' L'+r+','+lower+' A'+r+','+e+' 0 0 1 '+l+','+lower+
-        ' Z" fill="'+strap+'" stroke="#3b2e25" stroke-opacity=".45" stroke-width=".6"/>'+
-      '<path d="M'+l+','+glint+' A'+r+','+e+' 0 0 0 '+r+','+glint+
-        '" fill="none" stroke="#fff" stroke-opacity=".56" stroke-width="1"/>';
+    var sprite=textbookBundleSprite(N,level);
+    x=sprite.x; y=sprite.y; w=sprite.width; h=sprite.height;
+    picture='<image x="'+f(x)+'" y="'+f(y)+'" width="'+f(w)+'" height="'+f(h)+
+      '" preserveAspectRatio="xMidYMid meet" href="'+sprite.url+'"/>';
   }
-  DEF[id]='<g id="'+id+'">'+picture+'</g>';
-  INFO[id]={id:id,R:R};
-  dirty=true;
+
+  PENDING.push('<g id="'+id+'">'+picture+'</g>');
+  INFO[id]={id:id,x:x,y:y,w:w,h:h};
   return INFO[id];
 }
+
 function flushDefs(){
-  if(!dirty) return;
-  var g='<linearGradient id="gStick" x1="0" y1="0" x2="1" y2="0">'+
-        '<stop offset="0" stop-color="#ffb3a6"/><stop offset=".4" stop-color="#ec3d2d"/><stop offset="1" stop-color="#a81b10"/></linearGradient>'+
-        '<radialGradient id="gCap" cx=".38" cy=".35" r=".8">'+
-        '<stop offset="0" stop-color="#ffb0a4"/><stop offset=".7" stop-color="#ee4a39"/><stop offset="1" stop-color="#c22617"/></radialGradient>';
-  var all='';
-  for(var k in DEF) all+=DEF[k];
-  $('defsHost').innerHTML='<svg width="0" height="0"><defs>'+g+all+'</defs></svg>';
-  dirty=false;
+  if(!PENDING.length) return;
+  var host=$('defsHost'),defs=host.querySelector('defs');
+  if(!defs){
+    var gradients='<linearGradient id="gStick" x1="0" y1="0" x2="1" y2="0">'+
+      '<stop offset="0" stop-color="#ffb3a6"/><stop offset=".4" stop-color="#ec3d2d"/><stop offset="1" stop-color="#a81b10"/></linearGradient>'+
+      '<radialGradient id="gCap" cx=".38" cy=".35" r=".8">'+
+      '<stop offset="0" stop-color="#ffb0a4"/><stop offset=".7" stop-color="#ee4a39"/><stop offset="1" stop-color="#c22617"/></radialGradient>';
+    host.innerHTML='<svg width="0" height="0"><defs>'+gradients+'</defs></svg>';
+    defs=host.querySelector('defs');
+  }
+  defs.insertAdjacentHTML('beforeend',PENDING.join(''));
+  PENDING.length=0;
 }
-function bundleHTML(level){
-  var inf=ensure(level),R=inf.R;
-  var x=-R-2,y=-H-R*K-2,w=2*R+4,h=H+2*R*K+4;
-  var sc=Math.min(1,CAPW[Math.min(level,CAPW.length-1)]/w);
-  return '<svg class="grp" aria-hidden="true" focusable="false" viewBox="'+f(x)+' '+f(y)+' '+f(w)+' '+f(h)+
-         '" width="'+f(w*sc)+'" height="'+f(h*sc)+'"><use href="#'+inf.id+'"/></svg>';
+
+function bundleHTML(level,N,cap){
+  var inf=ensure(level,N);
+  var sc=Math.min(1,(cap||CAPW[Math.min(level,CAPW.length-1)])/inf.w);
+  return '<svg class="grp" aria-hidden="true" focusable="false" viewBox="'+
+    f(inf.x)+' '+f(inf.y)+' '+f(inf.w)+' '+f(inf.h)+'" width="'+f(inf.w*sc)+
+    '" height="'+f(inf.h*sc)+'"><use href="#'+inf.id+'"/></svg>';
 }
 
 /* ===== разбор записи: возвращает {s, ds} или {err} ===== */
@@ -390,7 +507,7 @@ function aDraw(){
     if(d===0){
       b='<span class="empty">'+(L===1?'пусто':(i<first?'пусто<br>(незначащий ноль)':'пусто,<br>но место занято'))+'</span>';
     }else{
-      for(k=0;k<d;k++) b+=bundleHTML(pos);
+      for(k=0;k<d;k++) b+=bundleHTML(pos,N);
     }
     html+='<div class="place'+(d===0&&L>1?' zero':'')+'">'+
           '<div class="big">'+ch+'</div>'+
@@ -418,7 +535,7 @@ var uDs=[],uS='',uN=7,uK=0,uErr='';     // uK — сколько шагов «р
 function uAcc(k){var a=0;for(var i=0;i<=k;i++)a=a*uN+uDs[i];return a;}   // значение первых k+1 цифр
 function uItems(level,count,added){
   var shown=Math.min(count,level===0?150:36),s='',i;
-  for(i=0;i<shown;i++) s+=bundleHTML(level);
+  for(i=0;i<shown;i++) s+=bundleHTML(level,uN);
   if(shown===0) s='<span class="empty">0</span>';
   if(count>shown) s+='<span class="u-more">Ещё <b>'+(count-shown)+'</b> шт.</span>';
   var label=(added?'Добавлено':'Получено')+' '+(level===0?'палочек: ':'пучков: ')+count;

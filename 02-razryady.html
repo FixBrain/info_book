@@ -353,6 +353,127 @@ function bundleRadius(level,N){
   return radii[level];
 }
 
+const textbookBundleSprite = (() => {
+  const red = ['#ffb3a6', '#ec3d2d', '#a81b10'];
+  const bands = ['', '#1e8fe6', '#23b34b', '#f3c516', '#9b59e0', '#ff8a1e', '#12b5b0', '#e0508c', '#6b7a8f'];
+  const height = 34;
+  const tilt = .42;
+  const root3 = Math.sqrt(3);
+  const cache = new Map();
+
+  function pack(base, radius) {
+    const diameter = 2 * radius;
+    let best;
+    for (const [ox, oy] of [[0, 0], [.5, 0], [.5, root3 / 6]]) {
+      const lattice = [];
+      for (let row = -4; row <= 4; row += 1) {
+        for (let column = -4; column <= 4; column += 1) {
+          const x = diameter * (column + row / 2 - ox);
+          const y = diameter * (row * root3 / 2 - oy);
+          lattice.push({ x, y, distance: Math.hypot(x, y), angle: Math.atan2(y, x) });
+        }
+      }
+      const closest = lattice.sort((a, b) => a.distance - b.distance || a.angle - b.angle).slice(0, base);
+      const cx = closest.reduce((sum, p) => sum + p.x, 0) / base;
+      const cy = closest.reduce((sum, p) => sum + p.y, 0) / base;
+      const pieces = closest.map((p) => ({ x: p.x - cx, y: p.y - cy })).sort((a, b) => a.y - b.y);
+      const extent = Math.max(...pieces.map((p) => Math.hypot(p.x, p.y))) + radius;
+      if (!best || extent < best.radius) best = { radius: extent, pieces };
+    }
+    return best;
+  }
+
+  function rod(context, radius) {
+    const edge = radius * tilt;
+    const body = context.createLinearGradient(-radius, 0, radius, 0);
+    body.addColorStop(0, red[0]);
+    body.addColorStop(.4, red[1]);
+    body.addColorStop(1, red[2]);
+    context.lineWidth = .5;
+    context.strokeStyle = '#8d160c';
+    context.fillStyle = body;
+    context.beginPath();
+    context.moveTo(-radius, -height);
+    context.lineTo(-radius, 0);
+    context.ellipse(0, 0, radius, edge, 0, Math.PI, 0, true);
+    context.lineTo(radius, -height);
+    context.closePath();
+    context.fill();
+    context.stroke();
+
+    context.fillStyle = '#f26652';
+    context.beginPath();
+    context.ellipse(0, -height, radius, edge, 0, 0, 2 * Math.PI);
+    context.fill();
+    context.stroke();
+  }
+
+  function band(context, radius, level) {
+    const rx = radius - .2;
+    const bend = radius * tilt * 1.26;
+    const y = -height * .58;
+    const lower = y + height * .22;
+    context.beginPath();
+    context.moveTo(-rx, y);
+    context.bezierCurveTo(-rx * .62, y + bend, rx * .62, y + bend, rx, y);
+    context.lineTo(rx, lower);
+    context.bezierCurveTo(rx * .62, lower + bend, -rx * .62, lower + bend, -rx, lower);
+    context.closePath();
+    context.fillStyle = bands[Math.min(level, bands.length - 1)];
+    context.fill();
+    context.strokeStyle = 'rgba(35,30,26,.4)';
+    context.lineWidth = Math.max(.6, radius / 80);
+    context.stroke();
+
+    context.beginPath();
+    context.moveTo(-rx * .98, y + 1.5);
+    context.bezierCurveTo(-rx * .62, y + bend + 1.5, rx * .62, y + bend + 1.5, rx * .98, y + 1.5);
+    context.strokeStyle = 'rgba(255,255,255,.58)';
+    context.lineWidth = 1;
+    context.stroke();
+  }
+
+  function create(base, level) {
+    const key = level ? base + ':' + level : 'rod';
+    const stored = cache.get(key);
+    if (stored) return stored;
+
+    const child = level ? create(base, level - 1) : null;
+    const layout = child ? pack(base, child.radius + .5) : null;
+    const radius = layout ? layout.radius : 5;
+    const x = -radius - 2;
+    const y = -height - radius * tilt - 2;
+    const width = 2 * radius + 4;
+    const depth = height + 2 * radius * tilt + 4;
+    const scale = Math.min(4, 192 / Math.max(width, depth));
+
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.ceil(width * scale);
+    canvas.height = Math.ceil(depth * scale);
+    const context = canvas.getContext('2d');
+    context.setTransform(canvas.width / width, 0, 0, canvas.height / depth,
+      -x * canvas.width / width, -y * canvas.height / depth);
+    if (child) {
+      for (const piece of layout.pieces) {
+        context.drawImage(child.canvas, piece.x + child.x, piece.y * tilt + child.y, child.width, child.height);
+      }
+      band(context, radius, level);
+    } else {
+      rod(context, radius);
+    }
+
+    const sprite = { canvas, radius, x, y, width, height: depth, url: null };
+    cache.set(key, sprite);
+    return sprite;
+  }
+
+  return (base, level) => {
+    const sprite = create(base, level);
+    if (!sprite.url) sprite.url = sprite.canvas.toDataURL('image/png');
+    return sprite;
+  };
+})();
+
 /* Один условный значок для каждой группы и прежний рисунок одной палочки. */
 function ensure(level,N){
   var id=level===0?'b0':('b'+N+'_'+level);
@@ -364,17 +485,10 @@ function ensure(level,N){
       '<path d="M'+(-R0)+','+(-H)+' L'+(-R0)+',0 A'+R0+','+f(e)+' 0 0 0 '+R0+',0 L'+R0+','+(-H)+' Z" fill="url(#gStick)" stroke="#8d160c" stroke-width=".5"/>'+
       '<ellipse cx="0" cy="'+(-H)+'" rx="'+R0+'" ry="'+f(e)+'" fill="url(#gCap)" stroke="#8d160c" stroke-width=".5"/></g>';
   }else{
-    var rx=f(R*.93), ry=f(R*K*.76), top=f(-H*.88), bottom=f(H*.04);
-    var bandY=f(-H*.54), bandH=H*.22+R*K*.12, bandBottom=f(+bandY+bandH);
-    var color=BAND[Math.min(level,BAND.length-1)], line=f(Math.max(.75,R*.021));
-    var bandLight=f(+bandY+bandH*.18);
-    DEF[id]='<g id="'+id+'" stroke-linejoin="round">'+
-      '<path d="M-'+rx+','+top+' V'+bottom+' A'+rx+','+ry+' 0 0 0 '+rx+','+bottom+' V'+top+' Z" fill="url(#gStick)" stroke="#74251d" stroke-width="'+line+'"/>'+
-      '<ellipse cx="0" cy="'+top+'" rx="'+rx+'" ry="'+ry+'" fill="url(#gCap)" stroke="#74251d" stroke-width="'+line+'"/>'+
-      '<path d="M-'+rx+','+bandY+' A'+rx+','+ry+' 0 0 0 '+rx+','+bandY+' V'+bandBottom+
-      ' A'+rx+','+ry+' 0 0 1 -'+rx+','+bandBottom+' Z" fill="'+color+'" stroke="#453126" stroke-opacity=".58" stroke-width="'+line+'"/>'+
-      '<path d="M-'+rx+','+bandLight+' A'+rx+','+ry+' 0 0 0 '+rx+','+bandLight+'" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="'+f(Math.max(.55,R*.012))+'"/>'+
-      '</g>';
+    var sprite=textbookBundleSprite(N,level);
+    var x=f(-R-2), y=f(-H-R*K-2), w=f(2*R+4), h=f(H+2*R*K+4);
+    DEF[id]='<g id="'+id+'"><image href="'+sprite.url+'" x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+
+            '" preserveAspectRatio="xMidYMid meet"/></g>';
   }
   INFO[id]={id:id,R:R};
   dirty=true;
