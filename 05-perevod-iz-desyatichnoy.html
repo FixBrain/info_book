@@ -425,6 +425,12 @@ const textbookBundleSprite = (() => {
   const tilt = .42;
   const root3 = Math.sqrt(3);
   const cache = new Map();
+  const maxSpriteSize = 192;
+  const halfOutline = 32;
+  const directions = Array.from({ length: 2 * halfOutline }, (_, index) => {
+    const angle = index * Math.PI / halfOutline;
+    return { x: Math.cos(angle), y: Math.sin(angle) };
+  });
 
   function pack(base, radius) {
     const diameter = 2 * radius;
@@ -473,44 +479,66 @@ const textbookBundleSprite = (() => {
     context.stroke();
   }
 
-  function band(context, radius, level) {
-    const rx = radius - .2;
-    const bend = radius * tilt * 1.26;
-    const y = -height * .58;
-    const lower = y + height * .22;
-    context.beginPath();
-    context.moveTo(-rx, y);
-    context.bezierCurveTo(-rx * .62, y + bend, rx * .62, y + bend, rx, y);
-    context.lineTo(rx, lower);
-    context.bezierCurveTo(rx * .62, lower + bend, -rx * .62, lower + bend, -rx, lower);
-    context.closePath();
-    context.fillStyle = bands[Math.min(level, bands.length - 1)];
-    context.fill();
-    context.strokeStyle = 'rgba(35,30,26,.4)';
-    context.lineWidth = Math.max(.6, radius / 80);
-    context.stroke();
+  function makeOutline(layout, child, radius) {
+    return directions.map((direction, index) => {
+      if (!child) return { x: direction.x * radius, y: direction.y * radius };
+
+      const projection = (piece) => piece.x * direction.x + piece.y * direction.y;
+      const edge = layout.pieces.reduce((outermost, piece) =>
+        projection(piece) > projection(outermost) ? piece : outermost);
+      return { x: edge.x + child.outline[index].x, y: edge.y + child.outline[index].y };
+    });
+  }
+
+  function band(context, outline, level, visibleLevel, width, rear) {
+    const top = -height * [.58, .25, .115][visibleLevel - 1];
+    const minimum = height * [.22, .10, .065][visibleLevel - 1];
+    const maximum = height * [.22, .20, .095][visibleLevel - 1];
+    const thickness = Math.min(maximum, Math.max(minimum, width / 52));
+    const rim = rear ? outline.slice(halfOutline).concat(outline[0]) : outline.slice(0, halfOutline + 1);
+    const edge = (point, y) => context.lineTo(point.x, point.y * tilt + y);
 
     context.beginPath();
-    context.moveTo(-rx * .98, y + 1.5);
-    context.bezierCurveTo(-rx * .62, y + bend + 1.5, rx * .62, y + bend + 1.5, rx * .98, y + 1.5);
+    rim.forEach((point) => edge(point, top));
+    rim.slice().reverse().forEach((point) => edge(point, top + thickness));
+    context.closePath();
+    context.fillStyle = bands[1 + (level - 1) % (bands.length - 1)];
+    context.fill();
+    context.strokeStyle = 'rgba(35,30,26,.4)';
+    context.lineWidth = Math.min(.65, thickness / 4);
+    context.stroke();
+
+    if (rear) return;
+    context.beginPath();
+    rim.forEach((point) => edge(point, top + thickness * .24));
     context.strokeStyle = 'rgba(255,255,255,.58)';
-    context.lineWidth = 1;
+    context.lineWidth = Math.min(1, thickness / 5);
     context.stroke();
   }
 
-  function create(base, level) {
-    const key = level ? base + ':' + level : 'rod';
+  function create(base, level, simplified = false) {
+    const key = level ? `${base}:${level}${simplified ? ':small' : ''}` : 'rod';
     const stored = cache.get(key);
     if (stored) return stored;
 
-    const child = level ? create(base, level - 1) : null;
-    const layout = child ? pack(base, child.radius + .5) : null;
+    let child = level ? create(base, simplified ? 0 : level - 1) : null;
+    let layout = child ? pack(base, child.radius + .5) : null;
+    const compact = !simplified && level > 2 && (child.compact || 2 * layout.radius + 4 > maxSpriteSize);
+    if (compact) {
+      // Keep every group in the previous place visible when the inner detail becomes too small.
+      child = create(base, level - 1, true);
+      layout = pack(base, child.radius + .5);
+    }
     const radius = layout ? layout.radius : 5;
-    const x = -radius - 2;
-    const y = -height - radius * tilt - 2;
-    const width = 2 * radius + 4;
-    const depth = height + 2 * radius * tilt + 4;
-    const scale = Math.min(4, 192 / Math.max(width, depth));
+    const outline = makeOutline(layout, child, radius);
+    const visibleLevel = simplified ? 1 : compact ? 2 : level;
+    const padding = Math.max(2, 4 * radius / maxSpriteSize);
+    const x = -radius - padding;
+    const y = -height - radius * tilt - padding;
+    const width = 2 * (radius + padding);
+    const depth = height + 2 * (radius * tilt + padding);
+    const scale = Math.min(4, maxSpriteSize / Math.max(width, depth));
+    const displayScale = compact ? Math.max(1, maxSpriteSize / width) : 1;
 
     const canvas = document.createElement('canvas');
     canvas.width = Math.ceil(width * scale);
@@ -519,15 +547,16 @@ const textbookBundleSprite = (() => {
     context.setTransform(canvas.width / width, 0, 0, canvas.height / depth,
       -x * canvas.width / width, -y * canvas.height / depth);
     if (child) {
+      band(context, outline, level, visibleLevel, width, true);
       for (const piece of layout.pieces) {
         context.drawImage(child.canvas, piece.x + child.x, piece.y * tilt + child.y, child.width, child.height);
       }
-      band(context, radius, level);
+      band(context, outline, level, visibleLevel, width, false);
     } else {
       rod(context, radius);
     }
 
-    const sprite = { canvas, radius, x, y, width, height: depth, url: null };
+    const sprite = { canvas, outline, radius, x, y, width, height: depth, compact, displayScale, url: null };
     cache.set(key, sprite);
     return sprite;
   }
@@ -535,7 +564,8 @@ const textbookBundleSprite = (() => {
   return (base, level) => {
     const sprite = create(base, level);
     if (!sprite.url) sprite.url = sprite.canvas.toDataURL('image/png');
-    return sprite;
+    const { x, y, width, height, displayScale, url } = sprite;
+    return { url, x: x * displayScale, y: y * displayScale, width: width * displayScale, height: height * displayScale };
   };
 })();
 
