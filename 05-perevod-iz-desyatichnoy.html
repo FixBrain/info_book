@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>6. Перевод из десятичной системы</title>
+<style>
+:root{--accent:#2563eb;--bg:#f7f8fa;--card:#fff;--line:#e3e7ee;--ink:#1f2430;--muted:#5b6472}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+header.top{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+nav.menu{max-width:900px;margin:0 auto;display:flex;flex-wrap:wrap;gap:4px;padding:10px 16px}
+nav.menu a{text-decoration:none;color:var(--muted);padding:6px 10px;border-radius:8px;font-size:14px}
+nav.menu a:hover{background:#eef2ff;color:var(--accent)}
+nav.menu a[aria-current]{background:var(--accent);color:#fff}
+main{max-width:900px;margin:0 auto;padding:24px 16px 40px}
+h1{font-size:28px;margin:.2em 0 .4em}
+h2{font-size:21px;margin:1.6em 0 .5em;border-left:4px solid var(--accent);padding-left:10px}
+p{margin:.7em 0}
+.lead{font-size:18px;color:var(--muted)}
+b.term{color:var(--accent)}
+ul,ol{margin:.6em 0;padding-left:1.6em}
+li{margin:.3em 0}
+.example,.interactive,.selfcheck,.note{border-radius:12px;padding:16px 18px;margin:18px 0}
+.example{background:#f0f6ff;border:1px solid #d6e4ff}
+.interactive{background:#fffdf3;border:1px solid #f0e4b8}
+.selfcheck{background:#f3fbf4;border:1px solid #cdeccf}
+.note{background:#fff8ec;border:1px solid #f3e2bd}
+.tag{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 9px;border-radius:20px;margin-bottom:10px;color:#fff}
+.example .tag{background:#2563eb}
+.interactive .tag{background:#b7860b}
+.selfcheck .tag{background:#2e9e45}
+.controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0}
+input[type=number],input[type=text]{font-size:16px;padding:6px 10px;border:1px solid var(--line);border-radius:8px;width:130px}
+select{font-size:16px;padding:6px 10px;border:1px solid var(--line);border-radius:8px}
+button{font-size:15px;padding:8px 16px;border:0;border-radius:9px;background:var(--accent);color:#fff;cursor:pointer}
+button:hover{background:#1d4fd0}
+button:disabled{background:#c5cbd6;cursor:default}
+button.ghost{background:#eef2ff;color:var(--accent)}
+button.ghost:hover{background:#dfe7ff}
+button.ghost:disabled{background:#eef0f4;color:#a3aab8}
+.formula{text-align:center;font-size:17px;margin:12px 0;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;overflow-x:auto}
+.scroll{overflow-x:auto}
+table.t{border-collapse:collapse;margin:10px auto;background:#fff}
+table.t th,table.t td{border:1px solid var(--line);padding:6px 12px;text-align:center}
+table.t th{background:#f3f5f9;font-weight:600}
+table.t td.l{text-align:left}
+table.t tr.zero td{background:#fff8ec}
+table.t tr.new td{background:#eaf1ff}
+.pile{background:#fff;border:1px dashed #d9c58a;border-radius:14px;padding:12px;margin-top:12px;text-align:center}
+.pile b{color:var(--accent)}
+.pile .pitems{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;align-items:flex-end;margin:10px 0 6px}
+.pile .phint{font-size:14px;color:var(--muted)}
+.subcap{font-size:13px;color:var(--muted);text-align:center;margin-top:14px;text-transform:uppercase;letter-spacing:.04em}
+.places{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:stretch;margin-top:8px}
+.places .none{font-size:14px;color:var(--muted)}
+.place{display:flex;flex-direction:column;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 12px 12px;min-width:118px;max-width:100%}
+.place.zero{background:#fff8ec;border-color:#f0c36a}
+.place.moved{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.22)}
+.place .big{font-size:40px;font-weight:800;line-height:1.1}
+.place .cap1{font-weight:700;font-size:15px;margin-top:2px}
+.place .cap2{font-size:12px;color:var(--muted)}
+.place .bundles{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:flex-end;margin-top:10px;max-width:320px;min-height:44px}
+.place .empty{color:#b98a2a;font-size:13px;align-self:center}
+svg.grp{display:block;overflow:visible}
+.readout{font-size:16px;margin-top:14px;text-align:center}
+.readout b{color:var(--accent)}
+.pager{display:flex;justify-content:space-between;margin-top:36px;gap:10px}
+.pager a{text-decoration:none;color:var(--accent);background:#eef2ff;padding:10px 16px;border-radius:9px;font-size:15px}
+.task{border-top:1px dashed #b9dcbc;padding-top:10px;margin-top:14px}
+.task:first-of-type{border-top:0;margin-top:0;padding-top:0}
+.verdict{margin-top:8px;font-weight:600}
+.verdict.ok{color:#2e9e45}
+.verdict.no{color:#c0392b}
+.explain{margin-top:10px;background:#fff;border:1px dashed #bcd;border-radius:9px;padding:12px;display:none}
+table.ld{border-collapse:separate;border-spacing:0;margin:12px auto;font-family:Consolas,Menlo,monospace;font-size:19px;line-height:1.35}
+table.ld td{min-width:.75em;height:1.5em;padding:0 1px;text-align:center;border-left:2px solid transparent;border-bottom:2px solid transparent}
+table.ld td.u{border-bottom-color:var(--ink)}
+table.ld td.vl{border-left-color:var(--ink)}
+table.ld td.rm{background:#ffe08a;font-weight:700}
+table.ld td.lq{background:#cfe0ff;font-weight:700}
+table.ld td.mn{color:var(--muted)}
+.legend{font-size:14px;color:var(--muted);text-align:center}
+.legend i{font-style:normal;padding:0 6px;border-radius:4px;color:var(--ink)}
+.ladder-map{margin:14px auto;text-align:center;max-width:35rem}
+.ladder-map figcaption{font-weight:700;margin-bottom:6px}
+.ladder-map ol{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));list-style:none;gap:4px;padding:0;margin:0}
+.ladder-map li{min-width:0;display:grid;justify-items:center;align-content:start;gap:3px;margin:0;background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 2px}
+.ladder-map small{font-size:.8rem;line-height:1.25;color:var(--muted);overflow-wrap:anywhere}
+.ladder-map .map-source{font:700 1.1rem/1.3 Consolas,Menlo,monospace;padding:1px 7px;border-radius:4px;background:#ffe08a}
+.ladder-map .map-source.quotient{background:#cfe0ff}
+.ladder-map .map-arrow{font-weight:700;color:var(--accent);line-height:1}
+.ladder-map .map-digit{font-size:1.2rem;line-height:1.1;color:var(--ink)}
+.zero-in-quotient,.zero-in-answer{padding:0 .15em;border-radius:.22em;font-weight:700}
+.zero-in-quotient{background:#eee7fc;color:#472769}
+.zero-in-answer{background:#ffe08a;color:var(--ink)}
+@media(max-width:540px){header.top{position:static}}
+</style>
+</head>
+<body>
+
+<div id="defsHost" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true"></div>
+
+<header class="top">
+  <nav class="menu" aria-label="Главы учебника">
+    <a href="index.html">Оглавление</a>
+    <a href="01-chto-takoe-chislo.html">1. Что такое число</a>
+    <a href="02-razryady.html">2. Термины</a>
+    <a href="03-sravnenie.html">3. Сравнение чисел</a>
+    <a href="03-osnovaniya.html">4. Разные основания</a>
+    <a href="04-razvernutaya-zapis.html">5. Развёрнутая запись</a>
+    <a href="05-perevod-iz-desyatichnoy.html" aria-current="page">6. Из десятичной</a>
+    <a href="07-slozhenie-i-vychitanie.html">7. Сложение</a>
+    <a href="08-vychitanie.html">8. Вычитание</a>
+    <a href="08-svoystva-chisel.html">9. Свойства чисел</a>
+    <a href="09-alternativnye-alfavity.html">10. Альтернативные алфавиты</a>
+    <a href="10-numeratsiya-slov.html">11. Сравнение и нумерация слов</a>
+    <a href="11-itogi.html">12. Итоги</a>
+  </nav>
+</header>
+<main>
+  <h1>6. Перевод из десятичной системы</h1>
+  <p class="lead">У нас 143 палочки. Как записать это количество, если связывать их по семь? Найдём цифры новой записи двумя способами. Деление на основание начинает с младшей цифры, а подбор по весам — со старшей.</p>
+  <p>В <a href="04-razvernutaya-zapis.html">главе 5</a> мы получили 143, когда сложили вклады цифр записи 263<sub>7</sub>. Теперь решаем обратную задачу и проверим результат тем же сложением вкладов. Цифры в основании N имеют значения от 0 до N − 1. Значения буквенных цифр можно сверить с таблицей в <a href="03-osnovaniya.html">главе 4</a>.</p>
+
+  <h2>Способ 1. Последовательное деление на основание</h2>
+  <h3>Связываем палочки в пучки</h3>
+  <p>Разделить количество на N с остатком — значит связать предметы в пучки по N. <b>Частное</b> показывает, сколько получилось пучков. <b>Остаток</b> показывает, сколько предметов не вошло ни в один пучок. Они так и останутся в своём разряде, значит, остаток — готовая цифра.</p>
+  <p>Дальше то же самое делаем с пучками: связываем их по N в пучки побольше. Что не связалось — цифра следующего разряда. И так до тех пор, пока связывать станет нечего.</p>
+
+  <div class="example">
+    <span class="tag">Разобранный пример</span>
+    <p><b>Задача.</b> Записать 143<sub>10</sub> в системе с основанием 7.</p>
+    <div class="scroll"><table class="t">
+      <tr><th>Делим</th><th>Частное</th><th>Остаток</th><th>Что это значит</th></tr>
+      <tr><td>143 : 7</td><td>20</td><td>3</td><td class="l">Из 143 палочек вышло 20 пучков по 7, а 3 палочки остались отдельными. Цифра разряда № 0 — <b>3</b>.</td></tr>
+      <tr><td>20 : 7</td><td>2</td><td>6</td><td class="l">Из 20 пучков по 7 вышло 2 пучка по 49, а 6 пучков по 7 остались. Цифра разряда № 1 — <b>6</b>.</td></tr>
+      <tr><td>2 : 7</td><td>0</td><td>2</td><td class="l">Два пучка по 49 связать в пучок по 343 нельзя: их меньше семи. Оба остаются. Цифра разряда № 2 — <b>2</b>.</td></tr>
+    </table></div>
+    <p>Частное стало равно нулю: связывать больше нечего, деление закончено.</p>
+    <p>Первый остаток — цифра самого младшего разряда, последний — самого старшего. Запись числа начинается со старшего разряда, поэтому остатки читаем <b>от последнего к первому</b>: 2, 6, 3.</p>
+    <p><b>Результат.</b> 143<sub>10</sub> = 263<sub>7</sub>.</p>
+    <p><b>Проверка по весам.</b> 2 · 49 + 6 · 7 + 3 · 1 = 98 + 42 + 3 = 143.</p>
+  </div>
+
+  <div class="interactive">
+    <span class="tag">Интерактив · деление как связывание</span>
+    <p><b>Задание.</b> 1) Пройдите пример 143 при N = 7. Перед каждым нажатием назовите, сколько получится пучков и сколько останется, затем сверьтесь с таблицей под рисунком. 2) Кнопкой «Назад» вернитесь на шаг и убедитесь, что пучки развязались обратно. 3) Наберите 147 при N = 7 и объясните, откуда в записи берутся нули.</p>
+    <div class="controls">
+      <label>Палочек: <input type="number" id="gnum" min="1" max="500" value="143"></label>
+      <label>Размер пучка N: <select id="gbase"></select></label>
+    </div>
+    <div class="controls">
+      <button id="gnext" onclick="gStep()">Связать</button>
+      <button class="ghost" id="gprev" onclick="gBack()">Назад</button>
+      <button class="ghost" onclick="gReset()">Сначала</button>
+    </div>
+    <div class="scroll"><table class="t" id="glog"></table></div>
+    <div class="pile" id="gpile"></div>
+    <div class="subcap">Готовые разряды</div>
+    <div class="places" id="gplaces"></div>
+    <div class="readout" id="gout"></div>
+  </div>
+
+  <h3>Почему остатки становятся цифрами</h3>
+  <p>Связь с развёрнутой записью объясняет, почему деление работает для любого основания. В примере из главы 5 сумма вкладов разрядов имеет вид</p>
+  <div class="formula">143 = 2 · 7² + 6 · 7 + 3</div>
+  <p>Во всех слагаемых, кроме последнего, есть множитель 7. Вынесем его за скобки:</p>
+  <div class="formula">143 = (2 · 7 + 6) · 7 + 3</div>
+  <p>Это запись деления с остатком: 143 = 20 · 7 + 3, остаток 3 меньше 7. Частное 2 · 7 + 6 = 20 — это число пучков, а его запись 26<sub>7</sub> — прежняя запись без последней цифры. С частным поступаем так же: 20 = 2 · 7 + 6, остаток 6. Наконец, 2 = 0 · 7 + 2.</p>
+  <p>В общем виде. Пусть запись числа x в основании N состоит из цифр a<sub>k</sub> … a<sub>1</sub> a<sub>0</sub>. Тогда</p>
+  <div class="formula">x = a<sub>k</sub>·N<sup>k</sup> + … + a<sub>2</sub>·N² + a<sub>1</sub>·N + a<sub>0</sub> = (a<sub>k</sub>·N<sup>k−1</sup> + … + a<sub>2</sub>·N + a<sub>1</sub>) · N + a<sub>0</sub></div>
+  <p>Цифра a<sub>0</sub> меньше N, а всё остальное делится на N нацело. Остаток при делении определяется однозначно, поэтому:</p>
+  <ul>
+    <li>остаток от деления x на N — это a<sub>0</sub>, <b>младшая</b> цифра;</li>
+    <li>частное — число с записью a<sub>k</sub> … a<sub>1</sub>, то есть та же запись без последней цифры;</li>
+    <li>разделив частное на N ещё раз, получим в остатке a<sub>1</sub>, затем a<sub>2</sub> и так далее. Когда частное станет нулём, цифры закончились.</li>
+  </ul>
+  <p>Отсюда и правило чтения: первый остаток стоит в записи последним, последний остаток — первым. Коротко то же самое записывают так (⌊ ⌋ — целая часть, mod — остаток от деления):</p>
+  <div class="formula">a<sub>i</sub> = ⌊ x / N<sup>i</sup> ⌋ mod N</div>
+  <p>Число 0 в любом основании записывается одной цифрой 0. При делении нуля первый же остаток равен 0 и частное тоже равно 0.</p>
+
+  <div class="example">
+    <span class="tag">Разобранный пример</span>
+    <p><b>Задача.</b> Записать 3867<sub>10</sub> в системе с основанием 16.</p>
+    <div class="scroll"><table class="t">
+      <tr><th>Делим</th><th>Частное</th><th>Остаток</th><th>Цифра</th></tr>
+      <tr><td>3867 : 16</td><td>241</td><td>11</td><td>B</td></tr>
+      <tr><td>241 : 16</td><td>15</td><td>1</td><td>1</td></tr>
+      <tr><td>15 : 16</td><td>0</td><td>15</td><td>F</td></tr>
+    </table></div>
+    <p>Каждый остаток — это <b>ровно одна цифра</b>. Остаток 11 записывается цифрой B, остаток 15 — цифрой F. Читаем снизу вверх: F, 1, B.</p>
+    <p><b>Результат.</b> 3867<sub>10</sub> = F1B<sub>16</sub>.</p>
+    <p><b>Проверка.</b> 15 · 256 + 1 · 16 + 11 · 1 = 3840 + 16 + 11 = 3867.</p>
+    <p><b>Как нельзя.</b> Писать остатки десятичными числами подряд: «15111». В такой записи пять цифр вместо трёх, и это совсем другое число.</p>
+  </div>
+
+  <div class="interactive">
+    <span class="tag">Интерактив · деление в таблице</span>
+    <p>Проследите тот же алгоритм в таблице. Здесь можно попробовать большие числа и основания с буквенными цифрами.</p>
+    <p><b>Задание.</b> 1) Пройдите по шагам перевод 3867 в основание 16. Перед каждым шагом посчитайте частное и остаток сами. 2) Смените основание на 20 и найдите остаток, который записывается буквой. 3) Смените основание на 2 и объясните, почему шагов стало больше.</p>
+    <div class="controls">
+      <label>Число: <input type="number" id="dnum" min="0" max="999999" value="3867"></label>
+      <label>Основание N: <select id="dbase"></select></label>
+    </div>
+    <div class="controls">
+      <button id="dnext" onclick="D.step()">Шаг</button>
+      <button class="ghost" id="dprev" onclick="D.back()">Назад</button>
+      <button class="ghost" id="dall" onclick="D.all()">Все шаги</button>
+      <button class="ghost" onclick="D.reset()">Сначала</button>
+    </div>
+    <div class="scroll"><table class="t" id="dtab"></table></div>
+    <div class="readout" id="dout"></div>
+  </div>
+  <h3>Запись на бумаге</h3>
+  <p>В тетради каждое деление выполняют столбиком. Сначала вспомним сам алгоритм на одном делении: 3867 : 16. Все вычисления внутри столбика идут в десятичной системе, ведь делим мы десятичное число.</p>
+  <div class="scroll"><table class="ld" id="lex0"></table></div>
+  <ol>
+    <li>Слева отделяем столько цифр делимого, чтобы получилось число не меньше делителя: 38.</li>
+    <li>Подбираем, сколько раз 16 помещается в 38: 2 раза. Пишем 2 в частное. Под 38 пишем 2 · 16 = 32 и вычитаем: 38 − 32 = 6.</li>
+    <li>Сносим следующую цифру, 6: получается 66. В 66 число 16 помещается 4 раза: 4 · 16 = 64, 66 − 64 = 2. В частное пишем 4.</li>
+    <li>Сносим 7: получается 27. В 27 число 16 помещается 1 раз: 27 − 16 = 11. В частное пишем 1.</li>
+    <li>Цифры закончились. Частное 241, остаток 11. Остаток всегда меньше делителя.</li>
+  </ol>
+  <div class="note"><p>Если после сноса цифры получилось число меньше делителя, в частное пишут 0 и сносят следующую цифру. Так в делении 143 : 7 после 14 − 14 = 0 сносят 3, в частное идёт 0, а 3 остаётся остатком.</p></div>
+
+  <p>Для перевода нужно несколько делений подряд: каждое новое делимое — это только что найденное частное. Поэтому столбики пристраивают друг к другу «лесенкой»:</p>
+  <ul>
+    <li>справа от делимого за чертой пишут основание, под чертой — частное;</li>
+    <li>остаток получается внизу столбика, его обводят;</li>
+    <li>частное делят так же, новый столбик пристраивают справа;</li>
+    <li>останавливаются, когда частное стало меньше основания. Такое частное само является старшей цифрой, его тоже обводят;</li>
+    <li>ответ читают от последнего частного по остаткам справа налево.</li>
+  </ul>
+
+  <div class="example">
+    <span class="tag">Разобранный пример</span>
+    <p><b>Задача.</b> Перевести лесенкой 143<sub>10</sub> в основание 7 и 3867<sub>10</sub> в основание 16.</p>
+    <div class="scroll"><table class="ld" id="lex1"></table></div>
+    <p>Последнее частное 2, остатки справа налево: 6, 3. <b>143<sub>10</sub> = 263<sub>7</sub>.</b></p>
+    <div class="scroll"><table class="ld" id="lex2"></table></div>
+    <p>Последнее частное 15 — это цифра F. Остатки справа налево: 1 и 11, то есть цифры 1 и B. <b>3867<sub>10</sub> = F1B<sub>16</sub>.</b></p>
+    <div class="legend"><i style="background:#ffe08a">остатки</i> <i style="background:#cfe0ff">последнее частное</i></div>
+    <p><b>Почему здесь на одно деление меньше, чем в таблице.</b> В таблице мы делили до нулевого частного: последняя строка была 2 : 7 = 0, остаток 2. Если делимое меньше основания, частное всегда 0, а остаток равен самому делимому. На бумаге эту строку не пишут и сразу берут последнее частное как цифру. Ответ получается тот же.</p>
+  </div>
+    <div class="example">
+    <span class="tag">Разобранный пример · ноль в середине</span>
+    <p><b>Задача.</b> Перевести 1409<sub>10</sub> в систему с основанием 7.</p>
+    <p><b>Первое деление столбиком:</b> 1409 : 7.</p>
+    <div class="scroll"><table class="ld" id="lex3"></table></div>
+    <ol>
+      <li>Цифра 1 меньше 7, поэтому отделяем две цифры: 14. В 14 семёрка помещается 2 раза: 2 · 7 = 14, 14 − 14 = 0. В частное пишем 2.</li>
+      <li>Сносим следующую цифру, 0. Рядом с остатком 0 встал снесённый 0, получилось число 0. Делим его на основание: 0 : 7 = 0. Семёрка не помещается ни разу, но разряд частного пропускать нельзя: в частное пишем <b>0</b>. Вычитать нечего.</li>
+      <li>Сносим 9. Получилось 9. В 9 семёрка помещается 1 раз: 9 − 7 = 2. В частное пишем 1.</li>
+      <li>Цифры закончились. Частное 201, остаток 2.</li>
+    </ol>
+    <p>Строка «009» на рисунке читается слева направо: 0 — остаток от 14 − 14, второй 0 — снесённая цифра, 9 — следующая снесённая цифра.</p>
+    <p><b>Как нельзя.</b> Пропустить ноль и записать частное 21. Проверка умножением сразу показывает ошибку: 21 · 7 + 2 = 149, а должно быть 201 · 7 + 2 = 1409.</p>
+    <p><b>Вся лесенка.</b> При делении 201 на 7 получаем частное 28 и остаток 5. При делении 28 на 7 получаем частное 4 и остаток 0. Частное 4 меньше 7. На бумажной лесенке останавливаемся на нём, оно станет старшей цифрой.</p>
+    <div class="scroll"><table class="ld" id="lex4"></table></div>
+    <div class="legend"><i style="background:#ffe08a">остатки</i> <i style="background:#cfe0ff">последнее частное</i></div>
+    <figure class="ladder-map">
+      <figcaption>Переносим цифры из лесенки в ответ</figcaption>
+      <ol>
+        <li><small>28 : 7</small><small>Частное</small><b class="map-source quotient">4</b><span class="map-arrow" aria-hidden="true">↓</span><small>Разряд 3</small><b class="map-digit">4</b></li>
+        <li><small>28 : 7</small><small>Остаток</small><b class="map-source">0</b><span class="map-arrow" aria-hidden="true">↓</span><small>Разряд 2</small><b class="map-digit">0</b></li>
+        <li><small>201 : 7</small><small>Остаток</small><b class="map-source">5</b><span class="map-arrow" aria-hidden="true">↓</span><small>Разряд 1</small><b class="map-digit">5</b></li>
+        <li><small>1409 : 7</small><small>Остаток</small><b class="map-source">2</b><span class="map-arrow" aria-hidden="true">↓</span><small>Разряд 0</small><b class="map-digit">2</b></li>
+      </ol>
+    </figure>
+    <p>Читаем от последнего частного по остаткам справа налево. Цифры ответа сразу встают от старшей к младшей.</p>
+    <p><b>Результат.</b> 1409<sub>10</sub> = 4052<sub>7</sub>.</p>
+    <p><b>Откуда ноль в середине ответа.</b> Число 28 разделилось на 7 без остатка: 28 пучков по 49 связались в 4 пучка по 343, и ни одного пучка по 49 не осталось. Остаток 0 — такая же цифра, как любая другая: она занимает разряд № 2 и удерживает четвёрку в разряде № 3. Без неё получилась бы запись 452<sub>7</sub>, а это 4 · 49 + 5 · 7 + 2 = 233.</p>
+    <p><b>Проверка.</b> 4 · 343 + 0 · 49 + 5 · 7 + 2 · 1 = 1372 + 0 + 35 + 2 = 1409.</p>
+    <div class="note">
+      <h4>Роль каждого нуля</h4>
+      <p><b>Частное 2<span class="zero-in-quotient">0</span>1<sub>10</sub>.</b> При делении 1409 на 7 внутри десятичного столбика делим 0 на 7. Получаем 0 в разряде десятков частного. Число 201 делим на 7 на следующей ступени.</p>
+      <p><b>Ответ 4<span class="zero-in-answer">0</span>52<sub>7</sub>.</b> Остаток от деления 28 на 7 равен 0. Он занимает разряд с весом 7² = 49 в семеричной записи.</p>
+    </div>
+    <p>Этот пример можно пройти по шагам в интерактиве ниже: число 1409, основание 7.</p>
+  </div>
+  <div class="interactive">
+
+    <span class="tag">Интерактив · лесенка</span>
+    <p><b>Задание.</b> 1) Пройдите перевод 1000 в основание 12. Перед каждым шагом выполните деление столбиком в тетради и сравните с экраном. 2) Наберите 147 при N = 7 и найдите в лесенке остатки, равные нулю. 3) Наберите 1100 при N = 2 и посчитайте, сколько столбиков в лесенке.</p>
+    <div class="controls">
+      <label>Число: <input type="number" id="lnum" min="0" max="9999" value="1000"></label>
+      <label>Основание N: <select id="lbase"></select></label>
+    </div>
+    <div class="controls">
+      <button id="lnext" onclick="LD.step()">Шаг</button>
+      <button class="ghost" id="lprev" onclick="LD.back()">Назад</button>
+      <button class="ghost" id="lall" onclick="LD.all()">Все шаги</button>
+      <button class="ghost" onclick="LD.reset()">Сначала</button>
+    </div>
+    <div class="scroll"><table class="ld" id="ltab"></table></div>
+    <div class="readout" id="lout"></div>
+  </div>
+  <h2>Способ 2. Подбор по весам</h2>
+  <p>Можно идти с другой стороны: не связывать палочки снизу вверх, а сразу набирать число из самых больших пучков.</p>
+  <ol>
+    <li>Выписываем веса разрядов 1, N, N², … пока очередной вес не станет больше числа.</li>
+    <li>Берём самый большой вес, который помещается в число. Сколько раз он помещается — это старшая цифра.</li>
+    <li>Вычитаем взятое и переходим к следующему, меньшему весу.</li>
+    <li>Если вес не помещается ни разу, цифра этого разряда — 0. Пропускать её нельзя.</li>
+  </ol>
+
+  <div class="example">
+    <span class="tag">Разобранный пример</span>
+    <p><b>Задача.</b> Записать 143<sub>10</sub> в основании 7 подбором по весам.</p>
+    <p>Веса: 1, 7, 49. Следующий вес 343 больше 143, он не нужен.</p>
+    <div class="scroll"><table class="t">
+      <tr><th>Вес</th><th>Было</th><th>Помещается раз (цифра)</th><th>Вычитаем</th><th>Осталось</th></tr>
+      <tr><td>49</td><td>143</td><td><b>2</b></td><td>2 · 49 = 98</td><td>45</td></tr>
+      <tr><td>7</td><td>45</td><td><b>6</b></td><td>6 · 7 = 42</td><td>3</td></tr>
+      <tr><td>1</td><td>3</td><td><b>3</b></td><td>3 · 1 = 3</td><td>0</td></tr>
+    </table></div>
+    <p><b>Результат.</b> Цифры читаем сверху вниз: 143<sub>10</sub> = 263<sub>7</sub>. Ответ тот же, что при делении.</p>
+    <p><b>Ещё пример, с нулями.</b> 1100<sub>10</sub> в основании 2. Ближайшая степень двойки 1024: 1100 = 1024 + 76, 76 = 64 + 12, 12 = 8 + 4. Ставим 1 под взятыми весами и 0 под остальными:</p>
+    <div class="scroll"><table class="t">
+      <tr><th>Вес</th><td>1024</td><td>512</td><td>256</td><td>128</td><td>64</td><td>32</td><td>16</td><td>8</td><td>4</td><td>2</td><td>1</td></tr>
+      <tr><th>Цифра</th><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td></tr>
+    </table></div>
+    <p>1100<sub>10</sub> = 10001001100<sub>2</sub>.</p>
+  </div>
+
+  <p><b>Почему ответ совпадает с делением.</b> Оба способа ищут одно и то же разложение x = a<sub>k</sub>·N<sup>k</sup> + … + a<sub>1</sub>·N + a<sub>0</sub>, только с разных концов: деление находит цифры от младшей к старшей, подбор — от старшей к младшей. После каждого шага подбора остаётся меньше, чем текущий вес, поэтому остаток всегда можно набрать младшими разрядами, а каждая цифра получается меньше N.</p>
+  <div class="note"><p>Подбор удобен для небольших чисел, для основания 2 и для чисел рядом со степенью основания. Деление работает одинаково для любых чисел и оснований. Хорошая привычка — перевести одним способом и проверить другим.</p></div>
+
+  <div class="interactive">
+    <span class="tag">Интерактив · подбор по весам</span>
+    <p><b>Задание.</b> 1) Пройдите 1100 при N = 2 и назовите веса, которые не поместились. 2) Наберите 143 при N = 7 и сравните ответ с результатом деления. 3) Наберите 344 при N = 7 и объясните, почему в записи два нуля подряд.</p>
+    <div class="controls">
+      <label>Число: <input type="number" id="wnum" min="0" max="999999" value="1100"></label>
+      <label>Основание N: <select id="wbase"></select></label>
+    </div>
+    <div class="controls">
+      <button id="wnext" onclick="W.step()">Шаг</button>
+      <button class="ghost" id="wprev" onclick="W.back()">Назад</button>
+      <button class="ghost" id="wall" onclick="W.all()">Все шаги</button>
+      <button class="ghost" onclick="W.reset()">Сначала</button>
+    </div>
+    <div class="scroll"><table class="t" id="wtab"></table></div>
+    <div class="readout" id="wout"></div>
+  </div>
+
+  <h2>Обобщение</h2>
+  <ul>
+    <li>Перевести число — значит найти цифры a<sub>i</sub> в разложении x = a<sub>k</sub>·N<sup>k</sup> + … + a<sub>1</sub>·N + a<sub>0</sub>.</li>
+    <li>Деление на N — это связывание в пучки: частное — число пучков, остаток — цифра текущего разряда.</li>
+    <li>Первый остаток — младшая цифра, потому что всё остальное в разложении делится на N. Остатки читают от последнего к первому.</li>
+    <li>Каждый остаток — одна цифра; значения 10–19 записывают буквами A–J. Остаток 0 — тоже цифра.</li>
+    <li>Подбор по весам даёт те же цифры в обратном порядке, от старшей к младшей.</li>
+    <li>Результат проверяют обратным вычислением: сумма «цифра · вес» должна дать исходное число.</li>
+  </ul>
+
+  <div class="selfcheck">
+    <span class="tag">Самопроверка</span>
+
+    <div class="task">
+      <p><b>Задача 1.</b> Число 77<sub>10</sub> запишите в системе с основанием 5. В ответе укажите только цифры.</p>
+      <div class="controls">
+        <input type="text" id="q1">
+        <button onclick="c1()">Проверить</button>
+        <button class="ghost" onclick="toggleEx('ex1')">Показать разбор</button>
+      </div>
+      <div class="verdict" id="v1"></div>
+      <div class="explain" id="ex1">
+        <p>77 : 5 = 15, остаток <b>2</b> — цифра разряда № 0.</p>
+        <p>15 : 5 = 3, остаток <b>0</b> — цифра разряда № 1.</p>
+        <p>3 : 5 = 0, остаток <b>3</b> — цифра разряда № 2. Частное равно нулю, деление закончено.</p>
+        <p>Читаем остатки от последнего к первому: <b>302</b><sub>5</sub>.</p>
+        <p>Проверка: 3 · 25 + 0 · 5 + 2 · 1 = 75 + 0 + 2 = 77.</p>
+      </div>
+    </div>
+
+    <div class="task">
+      <p><b>Задача 2.</b> Число 500<sub>10</sub> запишите в системе с основанием 16. Буквы можно вводить в любом регистре.</p>
+      <div class="controls">
+        <input type="text" id="q2">
+        <button onclick="c2()">Проверить</button>
+        <button class="ghost" onclick="toggleEx('ex2')">Показать разбор</button>
+      </div>
+      <div class="verdict" id="v2"></div>
+      <div class="explain" id="ex2">
+        <p>500 : 16 = 31, остаток <b>4</b> — цифра 4.</p>
+        <p>31 : 16 = 1, остаток <b>15</b> — это одна цифра, F.</p>
+        <p>1 : 16 = 0, остаток <b>1</b> — цифра 1.</p>
+        <p>Читаем снизу вверх: <b>1F4</b><sub>16</sub>.</p>
+        <p>Проверка: 1 · 256 + 15 · 16 + 4 · 1 = 256 + 240 + 4 = 500.</p>
+      </div>
+    </div>
+
+    <div class="task">
+      <p><b>Задача 3.</b> Число 200<sub>10</sub> запишите в системе с основанием 2. Решите подбором по весам.</p>
+      <div class="controls">
+        <input type="text" id="q3">
+        <button onclick="c3()">Проверить</button>
+        <button class="ghost" onclick="toggleEx('ex3')">Показать разбор</button>
+      </div>
+      <div class="verdict" id="v3"></div>
+      <div class="explain" id="ex3">
+        <p>Веса: 128, 64, 32, 16, 8, 4, 2, 1. Следующий вес 256 больше 200.</p>
+        <p>200 − 128 = 72, цифра 1. 72 − 64 = 8, цифра 1. Веса 32 и 16 в восьмёрку не помещаются, цифры 0 и 0. 8 − 8 = 0, цифра 1. Веса 4, 2 и 1 не нужны, цифры 0, 0, 0.</p>
+        <p>Цифры сверху вниз: <b>11001000</b><sub>2</sub>.</p>
+        <p>Проверка: 128 + 64 + 8 = 200. Нули в конце отбрасывать нельзя: они удерживают единицы в старших разрядах.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="pager">
+    <a href="04-razvernutaya-zapis.html">← Назад: развёрнутая запись</a>
+    <a href="07-slozhenie-i-vychitanie.html">Дальше: сложение →</a>
+  </div>
+</main>
+
+<script>
+function $(id){return document.getElementById(id);}
+var DIG='0123456789ABCDEFGHIJ';
+
+/* ===== значки палочек и пучков ===== */
+var K=0.42,R0=5,H=34;
+var BAND=['','#1e8fe6','#23b34b','#f3c516','#9b59e0','#ff8a1e','#12b5b0','#e0508c','#6b7a8f'];
+var CAPW=[14,100,100,150,160];
+var DEF={},INFO={},dirty=false;
+function f(x){return (Math.round(x*100)/100).toString();}
+
+function ensure(level){
+  var id='b'+level;
+  if(INFO[id]) return INFO[id];
+
+  var R=level===0?R0:10+Math.min(level,8)*3;
+  var e=f(R*K);
+  var s='<path d="M'+(-R)+','+(-H)+' L'+(-R)+',0 A'+R+','+e+' 0 0 0 '+R+',0 L'+R+','+(-H)+' Z" fill="url(#gStick)" stroke="#8d160c" stroke-width=".5"/>'+
+        '<ellipse cx="0" cy="'+(-H)+'" rx="'+R+'" ry="'+e+'" fill="url(#gCap)" stroke="#8d160c" stroke-width=".5"/>';
+  if(level>0){
+    var half=R+.5, y=-21, h=8;
+    var color=BAND[Math.min(level,BAND.length-1)];
+    // Пучок — один силуэт с перевязкой. Его вес подписан рядом с моделью.
+    s+='<path d="M'+(-half)+','+y+' A'+half+','+e+' 0 0 0 '+half+','+y+
+       ' L'+half+','+(y+h)+' A'+half+','+e+' 0 0 1 '+(-half)+','+(y+h)+
+       ' Z" fill="'+color+'" stroke="#213547" stroke-opacity=".45" stroke-width=".6"/>';
+    s+='<path d="M'+(-half)+','+(y+1.5)+' A'+half+','+e+' 0 0 0 '+half+','+(y+1.5)+
+       '" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="1"/>';
+  }
+  DEF[id]='<g id="'+id+'">'+s+'</g>';
+  INFO[id]={id:id,R:R};
+  dirty=true;
+  return INFO[id];
+}
+function flushDefs(){
+  if(!dirty) return;
+  var g='<linearGradient id="gStick" x1="0" y1="0" x2="1" y2="0">'+
+        '<stop offset="0" stop-color="#ffb3a6"/><stop offset=".4" stop-color="#ec3d2d"/><stop offset="1" stop-color="#a81b10"/></linearGradient>'+
+        '<radialGradient id="gCap" cx=".38" cy=".35" r=".8">'+
+        '<stop offset="0" stop-color="#ffb0a4"/><stop offset=".7" stop-color="#ee4a39"/><stop offset="1" stop-color="#c22617"/></radialGradient>';
+  var all='';
+  for(var k in DEF) all+=DEF[k];
+  $('defsHost').innerHTML='<svg width="0" height="0"><defs>'+g+all+'</defs></svg>';
+  dirty=false;
+}
+/* cap — наибольшая ширина пучка на экране */
+function bundleHTML(level,cap){
+  var inf=ensure(level),R=inf.R;
+  var x=-R-2,y=-H-R*K-2,w=2*R+4,h=H+2*R*K+4;
+  var sc=Math.min(1,(cap||CAPW[Math.min(level,CAPW.length-1)])/w);
+  return '<svg class="grp" aria-hidden="true" viewBox="'+f(x)+' '+f(y)+' '+f(w)+' '+f(h)+'" width="'+f(w*sc)+'" height="'+f(h*sc)+'">'+
+         '<use href="#'+inf.id+'"/></svg>';
+}
+
+/* ===== интерактив 1: деление как связывание ===== */
+var gX=143,gN=7,gH=[];          // gH — выполненные деления: {a: делимое, q: частное, r: остаток}
+(function(){var o='';for(var n=2;n<=10;n++)o+='<option value="'+n+'"'+(n===7?' selected':'')+'>'+n+'</option>';$('gbase').innerHTML=o;})();
+
+function gCount(){return gH.length?gH[gH.length-1].q:gX;}
+function gRead(){
+  var x=Math.floor(+$('gnum').value)||1;
+  x=Math.max(1,Math.min(500,x));
+  $('gnum').value=x; gX=x; gN=+$('gbase').value; gH=[]; gDraw();
+}
+function gStep(){var c=gCount(); if(c===0) return; gH.push({a:c,q:Math.floor(c/gN),r:c%gN}); gDraw();}
+function gBack(){if(gH.length){gH.pop(); gDraw();}}
+function gReset(){gH=[]; gDraw();}
+
+function gDraw(){
+  var c=gCount(),L=gH.length,w=Math.pow(gN,L),done=(c===0),i,k,html;
+
+  /* куча того, что ещё не разложено */
+  if(done){
+    html='<div>Куча пуста: связывать больше нечего. Все палочки разложены по разрядам.</div>';
+  }else{
+    var cap=Math.max(L===0?8:20,Math.min(CAPW[Math.min(L,CAPW.length-1)],3000/c)),items='';
+    for(i=0;i<c;i++) items+=bundleHTML(L,cap);
+    var what=(L===0)?'отдельные палочки':('пучки по '+w);
+    var hint=(c<gN)
+      ?('Их меньше '+gN+', связать в пучок по '+(w*gN)+' не получится. Все останутся в разряде № '+L+'.')
+      :('Следующий шаг: '+c+' : '+gN+'. Свяжем по '+gN+' штук в пучки по '+(w*gN)+'.');
+    html='<div>В куче '+what+': <b>'+c+'</b> шт.</div><div class="pitems">'+items+'</div><div class="phint">'+hint+'</div>';
+  }
+
+  /* готовые разряды, старший слева */
+  var ph='';
+  for(i=L-1;i>=0;i--){
+    var d=gH[i].r,b='';
+    for(k=0;k<d;k++) b+=bundleHTML(i);
+    if(d===0) b='<span class="empty">пусто</span>';
+    ph+='<div class="place'+(d===0?' zero':'')+(i===L-1?' moved':'')+'">'+
+        '<div class="big">'+d+'</div><div class="cap1">разряд № '+i+'</div>'+
+        '<div class="cap2">'+(i===0?'отдельные палочки':'пучки по '+Math.pow(gN,i))+'</div>'+
+        '<div class="bundles">'+b+'</div></div>';
+  }
+  if(!ph) ph='<span class="none">Пока пусто. Первая цифра появится после первого связывания.</span>';
+
+  flushDefs();
+  $('gpile').innerHTML=html;
+  $('gplaces').innerHTML=ph;
+
+  /* таблица делений */
+  var t='<tr><th>Делим</th><th>Частное (пучков)</th><th>Остаток (цифра)</th><th>Разряд</th></tr>';
+  for(i=0;i<L;i++)
+    t+='<tr'+(i===L-1?' class="new"':'')+'><td>'+gH[i].a+' : '+gN+'</td><td>'+gH[i].q+'</td><td><b>'+gH[i].r+'</b></td><td>№ '+i+'</td></tr>';
+  $('glog').innerHTML=t;
+
+  /* итог */
+  var rec='',parts=[],out;
+  for(i=L-1;i>=0;i--){rec+=gH[i].r; parts.push(gH[i].r+' · '+Math.pow(gN,i));}
+  if(done) out='<b>'+gX+'</b><sub>10</sub> = <b>'+rec+'</b><sub>'+gN+'</sub>. Остатки прочитаны от последнего к первому.<br>Проверка: '+parts.join(' + ')+' = '+gX+'.';
+  else if(L) out='Младшие цифры уже известны: …<b>'+rec+'</b>. Старшие пока лежат в куче.';
+  else out='Нажмите «Связать по '+gN+'».';
+  $('gout').innerHTML=out;
+
+  $('gnext').textContent='Связать по '+gN;
+  $('gnext').disabled=done;
+  $('gprev').disabled=(L===0);
+}
+$('gnum').onchange=gRead;
+$('gbase').onchange=gRead;
+gRead();
+
+/* ===== общий пошаговый показ таблицы (интерактивы 2 и 3) ===== */
+function makeStepper(p,maxX,defBase,make,view){
+  var num=$(p+'num'),base=$(p+'base'),S={x:0,n:defBase,rows:[],k:0},o='',n;
+  for(n=2;n<=20;n++) o+='<option value="'+n+'"'+(n===defBase?' selected':'')+'>'+n+'</option>';
+  base.innerHTML=o;
+  function draw(){
+    var v=view(S),end=(S.k>=S.rows.length);
+    $(p+'tab').innerHTML=v.table;
+    $(p+'out').innerHTML=v.out;
+    $(p+'next').disabled=end;
+    $(p+'all').disabled=end;
+    $(p+'prev').disabled=(S.k===0);
+  }
+  function read(){
+    var x=Math.floor(+num.value)||0;
+    x=Math.max(0,Math.min(maxX,x));
+    num.value=x; S.x=x; S.n=+base.value; S.rows=make(x,S.n); S.k=0; draw();
+  }
+  num.onchange=read; base.onchange=read; read();
+  return {
+    step:function(){if(S.k<S.rows.length){S.k++;draw();}},
+    back:function(){if(S.k>0){S.k--;draw();}},
+    all:function(){S.k=S.rows.length;draw();},
+    reset:function(){S.k=0;draw();}
+  };
+}
+
+/* ===== интерактив 2: таблица деления ===== */
+var D=makeStepper('d',999999,16,
+  function(x,n){
+    var rows=[],c=x;
+    do{rows.push({a:c,q:Math.floor(c/n),r:c%n}); c=Math.floor(c/n);}while(c>0);
+    return rows;
+  },
+  function(S){
+    var t='<tr><th>Делим</th><th>Частное</th><th>Остаток</th><th>Цифра</th><th>Разряд</th></tr>',i,r,rec='',parts=[],out;
+    for(i=0;i<S.k;i++){
+      r=S.rows[i];
+      t+='<tr'+(i===S.k-1?' class="new"':'')+'><td>'+r.a+' : '+S.n+'</td><td>'+r.q+'</td><td>'+r.r+
+         '</td><td><b>'+DIG.charAt(r.r)+'</b></td><td>№ '+i+'</td></tr>';
+    }
+    for(i=S.k-1;i>=0;i--){rec+=DIG.charAt(S.rows[i].r); parts.push(S.rows[i].r+' · '+Math.pow(S.n,i));}
+    if(S.k===S.rows.length)
+      out='<b>'+S.x+'</b><sub>10</sub> = <b>'+rec+'</b><sub>'+S.n+'</sub>. Остатки прочитаны снизу вверх.<br>Проверка: '+parts.join(' + ')+' = '+S.x+'.';
+    else if(S.k>0)
+      out='Младшие цифры уже известны: …<b>'+rec+'</b>. Следующее деление: '+S.rows[S.k].a+' : '+S.n+'.';
+    else
+      out='Нажмите «Шаг». Первое деление: '+S.x+' : '+S.n+'.';
+    return {table:t,out:out};
+  });
+
+/* ===== интерактив 3: подбор по весам ===== */
+var W=makeStepper('w',999999,2,
+  function(x,n){
+    var w=1,rows=[],c=x,d;
+    while(w*n<=x) w*=n;
+    for(;w>=1;w=w/n){d=Math.floor(c/w); rows.push({w:w,a:c,d:d,left:c-d*w}); c-=d*w;}
+    return rows;
+  },
+  function(S){
+    var t='<tr><th>Вес</th><th>Было</th><th>Помещается раз</th><th>Цифра</th><th>Вычитаем</th><th>Осталось</th></tr>',
+        i,r,rec='',zeros=false,ws=[],out;
+    for(i=0;i<S.k;i++){
+      r=S.rows[i];
+      if(r.d===0) zeros=true;
+      rec+=DIG.charAt(r.d);
+      t+='<tr class="'+(r.d===0?'zero':(i===S.k-1?'new':''))+'"><td>'+r.w+'</td><td>'+r.a+'</td><td>'+r.d+
+         '</td><td><b>'+DIG.charAt(r.d)+'</b></td><td>'+r.d+' · '+r.w+' = '+(r.d*r.w)+'</td><td>'+r.left+'</td></tr>';
+    }
+    for(i=0;i<S.rows.length;i++) ws.push(S.rows[i].w);
+    if(S.k===S.rows.length)
+      out='Цифры сверху вниз: <b>'+S.x+'</b><sub>10</sub> = <b>'+rec+'</b><sub>'+S.n+'</sub>.'+
+          (zeros?' Вес, который не поместился ни разу, дал цифру 0.':'');
+    else if(S.k>0)
+      out='Старшие цифры уже известны: <b>'+rec+'</b>… Следующий вес: '+S.rows[S.k].w+'.';
+    else
+      out='Понадобятся веса: '+ws.join(', ')+'. Следующий вес, '+(ws[0]*S.n)+', уже больше числа. Нажмите «Шаг».';
+    return {table:t,out:out};
+  });
+
+  /* ===== деление столбиком и лесенка ===== */
+/* одно деление a : n столбиком; steps — вычитания по порядку */
+function longDiv(a,n){
+  var s=String(a),cur=0,steps=[],i,qd;
+  for(i=0;i<s.length;i++){
+    cur=cur*10+(+s.charAt(i));
+    qd=Math.floor(cur/n);
+    if(qd>0){steps.push({col:i,part:cur,qd:qd,sub:qd*n,rem:cur-qd*n}); cur-=qd*n;}
+  }
+  return {a:a,q:Math.floor(a/n),r:a%n,steps:steps};
+}
+/* цепочка делений: делим, пока делимое не меньше основания */
+function ladder(x,n){
+  var rows=[],c=x;
+  while(c>=n){rows.push(longDiv(c,n)); c=Math.floor(c/n);}
+  return rows;
+}
+/* рисунок первых k столбиков лесенки (строки таблицы);
+   plain=true — без подсветки остатков и последнего частного */
+function ladderHTML(rows,k,n,x,plain){
+  var G={},maxR=0,maxC=0;
+  function cell(r,c){
+    var key=r+'_'+c;
+    if(!G[key]) G[key]={ch:'',cls:''};
+    if(r>maxR) maxR=r;
+    if(c>maxC) maxC=c;
+    return G[key];
+  }
+  function put(r,c,str,cls){
+    for(var i=0;i<str.length;i++){
+      var e=cell(r,c+i);
+      e.ch=str.charAt(i);
+      if(cls) e.cls+=' '+cls;
+    }
+  }
+  var c0=0,i,t,u;
+  if(k===0) put(0,1,String(x),(rows.length===0&&!plain)?'lq':'');
+  for(i=0;i<k;i++){
+    var b=rows[i],sa=String(b.a),La=sa.length,sq=String(b.q),sn=String(n),r0=i,dc=c0+La+2;
+    put(r0,c0+1,sa);                                    // делимое
+    put(r0,dc,sn);                                      // делитель
+    for(t=0;t<Math.max(sn.length,sq.length);t++) cell(r0,dc+t).cls+=' u';
+    cell(r0,dc).cls+=' vl'; cell(r0+1,dc).cls+=' vl';   // уголок
+    put(r0+1,dc,sq,(!plain&&i===rows.length-1)?'lq':''); // частное
+    for(t=0;t<b.steps.length;t++){
+      var st=b.steps[t],sp=String(st.part),ss=String(st.sub);
+      var end=c0+1+st.col,start=end-sp.length+1;
+      if(t>0){                                          // остаток и снесённые цифры; нулевой остаток тоже пишем
+        var pv=b.steps[t-1],full=String(pv.rem)+sa.substring(pv.col+1,st.col+1);
+        put(r0+2*t,end-full.length+1,full);
+      }
+      put(r0+2*t+1,end-ss.length+1,ss);                 // вычитаемое
+      put(r0+2*t+1,start-1,'−','mn');
+      for(u=start;u<=end;u++) cell(r0+2*t+1,u).cls+=' u';
+    }
+    var sr=String(b.r);
+    put(r0+2*b.steps.length,c0+La-sr.length+1,sr,plain?'':'rm'); // остаток деления
+    c0+=La+1;                                           // следующий столбик пристраиваем справа
+  }
+  var h='',r,c,e;
+  for(r=0;r<=maxR;r++){
+    h+='<tr>';
+    for(c=0;c<=maxC;c++){
+      e=G[r+'_'+c];
+      h+='<td'+(e&&e.cls?' class="'+e.cls.replace(/^ /,'')+'"':'')+'>'+(e?e.ch:'')+'</td>';
+    }
+    h+='</tr>';
+  }
+  return h;
+}
+
+/* статические примеры в тексте */
+$('lex0').innerHTML=ladderHTML([longDiv(3867,16)],1,16,3867,true);
+$('lex1').innerHTML=ladderHTML(ladder(143,7),2,7,143,false);
+$('lex2').innerHTML=ladderHTML(ladder(3867,16),2,16,3867,false);
+$('lex3').innerHTML=ladderHTML([longDiv(1409,7)],1,7,1409,true);
+$('lex4').innerHTML=ladderHTML(ladder(1409,7),3,7,1409,false);
+
+/* интерактив «лесенка» */
+var LD=makeStepper('l',9999,12,
+  function(x,n){return ladder(x,n);},
+  function(S){
+    var rows=S.rows,k=S.k,n=S.n,out,i,b,last,rec;
+    var t=ladderHTML(rows,k,n,S.x,false);
+    if(rows.length===0){
+      out='Число '+S.x+' меньше основания '+n+', делить нечего: оно само является единственной цифрой. '+
+          '<b>'+S.x+'</b><sub>10</sub> = <b>'+DIG.charAt(S.x)+'</b><sub>'+n+'</sub>.';
+    }else if(k===rows.length){
+      last=rows[k-1].q; rec=DIG.charAt(last);
+      for(i=k-1;i>=0;i--) rec+=DIG.charAt(rows[i].r);
+      out='Последнее частное '+last+' меньше '+n+', деление закончено. '+
+          'Читаем от последнего частного по остаткам справа налево: '+
+          '<b>'+S.x+'</b><sub>10</sub> = <b>'+rec+'</b><sub>'+n+'</sub>.'+
+          (/[A-J]/.test(rec)?' Значения больше 9 записаны буквами: каждое занимает один разряд.':'');
+    }else if(k>0){
+      b=rows[k-1];
+      out=b.a+' : '+n+' = '+b.q+', остаток <b>'+b.r+'</b>'+(b.r>9?' (цифра '+DIG.charAt(b.r)+')':'')+
+          '. Частное '+b.q+' не меньше '+n+', поэтому делим его дальше.';
+    }else{
+      out='Нажмите «Шаг». Первое деление: '+S.x+' : '+n+'.';
+    }
+    return {table:t,out:out};
+  });
+  
+/* ===== самопроверка ===== */
+function answer(id){return $(id).value.replace(/\s+/g,'').toUpperCase();}
+function verdict(id,ok,good,bad){
+  var v=$(id);
+  v.className='verdict '+(ok?'ok':'no');
+  v.textContent=ok?good:bad;
+}
+function c1(){
+  var a=answer('q1');
+  if(a===''){verdict('v1',false,'','Введите ответ.');return;}
+  var bad='Пока не так. Делите 77 на 5, затем частное снова на 5, пока частное не станет нулём. Выпишите остатки.';
+  if(a==='203') bad='Остатки найдены верно, но прочитаны в порядке получения. Первый остаток — младшая цифра, он стоит в записи последним.';
+  if(a==='32'||a==='23') bad='Пропущен остаток 0. Ноль — тоже цифра: он занимает разряд № 1 и удерживает тройку в разряде № 2.';
+  verdict('v1',a==='302','Верно! 77 = 3 · 25 + 0 · 5 + 2, запись 302 в основании 5.',bad);
+}
+function c2(){
+  var a=answer('q2');
+  if(a===''){verdict('v2',false,'','Введите ответ.');return;}
+  var bad='Пока не так. Делите 500 на 16 до нулевого частного и каждый остаток запишите одной цифрой.';
+  if(a==='4F1') bad='Остатки найдены верно, но прочитаны в порядке получения. Читать нужно от последнего остатка к первому.';
+  if(a==='1154'||a==='4151') bad='Остаток 15 должен занять один разряд, а записан двумя цифрами. Какой буквой обозначают значение 15?';
+  verdict('v2',a==='1F4','Верно! 500 = 1 · 256 + 15 · 16 + 4, запись 1F4 в основании 16.',bad);
+}
+function c3(){
+  var a=answer('q3');
+  if(a===''){verdict('v3',false,'','Введите ответ.');return;}
+  var bad='Пока не так. Выпишите веса 128, 64, 32, 16, 8, 4, 2, 1 и для каждого решите, помещается ли он в остаток.';
+  if(a==='10011'||a==='00010011') bad='Цифры записаны в обратном порядке. При подборе по весам первой находится старшая цифра, она стоит слева.';
+  if(a==='11001') bad='Отброшены нули в конце. Запись 11001 в основании 2 — это 25: без нулей единицы оказались в других разрядах.';
+  verdict('v3',a==='11001000','Верно! 200 = 128 + 64 + 8, запись 11001000 в основании 2.',bad);
+}
+function toggleEx(id){var e=$(id);e.style.display=e.style.display==='block'?'none':'block';}
+</script>
+</body>
+</html>

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>11. Сравнение и нумерация слов</title>
+<style>
+:root{--accent:#2563eb;--bg:#f7f8fa;--card:#fff;--line:#e3e7ee;--ink:#1f2430;--muted:#5b6472}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+header.top{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+nav.menu{max-width:900px;margin:0 auto;display:flex;flex-wrap:wrap;gap:4px;padding:10px 16px}
+nav.menu a{text-decoration:none;color:var(--muted);padding:6px 10px;border-radius:8px;font-size:14px}
+nav.menu a:hover{background:#eef2ff;color:var(--accent)}
+nav.menu a[aria-current]{background:var(--accent);color:#fff}
+main{max-width:900px;margin:0 auto;padding:24px 16px 40px}
+h1{font-size:28px;margin:.2em 0 .4em;line-height:1.3}
+h2{font-size:21px;margin:1.6em 0 .5em;border-left:4px solid var(--accent);padding-left:10px}
+h3{font-size:17px;margin:0 0 .4em}
+p{margin:.7em 0}
+ol{padding-inline-start:1.65em}
+li+li{margin-top:.35em}
+.lead{font-size:18px;color:var(--muted)}
+.example,.interactive,.selfcheck,.note{border-radius:12px;padding:16px 18px;margin:18px 0}
+.example{background:#f0f6ff;border:1px solid #d6e4ff}
+.interactive{background:#fffdf3;border:1px solid #f0e4b8}
+.selfcheck{background:#f3fbf4;border:1px solid #cdeccf}
+.note{background:#fff8ec;border:1px solid #f3e2bd}
+.formula{margin:12px 0;text-align:center;font-size:20px;line-height:1.6;overflow-wrap:anywhere}
+.literal{font:700 1em/1.25 Consolas,Menlo,monospace;letter-spacing:.04em}
+.alpha-row,.word-list{list-style:none;padding:0;margin:.85em 0;display:grid;gap:6px}
+.alpha-row{grid-template-columns:repeat(6,minmax(0,1fr));max-width:390px}
+.alpha-row li,.word-list li{min-width:0;margin:0;background:var(--card);border:1px solid #cedaf0;border-radius:9px;padding:5px 3px;text-align:center}
+.alpha-row strong,.alpha-row span{display:block}
+.alpha-row strong{font-size:1.2em}
+.alpha-row span,.word-list span{color:var(--muted);font-variant-numeric:tabular-nums}
+.word-list{grid-template-columns:repeat(6,minmax(0,1fr));max-width:520px}
+.word-list span{display:block;font-size:.88rem}
+.word-list b{font:700 1.05em Consolas,Menlo,monospace}
+.marker{border-radius:4px;padding:0 .15em;background:#ffe3ab;color:#553600}
+.worked-table{border-collapse:collapse;width:min(100%,34rem);margin:.65rem 0;table-layout:fixed;font-variant-numeric:tabular-nums}
+.worked-table caption{text-align:start;font-weight:700;margin-bottom:.35rem}
+.worked-table th,.worked-table td{padding:.36rem .4rem;border:1px solid #dbe2ed;text-align:center;overflow-wrap:anywhere}
+.worked-table th{background:#f2f5fa}
+.worked-table td{background:var(--card)}
+.rank-config{display:flex;align-items:center;flex-wrap:wrap;gap:.55rem 1rem;margin:12px 0}
+.rank-config label,.rank-form label{display:grid;gap:.25rem;font-weight:680}
+.rank-limit{margin:0;color:var(--muted)}
+.rank-panels{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.rank-cases{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}
+.rank-case{padding:9px 12px;border:1px solid #d6e4ff;border-radius:10px;background:var(--card)}
+.rank-case p{margin:.4em 0}
+.rank-cards{display:flex;flex-wrap:wrap;gap:6px;list-style:none;padding:0;margin:8px 0}
+.rank-cards li{min-width:42px;padding:4px 7px;border:1px solid var(--line);border-radius:7px;text-align:center}
+.rank-cards li:last-child{background:#fff3ce;border-color:#e9bb5f}
+.rank-cards small{display:block;color:var(--muted)}
+.rank-form{min-width:0;display:grid;align-content:start;justify-items:start;gap:.65rem;padding:12px;background:var(--card);border:1px solid #e5dcc1;border-radius:10px}
+.rank-form label{width:100%;min-width:0}
+button,input,select{font:inherit;min-height:44px;border-radius:8px}
+input,select{padding:6px 10px;border:1px solid #b8c2d1;color:var(--ink);background:var(--card);max-width:100%;min-width:0}
+.rank-form input{width:min(100%,17rem);font-family:Consolas,Menlo,monospace}
+input[aria-invalid="true"]{border-color:#9e2820;box-shadow:0 0 0 1px #9e2820}
+button{padding:7px 12px;border:0;background:var(--accent);color:#fff;cursor:pointer}
+button:hover{background:#1d4fd0}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.rank-output{min-width:0;margin-top:.75rem;overflow-wrap:anywhere}
+.rank-output:empty{display:none}
+.rank-answer,.rank-error{margin:0;padding:.5rem .65rem;border-radius:7px;font-weight:700}
+.rank-answer{background:#dff3e7;color:#145936}
+.rank-error{background:#ffe8e5;color:#92251e}
+.rank-sequence{display:grid;grid-template-columns:repeat(var(--rank-length),minmax(0,1fr));gap:4px;max-width:420px;margin:.65rem 0}
+.rank-token{min-width:0;display:grid;justify-items:center;line-height:1.25;padding:.35rem 0;background:var(--card);border:1px solid #dbe2ed;border-radius:6px}
+.rank-token b{font-family:Consolas,Menlo,monospace;font-size:1.05rem}
+.rank-token span{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.87rem}
+.rank-token.is-padding{background:#fff0ce;border-color:#c18a24}
+.selfcheck details{padding:.55rem 0}
+.selfcheck details+details{border-top:1px solid #cdeccf}
+.selfcheck summary{cursor:pointer;font-weight:650}
+.selfcheck details p{margin:.45em 0 0}
+.pager{display:flex;flex-wrap:wrap;justify-content:space-between;margin-top:36px;gap:10px}
+.pager a{text-decoration:none;color:#1647a8;background:#eef2ff;padding:10px 16px;border-radius:9px;font-size:15px}
+@media(max-width:540px){
+  header.top{position:static}
+  .example,.interactive,.selfcheck,.note{padding:13px}
+  .formula{font-size:17px}
+  .word-list{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .rank-panels,.rank-cases{grid-template-columns:minmax(0,1fr)}
+  .worked-table th,.worked-table td{padding:.28rem .2rem}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <nav class="menu" aria-label="Главы учебника">
+    <a href="index.html">Оглавление</a>
+    <a href="01-chto-takoe-chislo.html">1. Что такое число</a>
+    <a href="02-razryady.html">2. Термины</a>
+    <a href="03-sravnenie.html">3. Сравнение чисел</a>
+    <a href="03-osnovaniya.html">4. Разные основания</a>
+    <a href="04-razvernutaya-zapis.html">5. Развёрнутая запись</a>
+    <a href="05-perevod-iz-desyatichnoy.html">6. Из десятичной</a>
+    <a href="07-slozhenie-i-vychitanie.html">7. Сложение</a>
+    <a href="08-vychitanie.html">8. Вычитание</a>
+    <a href="08-svoystva-chisel.html">9. Свойства чисел</a>
+    <a href="09-alternativnye-alfavity.html">10. Альтернативные алфавиты</a>
+    <a href="10-numeratsiya-slov.html" aria-current="page">11. Сравнение и нумерация слов</a>
+    <a href="11-itogi.html">12. Итоги</a>
+  </nav>
+</header>
+<main>
+  <h1>11. Сравнение и нумерация слов</h1>
+  <p class="lead">Из букв можно составить список слов и расставить их по алфавиту. Если каждой букве сопоставить цифру, порядковый номер слова можно узнать по его разрядной записи.</p>
+
+  <h2>Как сравнивать записи с буквами</h2>
+  <p>Возьмём шесть разных букв слова <span class="literal">СОЛНЦЕ</span>. Расставим их в порядке русского алфавита и пронумеруем с нуля. Получим цифры для основания 6.</p>
+  <ol class="alpha-row" aria-label="Буквы и их значения">
+    <li><strong>Е</strong><span>0</span></li><li><strong>Л</strong><span>1</span></li><li><strong>Н</strong><span>2</span></li><li><strong>О</strong><span>3</span></li><li><strong>С</strong><span>4</span></li><li><strong>Ц</strong><span>5</span></li>
+  </ol>
+  <p>При сравнении неотрицательных целых чисел сначала убери ведущие знаки нуля. Если все знаки были нулями, оставь один. При одном основании число с более длинной записью больше. Если длина одинакова, найди первую отличающуюся цифру слева и сравни её значение по таблице. При полном совпадении цифр числа равны.</p>
+  <div class="example">
+    <h3>Первое различие</h3>
+    <p>Сравним <span class="literal">Л<span class="marker">Н</span>Ц</span> и <span class="literal">Л<span class="marker">О</span>Е</span>. Первые буквы совпали. На втором месте Н имеет значение 2, а О — 3. Значит, <b>ЛНЦ &lt; ЛОЕ</b>. В цифровой записи получаем 125<sub>6</sub> &lt; 130<sub>6</sub>.</p>
+  </div>
+
+  <h2>Как устроен список слов</h2>
+  <p>Для нумерации договоримся о правилах. Все слова имеют ровно <i>k</i> букв. Буквы можно повторять. В первой позиции разрешена и буква со значением 0. Словом здесь считаем любую запись такой длины, которую можно составить из выбранных букв.</p>
+  <p>В каждой позиции есть <i>N</i> вариантов. При <i>k</i> позициях получаем <b><i>N</i><sup><i>k</i></sup> слов</b>. Записи представляют подряд все числа от 0 до <i>N</i><sup><i>k</i></sup> − 1. Для трёх букв из нашего алфавита всего 6<sup>3</sup> = 216 слов, от <span class="literal">ЕЕЕ</span> до <span class="literal">ЦЦЦ</span>.</p>
+  <p>Если условие запрещает повторы, порядковые номера считают внутри списка, из которого убрали слова с повторяющимися буквами.</p>
+  <div class="example">
+    <h3>Начало списка трёхбуквенных слов</h3>
+    <ol class="word-list" aria-label="Первые шесть слов в порядке возрастания">
+      <li><b>ЕЕЕ</b><span>1-е</span></li><li><b>ЕЕЛ</b><span>2-е</span></li><li><b>ЕЕН</b><span>3-е</span></li><li><b>ЕЕО</b><span>4-е</span></li><li><b>ЕЕС</b><span>5-е</span></li><li><b>ЕЕЦ</b><span>6-е</span></li>
+    </ol>
+    <p>Следующим будет <span class="literal">ЕЛЕ</span>. После цифры 5 в младшем разряде идёт перенос, поэтому после <b>005<sub>6</sub></b> получается <b>010<sub>6</sub></b>.</p>
+  </div>
+  <p><b>Почему алфавитный и числовой порядок совпадают?</b> Находим первую отличающуюся букву слева. Порядок букв совпадает с порядком их значений. Если различие приходится на разряд с весом <i>N</i><sup><i>j</i></sup>, вклад этого разряда отличается хотя бы на <i>N</i><sup><i>j</i></sup>. Все младшие разряды вместе дают не больше <i>N</i><sup><i>j</i></sup> − 1. Поэтому первая отличающаяся буква определяет и порядок слов, и порядок чисел.</p>
+
+  <div class="example" id="rank-repeat-cases">
+    <h3>На каком месте ЛН в списке двухбуквенных слов</h3>
+    <p>Возьмём один алфавит Е, Л, Н, О, С, Ц. В обоих списках слово может начинаться с Е.</p>
+    <div class="rank-cases">
+      <div class="rank-case">
+        <b>Повторы разрешены</b>
+        <p>В блоке на Е шесть слов. Блок на Л начинается так.</p>
+        <ol class="rank-cards" start="7" aria-label="Начало блока на Л в списке с повторами">
+          <li><b>ЛЕ</b><small>7-е</small></li><li><b>ЛЛ</b><small>8-е</small></li><li><b>ЛН</b><small>9-е</small></li>
+        </ol>
+        <p>Место ЛН — <b>6 + 3 = 9</b>.</p>
+      </div>
+      <div class="rank-case">
+        <b>Повторы запрещены</b>
+        <p>В блоке на Е пять слов. В блоке на Л пропускаем ЛЛ.</p>
+        <ol class="rank-cards" start="6" aria-label="Начало блока на Л в списке без повторов">
+          <li><b>ЛЕ</b><small>6-е</small></li><li><b>ЛН</b><small>7-е</small></li>
+        </ol>
+        <p>Место ЛН — <b>5 + 2 = 7</b>.</p>
+      </div>
+    </div>
+  </div>
+
+  <h2>От слова к номеру</h2>
+  <p>Если список содержит все слова заданной длины и допускает повторы и нулевой знак в начале, замени буквы цифрами и вычисли значение записи. Это <b>индекс с нуля</b>. Порядковый номер начинается с единицы, поэтому к индексу прибавь 1.</p>
+  <div class="example">
+    <h3>На каком месте стоит ЕЛН</h3>
+    <p>Буквам Е, Л, Н соответствуют 0, 1, 2. Получаем запись <b>012<sub>6</sub></b>.</p>
+    <p class="formula">012<sub>6</sub> = 0 · 6<sup>2</sup> + 1 · 6 + 2 = 8<sub>10</sub></p>
+    <p>Индекс равен 8, а номер слова <b>8 + 1 = 9</b>.</p>
+  </div>
+  <div class="example">
+    <h3>На каком месте стоит СОЛНЦЕ</h3>
+    <p>В списке шестибуквенных слов запись <span class="literal">СОЛНЦЕ</span> соответствует цифрам 4, 3, 1, 2, 5, 0.</p>
+    <p class="formula">431250<sub>6</sub> = 4 · 6<sup>5</sup> + 3 · 6<sup>4</sup> + 1 · 6<sup>3</sup> + 2 · 6<sup>2</sup> + 5 · 6 + 0 = 35310<sub>10</sub></p>
+    <p>Порядковый номер <b>35311</b>. Всего в списке 6<sup>6</sup> = 46656 слов.</p>
+  </div>
+
+  <h2>От номера к слову</h2>
+  <p>Из порядкового номера вычти 1. Переведи этот индекс в основание <i>N</i> делением с остатком. Дополни запись слева нулями до длины <i>k</i> и замени все цифры соответствующими буквами. Порядок чтения остатков можно повторить в <a href="05-perevod-iz-desyatichnoy.html">главе о переводе из десятичной системы</a>.</p>
+  <div class="example">
+    <h3>Какое слово стоит на девятом месте</h3>
+    <p>Получаем индекс 9 − 1 = 8. Делим на 6, пока частное не станет нулём.</p>
+    <table class="worked-table">
+      <caption>Деление индекса на 6</caption>
+      <thead><tr><th scope="col">Делимое</th><th scope="col">Частное</th><th scope="col">Остаток</th></tr></thead>
+      <tbody><tr><td>8</td><td>1</td><td>2</td></tr><tr><td>1</td><td>0</td><td>1</td></tr></tbody>
+    </table>
+    <p>Читаем остатки снизу вверх. Получаем <b>12<sub>6</sub></b>. Для трёхбуквенного слова дописываем слева ноль, получаем <b>012<sub>6</sub></b> и слово <b>ЕЛН</b>.</p>
+  </div>
+
+  <section class="interactive" id="word-ranker" aria-labelledby="rank-title">
+    <h3 id="rank-title">Нумератор слов</h3>
+    <p>Выбери длину и введи слово или его порядковый номер. Буквы идут в порядке <b>Е, Л, Н, О, С, Ц</b>.</p>
+    <div class="rank-config">
+      <label for="rank-length">Длина слова
+        <select id="rank-length">
+          <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+          <option value="5">5</option><option value="6" selected>6</option><option value="7">7</option><option value="8">8</option>
+        </select>
+      </label>
+      <p class="rank-limit" id="rank-limit" aria-live="polite">Номера от 1 до 46656</p>
+    </div>
+    <div class="rank-panels">
+      <form class="rank-form" id="rank-from-word" novalidate>
+        <label for="rank-word">Слово
+          <input id="rank-word" value="СОЛНЦЕ" spellcheck="false" autocomplete="off" autocapitalize="characters">
+        </label>
+        <button type="submit">Найти номер</button>
+      </form>
+      <form class="rank-form" id="word-from-rank" novalidate>
+        <label for="rank-number">Порядковый номер
+          <input id="rank-number" value="35311" inputmode="numeric" autocomplete="off" aria-describedby="rank-limit">
+        </label>
+        <button type="submit">Найти слово</button>
+      </form>
+    </div>
+    <div class="rank-output" id="rank-output" aria-live="polite"></div>
+  </section>
+
+  <div class="selfcheck">
+    <h3>Самопроверка</h3>
+    <details>
+      <summary>Сколько двубуквенных слов и какое из них последнее?</summary>
+      <p>Две позиции дают 6<sup>2</sup> = 36 слов. На последнем месте <b>ЦЦ</b>. Его индекс <b>55<sub>6</sub> = 35<sub>10</sub></b>, а номер 36.</p>
+    </details>
+    <details>
+      <summary>Какое слово идёт раньше, ЕЦО или ЛЕЕ?</summary>
+      <p>Раньше идёт <b>ЕЦО</b>. Уже в первой позиции Е со значением 0 предшествует Л со значением 1.</p>
+    </details>
+    <details>
+      <summary>Какое трёхбуквенное слово стоит на 31-м месте?</summary>
+      <p>Индекс 31 − 1 = 30. Это <b>50<sub>6</sub></b>. Дополняем запись до <b>050<sub>6</sub></b> и получаем <b>ЕЦЕ</b>.</p>
+    </details>
+  </div>
+
+  <nav class="pager" aria-label="Соседние главы">
+    <a href="09-alternativnye-alfavity.html">← Альтернативные алфавиты</a>
+    <a href="11-itogi.html">Итоги →</a>
+    <a href="index.html">Оглавление</a>
+  </nav>
+</main>
+
+<script>
+(function () {
+  const alphabet = 'ЕЛНОСЦ';
+  const base = alphabet.length;
+  const lengthInput = document.getElementById('rank-length');
+  const wordInput = document.getElementById('rank-word');
+  const numberInput = document.getElementById('rank-number');
+  const limit = document.getElementById('rank-limit');
+  const output = document.getElementById('rank-output');
+
+  function text(tag, value, className) {
+    const element = document.createElement(tag);
+    element.textContent = value;
+    if (className) element.className = className;
+    return element;
+  }
+
+  function notation(written, radix) {
+    const value = text('span', written);
+    value.append(text('sub', radix));
+    return value;
+  }
+
+  function formula(...parts) {
+    const line = text('p', '', 'formula');
+    line.append(...parts);
+    return line;
+  }
+
+  function clearValidation() {
+    wordInput.removeAttribute('aria-invalid');
+    numberInput.removeAttribute('aria-invalid');
+  }
+
+  function clearOutput() {
+    clearValidation();
+    output.replaceChildren();
+  }
+
+  function showError(input, message) {
+    clearValidation();
+    input.setAttribute('aria-invalid', 'true');
+    output.replaceChildren(text('p', message, 'rank-error'));
+    input.focus();
+  }
+
+  function mapping(word, digits, padding = 0) {
+    const row = text('div', '', 'rank-sequence');
+    row.style.setProperty('--rank-length', word.length);
+    row.setAttribute('role', 'list');
+    row.setAttribute('aria-label', 'Буквы слова и соответствующие цифры');
+    [...word].forEach((character, index) => {
+      const pair = text('div', '', index < padding ? 'rank-token is-padding' : 'rank-token');
+      pair.setAttribute('role', 'listitem');
+      pair.append(text('b', character), text('span', digits[index]));
+      row.append(pair);
+    });
+    return row;
+  }
+
+  function divisionTable(rows) {
+    const table = text('table', '', 'worked-table');
+    table.createCaption().textContent = 'Делим индекс на 6';
+    const header = table.createTHead().insertRow();
+    for (const label of ['Делимое', 'Частное', 'Остаток']) {
+      const cell = text('th', label);
+      cell.scope = 'col';
+      header.append(cell);
+    }
+    const body = table.createTBody();
+    for (const values of rows) {
+      const row = body.insertRow();
+      for (const value of values) row.insertCell().textContent = value;
+    }
+    return table;
+  }
+
+  function findNumber() {
+    const word = wordInput.value.trim().toUpperCase();
+    const length = Number(lengthInput.value);
+    if (!word) return showError(wordInput, 'Введи слово из букв Е, Л, Н, О, С, Ц.');
+    const symbols = [...word];
+    const values = symbols.map(letter => alphabet.indexOf(letter));
+    if (values.includes(-1)) return showError(wordInput, 'Используй только кириллические буквы Е, Л, Н, О, С и Ц.');
+    if (symbols.length !== length) return showError(wordInput, `Длина слова должна равняться ${length}.`);
+
+    clearValidation();
+    const digits = values.join('');
+    const index = values.reduce((value, digit) => value * base + digit, 0);
+    const number = index + 1;
+    numberInput.value = String(number);
+    wordInput.value = word;
+    const expansion = [];
+    values.forEach((digit, position) => {
+      if (position) expansion.push(' + ');
+      const place = values.length - 1 - position;
+      if (place > 1) expansion.push(`${digit} · 6`, text('sup', place));
+      else if (place === 1) expansion.push(`${digit} · 6`);
+      else expansion.push(String(digit));
+    });
+    output.replaceChildren(
+      text('p', `Слово ${word} стоит на месте ${number}.`, 'rank-answer'),
+      mapping(word, digits),
+      formula(notation(digits, base), ' = ', ...expansion, ' = ', notation(index, 10)),
+      text('p', `К индексу ${index} прибавляем 1. Получаем порядковый номер ${number}.`),
+    );
+  }
+
+  function findWord() {
+    const entered = numberInput.value.trim();
+    const number = Number(entered);
+    const length = Number(lengthInput.value);
+    const maximum = base ** length;
+    if (!/^[0-9]+$/.test(entered) || !Number.isSafeInteger(number) || number < 1 || number > maximum) {
+      return showError(numberInput, `Введи целый номер от 1 до ${maximum}.`);
+    }
+
+    clearValidation();
+    const index = number - 1;
+    const rows = [];
+    const remainders = [];
+    let remaining = index;
+    do {
+      const quotient = Math.floor(remaining / base);
+      const remainder = remaining % base;
+      rows.push([remaining, quotient, remainder]);
+      remainders.push(remainder);
+      remaining = quotient;
+    } while (remaining > 0);
+    const short = remainders.reverse().join('');
+    const digits = short.padStart(length, '0');
+    const padding = length - short.length;
+    const word = [...digits].map(digit => alphabet[Number(digit)]).join('');
+    wordInput.value = word;
+    numberInput.value = String(number);
+    const note = padding
+      ? 'Читаем остатки снизу вверх и дополняем запись слева нулями до выбранной длины.'
+      : 'Читаем остатки снизу вверх. Полученная запись уже нужной длины.';
+    output.replaceChildren(
+      text('p', `На месте ${number} стоит слово ${word}.`, 'rank-answer'),
+      text('p', `Получаем индекс ${number} − 1 = ${index}.`),
+      divisionTable(rows),
+      text('p', note),
+      formula(notation(short, base), ' → ', ...(padding ? [notation(digits, base), ' → '] : []), text('strong', word)),
+      mapping(word, digits, padding),
+    );
+  }
+
+  lengthInput.addEventListener('change', () => {
+    const length = Number(lengthInput.value);
+    limit.textContent = `Номера от 1 до ${base ** length}`;
+    clearOutput();
+  });
+  wordInput.addEventListener('input', clearOutput);
+  numberInput.addEventListener('input', clearOutput);
+  document.getElementById('rank-from-word').addEventListener('submit', event => {
+    event.preventDefault();
+    findNumber();
+  });
+  document.getElementById('word-from-rank').addEventListener('submit', event => {
+    event.preventDefault();
+    findWord();
+  });
+  findNumber();
+})();
+</script>
+</body>
+</html>

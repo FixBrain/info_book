@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>10. Альтернативные алфавиты</title>
+<style>
+:root{--accent:#2563eb;--bg:#f7f8fa;--card:#fff;--line:#e3e7ee;--ink:#1f2430;--muted:#5b6472}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+header.top{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+nav.menu{max-width:900px;margin:0 auto;display:flex;flex-wrap:wrap;gap:4px;padding:10px 16px}
+nav.menu a{text-decoration:none;color:var(--muted);padding:6px 10px;border-radius:8px;font-size:14px}
+nav.menu a:hover{background:#eef2ff;color:var(--accent)}
+nav.menu a[aria-current]{background:var(--accent);color:#fff}
+main{max-width:900px;margin:0 auto;padding:24px 16px 40px}
+h1{font-size:28px;margin:.2em 0 .4em}
+h2{font-size:21px;margin:1.6em 0 .5em;border-left:4px solid var(--accent);padding-left:10px}
+h3{font-size:17px;margin:0 0 .4em}
+p{margin:.7em 0}
+.lead{font-size:18px;color:var(--muted)}
+b.term{color:var(--accent)}
+.example,.interactive,.selfcheck,.note{border-radius:12px;padding:16px 18px;margin:18px 0}
+.example{background:#f0f6ff;border:1px solid #d6e4ff}
+.interactive{background:#fffdf3;border:1px solid #f0e4b8}
+.selfcheck{background:#f3fbf4;border:1px solid #cdeccf}
+.note{background:#fff8ec;border:1px solid #f3e2bd}
+.tag{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 9px;border-radius:20px;margin-bottom:4px;color:#fff}
+.example .tag{background:#2563eb}
+.interactive .tag{background:#795800}
+.selfcheck .tag{background:#217a36}
+.controls{display:flex;align-items:end;gap:10px;flex-wrap:wrap;margin:12px 0}
+.controls label{display:grid;gap:4px;font-weight:600}
+input,select{font:inherit;padding:6px 10px;border:1px solid #b8c2d1;border-radius:8px;color:var(--ink);background:var(--card);max-width:100%}
+input{width:110px}
+button{font:inherit;padding:7px 14px;border:0;border-radius:9px;background:var(--accent);color:#fff;cursor:pointer}
+button:hover{background:#1d4fd0}
+button.ghost{background:#eef2ff;color:#1647a8}
+button.ghost:hover{background:#dfe7ff}
+button:disabled{opacity:.55;cursor:default}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+
+.feedback{margin:8px 0;color:#a92620}
+.pager{display:flex;flex-wrap:wrap;justify-content:space-between;margin-top:36px;gap:10px}
+.pager a{text-decoration:none;color:#1647a8;background:#eef2ff;padding:10px 16px;border-radius:9px;font-size:15px}
+@media(max-width:540px){header.top{position:static}.example,.interactive,.selfcheck,.note{padding:13px}.controls label{max-width:100%}}
+.alphabet-bar{list-style:none;display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;padding:0}
+.alphabet-bar li{display:grid;min-width:49px;justify-items:center;border:1px solid var(--line);border-radius:10px;background:var(--card);padding:4px 8px}
+.alphabet-bar li b{font-size:21px;line-height:1.35}
+.alphabet-bar li span{font-size:14px;color:var(--muted)}
+.alphabet-bar li:first-child{border-color:#e9bb5f;background:#fff3ce}
+.alphabet-summary{color:var(--muted);font-size:15px}
+.alphabet-summary.feedback{color:#a92620}
+.alphabet-demo .controls{align-items:end}
+.alphabet-demo input{width:172px}
+.alphabet-demo select{width:100%}
+.alphabet-demo label{min-width:0}
+.alphabet-demo fieldset{min-width:0;border:0;border-top:1px solid #e6ddbb;margin:14px 0 0;padding:0}
+.alphabet-demo legend{font-weight:700;padding:0 8px 0 0}
+.alphabet-output{overflow-wrap:anywhere}
+.alphabet-output ol{padding-inline-start:26px;margin:.5em 0}
+.alphabet-output li{padding:.2em 0}
+.alphabet-output .answer{border:1px solid #d6e4ff;background:#eef4ff;border-radius:10px;padding:8px 10px}
+.alphabet-demo input[aria-invalid="true"]{border-color:#a92620}
+.alphabet-practice summary{color:#1647a8;cursor:pointer}
+.alphabet-practice details{margin:8px 0 14px}
+.alphabet-columns{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:12px 0}
+.alphabet-columns table{min-width:110px;border:1px solid var(--line);border-radius:10px;border-spacing:0;background:var(--card);padding:4px 12px 8px}
+.alphabet-columns caption{margin-bottom:3px;font-size:14px;color:var(--muted)}
+.alphabet-columns td{text-align:center;font:700 19px/1.4 Consolas,Menlo,monospace;padding:1px 3px}
+.alphabet-columns .carry td{color:#644400;font-size:15px}
+.alphabet-columns .carry td:nth-child(2){background:#fff3ce;border-radius:6px}
+.alphabet-columns .sum td{border-top:1px solid var(--ink)}
+</style>
+</head>
+<body>
+<header class="top">
+  <nav class="menu" aria-label="Главы учебника">
+    <a href="index.html">Оглавление</a>
+    <a href="01-chto-takoe-chislo.html">1. Что такое число</a>
+    <a href="02-razryady.html">2. Термины</a>
+    <a href="03-sravnenie.html">3. Сравнение чисел</a>
+    <a href="03-osnovaniya.html">4. Разные основания</a>
+    <a href="04-razvernutaya-zapis.html">5. Развёрнутая запись</a>
+    <a href="05-perevod-iz-desyatichnoy.html">6. Из десятичной</a>
+    <a href="07-slozhenie-i-vychitanie.html">7. Сложение</a>
+    <a href="08-vychitanie.html">8. Вычитание</a>
+    <a href="08-svoystva-chisel.html">9. Свойства чисел</a>
+    <a href="09-alternativnye-alfavity.html" aria-current="page">10. Альтернативные алфавиты</a>
+    <a href="10-numeratsiya-slov.html">11. Сравнение и нумерация слов</a>
+    <a href="11-itogi.html">12. Итоги</a>
+  </nav>
+</header>
+<main>
+  <h1>10. Альтернативные алфавиты</h1>
+  <p class="lead">Можно ли записать число буквами слова «СОЛНЦЕ»? Да, если заранее договориться, какая буква обозначает ноль, какая — единицу и так далее. Посмотрим, как это правило превращает набор букв в алфавит позиционной системы счисления.</p>
+
+  <h2 id="ordered-alphabet">От слова к алфавиту цифр</h2>
+  <p>В привычной шестиричной системе используются цифры 0, 1, 2, 3, 4, 5. Вместо них можно взять шесть других знаков. Для этого каждому знаку надо присвоить одно значение от 0 до 5, причём каждое значение используется ровно один раз.</p>
+  <div class="example">
+    <h3>Алфавит из слова «СОЛНЦЕ»</h3>
+    <ol>
+      <li>Выписываем разные буквы слова. Если буква встречается несколько раз, берём её один раз.</li>
+      <li>Ставим буквы в порядке русского алфавита. Получаем <b>Е, Л, Н, О, С, Ц</b>.</li>
+      <li>Присваиваем им значения слева направо, начиная с нуля.</li>
+    </ol>
+    <ul class="alphabet-bar" aria-label="Значения букв в алфавите из слова СОЛНЦЕ">
+      <li><b>Е</b><span>0</span></li><li><b>Л</b><span>1</span></li><li><b>Н</b><span>2</span></li>
+      <li><b>О</b><span>3</span></li><li><b>С</b><span>4</span></li><li><b>Ц</b><span>5</span></li>
+    </ul>
+    <p>Разных букв шесть, поэтому основание равно 6. Буква <b>Е</b> играет роль нуля.</p>
+  </div>
+  <p><b class="term">Алфавит цифр позиционной системы</b> задаёт, какие знаки допустимы и какое значение имеет каждый знак. Если записать знаки по возрастанию значений, получится упорядоченный список из <i>N</i> знаков для основания <i>N</i>. Чтобы построить такую систему, нужны как минимум два разных знака.</p>
+  <p>Собранный алфавит используем и для других записей. Например, запись <b>ЛЛ</b> допустима, хотя в самом списке цифр буква Л приведена один раз. В слове «ПЕРЕПЁЛКА» разные буквы по порядку — <b>А, Е, Ё, К, Л, П, Р</b>. Е и Ё занимают отдельные места, а основание равно 7.</p>
+
+  <h2 id="values">Как читать и записывать числа</h2>
+  <p>Заменим каждую букву её значением из таблицы. Разряды и их веса определяются основанием. Цифра со значением <i>d</i> в разряде <i>i</i> даёт вклад <i>d</i> · <i>N</i><sup><i>i</i></sup> независимо от того, каким знаком она записана. В записи <b>СО</b> буква С даёт 4 группы по 6, а О — 3 единицы.</p>
+  <div class="example">
+    <h3>Из буквенной записи в десятичную и обратно</h3>
+    <p><b>СО</b> → 43<sub>6</sub> = 4 · 6 + 3 · 1 = 27<sub>10</sub>.</p>
+    <p>Чтобы записать 27 буквами, делим на 6 с остатком. Получаем 27 = 4 · 6 + 3, затем 4 = 0 · 6 + 4. Читаем остатки с конца и заменяем 4 на С, а 3 на О. Снова получается <b>СО</b>.</p>
+    <p>Если в обычной записи числа слева стоит нулевая буква, её можно опустить. Например, <b>ЕО</b> и <b>О</b> обозначают число 3. Сам ноль записываем одной буквой <b>Е</b>.</p>
+  </div>
+  <div class="note">
+    <h3>Порядок знаков меняет их значения</h3>
+    <p>Мы выбрали порядок русского алфавита и прочитали <b>ОС</b> как 34<sub>6</sub> = 22<sub>10</sub>. Если взять те же буквы в порядке их появления в слове, получится <b>С, О, Л, Н, Ц, Е</b>. Тогда О = 1, С = 0, и запись <b>ОС</b> будет обозначать 10<sub>6</sub> = 6<sub>10</sub>. Поэтому в задании на перевод нужно знать порядок знаков.</p>
+  </div>
+
+  <section class="interactive alphabet-demo" aria-labelledby="alphabet-demo-title">
+    <h3 id="alphabet-demo-title">Собери свой алфавит</h3>
+    <p>Введи слово или набор русских букв и выбери порядок. Нужно от 2 до 20 разных букв. Первый знак в таблице обозначает ноль.</p>
+    <div class="controls">
+      <label for="alphabet-word">Слово для алфавита
+        <input id="alphabet-word" type="text" value="СОЛНЦЕ" spellcheck="false" autocomplete="off" autocapitalize="characters" aria-describedby="alphabet-description">
+      </label>
+      <label for="alphabet-order">Порядок букв
+        <select id="alphabet-order">
+          <option value="russian">По русскому алфавиту</option>
+          <option value="appearance">По первому появлению</option>
+        </select>
+      </label>
+    </div>
+    <p class="alphabet-summary" id="alphabet-description" role="status"></p>
+    <ul class="alphabet-bar" id="alphabet-mapping" aria-label="Действующий алфавит и значения цифр"></ul>
+
+    <form id="alphabet-converter">
+      <fieldset id="alphabet-fields">
+        <legend>Проверь перевод</legend>
+        <div class="controls">
+          <label for="alphabet-direction">Направление
+            <select id="alphabet-direction">
+              <option value="decode">В десятичную</option>
+              <option value="encode">Из десятичной</option>
+            </select>
+          </label>
+          <label for="alphabet-entry"><span id="alphabet-entry-label">Буквенная запись</span>
+            <input id="alphabet-entry" type="text" value="СО" spellcheck="false" autocomplete="off" autocapitalize="characters" aria-describedby="alphabet-limit">
+          </label>
+          <button type="submit">Перевести</button>
+        </div>
+        <p class="alphabet-summary" id="alphabet-limit"></p>
+      </fieldset>
+    </form>
+    <div class="alphabet-output" id="alphabet-output" role="status" aria-atomic="true"></div>
+  </section>
+
+  <h2 id="adding">Что происходит с арифметикой</h2>
+  <p>Вычисляем по значениям цифр и записываем результат знаками текущего алфавита. При переносе одна единица старшего разряда по-прежнему соответствует <i>N</i> единицам младшего разряда.</p>
+  <div class="example">
+    <h3>Перенос в алфавите Е, Л, Н, О, С, Ц</h3>
+    <p><b>Ц + Л = ЛЕ</b>. В единицах получаем 5 + 1 = 6. Это 0 единиц и 1 шестёрка, поэтому пишем справа нулевую букву Е, а слева — букву Л со значением 1.</p>
+  </div>
+  <div class="example" id="alphabet-carry">
+    <h3>Сложение двух буквенных записей</h3>
+    <p>Сложим <b>ОЦ + ЛН</b> в алфавите из слова «СОЛНЦЕ». Поставим единицы под единицами и запишем перенос над старшим разрядом.</p>
+    <div class="alphabet-columns">
+      <div role="img" aria-label="ОЦ плюс ЛН равно ЦЛ. Над старшим разрядом стоит перенос Л.">
+        <table aria-hidden="true">
+          <caption>Буквами</caption>
+          <tbody>
+            <tr class="carry"><td></td><td>Л</td><td></td></tr>
+            <tr><td></td><td>О</td><td>Ц</td></tr>
+            <tr><td>+</td><td>Л</td><td>Н</td></tr>
+            <tr class="sum"><td></td><td>Ц</td><td>Л</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div role="img" aria-label="35 в основании 6 плюс 12 в основании 6 равно 51 в основании 6. Перенос одной шестёрки.">
+        <table aria-hidden="true">
+          <caption>Цифрами в основании 6</caption>
+          <tbody>
+            <tr class="carry"><td></td><td>1</td><td></td></tr>
+            <tr><td></td><td>3</td><td>5</td></tr>
+            <tr><td>+</td><td>1</td><td>2</td></tr>
+            <tr class="sum"><td></td><td>5</td><td>1</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <p>Ц и Н в единицах дают 5 + 2 = 7. Пишем Л (1) и переносим одну шестёрку. В разряде шестёрок О, Л и перенос дают 3 + 1 + 1 = 5, поэтому пишем Ц. Ответ <b>ЦЛ</b>.</p>
+  </div>
+
+  <section class="selfcheck alphabet-practice" aria-labelledby="alphabet-practice-title">
+    <h3 id="alphabet-practice-title">Проверь себя</h3>
+    <p>Собери алфавит из слова «МОЛОКО» в порядке русского алфавита. Каковы основание и знак нуля?</p>
+    <details><summary>Показать ответ</summary><p>К, Л, М, О. Основание 4, ноль обозначает К.</p></details>
+    <p>В алфавите из слова «СОЛНЦЕ» запиши число 17<sub>10</sub>. Проверь перевод обратно.</p>
+    <details><summary>Показать ответ</summary><p>17 = 2 · 6 + 5. Цифры 2 и 5 обозначаются Н и Ц, поэтому ответ <b>НЦ</b>.</p></details>
+  </section>
+
+  <nav class="pager" aria-label="Соседние главы">
+    <a href="08-svoystva-chisel.html">← Свойства чисел</a>
+    <a href="10-numeratsiya-slov.html">Сравнение и нумерация слов →</a>
+    <a href="index.html">Оглавление</a>
+  </nav>
+</main>
+<script>
+(() => {
+  'use strict';
+
+  const russian = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ';
+  const maxPlaces = 8;
+  const number = new Intl.NumberFormat('ru-RU');
+  const get = (id) => document.getElementById(id);
+  const word = get('alphabet-word');
+  const order = get('alphabet-order');
+  const description = get('alphabet-description');
+  const mapping = get('alphabet-mapping');
+  const fields = get('alphabet-fields');
+  const direction = get('alphabet-direction');
+  const entry = get('alphabet-entry');
+  const entryLabel = get('alphabet-entry-label');
+  const limit = get('alphabet-limit');
+  const output = get('alphabet-output');
+  let alphabet = [];
+
+  function make(tag, content, className) {
+    const node = document.createElement(tag);
+    node.textContent = content;
+    if (className) node.className = className;
+    return node;
+  }
+
+  function upper(value) {
+    return value.trim().normalize('NFC').toUpperCase();
+  }
+
+  function maxValue() {
+    return alphabet.length ** maxPlaces - 1;
+  }
+
+  function clearOutput() {
+    output.replaceChildren();
+    entry.removeAttribute('aria-invalid');
+  }
+
+  function updateEntry() {
+    const decode = direction.value === 'decode';
+    entryLabel.textContent = decode ? 'Буквенная запись' : 'Десятичное число';
+    entry.inputMode = decode ? 'text' : 'numeric';
+    limit.textContent = fields.disabled ? '' : decode
+      ? 'До 8 букв действующего алфавита.'
+      : 'Целое число от 0 до ' + number.format(maxValue()) + '.';
+    clearOutput();
+  }
+
+  function updateAlphabet() {
+    const source = upper(word.value);
+    const validWord = /^[А-ЯЁ]+$/u.test(source);
+    alphabet = validWord ? [...new Set(source)] : [];
+    if (order.value === 'russian') {
+      alphabet.sort((first, second) => russian.indexOf(first) - russian.indexOf(second));
+    }
+
+    const valid = alphabet.length >= 2 && alphabet.length <= 20;
+    fields.disabled = !valid;
+    word.setAttribute('aria-invalid', String(!valid));
+    description.classList.toggle('feedback', !valid);
+    if (valid) {
+      description.textContent = 'Основание ' + alphabet.length + '. Нулевой знак — ' + alphabet[0] + '.';
+      mapping.replaceChildren(...alphabet.map((symbol, digit) => {
+        const item = make('li', '');
+        item.append(make('b', symbol), make('span', String(digit)));
+        return item;
+      }));
+    } else {
+      description.textContent = validWord ? 'Нужно от 2 до 20 разных букв.' : 'Введи слово из русских букв.';
+      mapping.replaceChildren();
+    }
+    updateEntry();
+  }
+
+  function showResult(steps, answer) {
+    const list = make('ol', '');
+    list.append(...steps.map((step) => make('li', step)));
+    output.replaceChildren(list, make('p', answer, 'answer'));
+  }
+
+  function showError(message) {
+    entry.setAttribute('aria-invalid', 'true');
+    output.replaceChildren(make('p', message, 'feedback'));
+  }
+
+  function decode() {
+    const record = upper(entry.value);
+    if (!record || record.length > maxPlaces) {
+      showError('Введи от 1 до 8 букв.');
+      return;
+    }
+    const absent = [...record].find((symbol) => !alphabet.includes(symbol));
+    if (absent !== undefined) {
+      showError('В действующем алфавите нет знака «' + absent + '». Используй знаки из таблицы.');
+      return;
+    }
+
+    const base = alphabet.length;
+    let total = 0;
+    const steps = [...record].map((symbol, index) => {
+      const digit = alphabet.indexOf(symbol);
+      const weight = base ** (record.length - index - 1);
+      const contribution = digit * weight;
+      total += contribution;
+      return symbol + ' → ' + digit + '. Вклад: ' + digit + ' · ' + number.format(weight) + ' = ' + number.format(contribution) + '.';
+    });
+    showResult(steps, record + ' обозначает число ' + number.format(total) + ' в десятичной системе.');
+  }
+
+  function encode() {
+    const raw = entry.value.trim();
+    const value = Number(raw);
+    if (!/^\d+$/u.test(raw) || !Number.isSafeInteger(value) || value > maxValue()) {
+      showError('Введи целое число от 0 до ' + number.format(maxValue()) + ' десятичными цифрами.');
+      return;
+    }
+
+    const base = alphabet.length;
+    const steps = [];
+    const symbols = [];
+    let remaining = value;
+    do {
+      const quotient = Math.floor(remaining / base);
+      const digit = remaining % base;
+      const symbol = alphabet[digit];
+      steps.push(number.format(remaining) + ' = ' + number.format(quotient) + ' · ' + base + ' + ' + digit + '. Остатку соответствует ' + symbol + '.');
+      symbols.push(symbol);
+      remaining = quotient;
+    } while (remaining > 0);
+
+    const record = symbols.reverse().join('');
+    showResult(steps, 'Читаем буквы снизу вверх. Запись числа ' + number.format(value) + ' — ' + record + '.');
+  }
+
+  word.addEventListener('input', updateAlphabet);
+  order.addEventListener('change', updateAlphabet);
+  direction.addEventListener('change', () => {
+    entry.value = '';
+    updateEntry();
+  });
+  entry.addEventListener('input', clearOutput);
+  get('alphabet-converter').addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (fields.disabled) return;
+    if (direction.value === 'decode') decode();
+    else encode();
+  });
+  updateAlphabet();
+})();
+</script>
+</body>
+</html>

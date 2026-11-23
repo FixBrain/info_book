@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>7. Сложение столбиком</title>
+<style>
+:root{--accent:#2563eb;--bg:#f7f8fa;--card:#fff;--line:#e3e7ee;--ink:#1f2430;--muted:#5b6472}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+main{max-width:900px;margin:0 auto;padding:24px 16px 40px}
+h1{font-size:28px;margin:.2em 0 .4em}
+h2{font-size:21px;margin:1.6em 0 .5em;border-left:4px solid var(--accent);padding-left:10px}
+p{margin:.7em 0}
+.lead{font-size:18px;color:var(--muted)}
+.interactive{background:#fffdf3;border:1px solid #f0e4b8}
+input,select{font:inherit;padding:6px 10px;border:1px solid #b8c2d1;border-radius:8px;color:var(--ink);background:var(--card);max-width:100%}
+button{font:inherit;padding:7px 14px;border:0;border-radius:9px;background:var(--accent);color:#fff;cursor:pointer}
+button:hover{background:#1d4fd0}
+button:disabled{opacity:.55;cursor:default}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.interactive{border-radius:12px;padding:16px 18px;margin:18px 0}
+@media(max-width:540px){.interactive{padding:13px}}
+
+.column-model {
+  --ca-ink: #1f2430;
+  --ca-muted: #5b6472;
+  --ca-card-line: #e6e9f0;
+  --ca-line: #ced4e1;
+  --ca-color: #57617a;
+  --ca-rod-width: 9.5px;
+  --ca-rod-height: 32px;
+  min-inline-size: 0;
+}
+
+.column-model h3{margin-block-start:.25em}
+
+.ca-panel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px 14px;
+  border: 1px solid var(--ca-card-line);
+  border-radius: 16px;
+  padding: 12px 14px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(20, 30, 60, .06);
+}
+
+.ca-field {
+  display: grid;
+  gap: 4px;
+  font-size: 14px;
+  color: var(--ca-muted);
+}
+
+.ca-field input {
+  width: 132px;
+  font-family: Consolas, Menlo, monospace;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.ca-field select { min-inline-size: 4em; }
+.ca-field :is(input, select)[aria-invalid="true"] { border-color: #a92620; }
+
+.ca-start {
+  min-block-size: 44px;
+  padding-inline: 19px;
+  border-radius: 12px;
+  box-shadow: 0 3px 0 rgba(20, 30, 60, .14);
+  font-weight: 700;
+  transition: transform .08s ease, box-shadow .08s ease;
+}
+
+.ca-start:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 rgba(20, 30, 60, .14);
+}
+
+.ca-error { color: #a92620; font-size: 15px; overflow-wrap: anywhere; }
+.ca-error:empty, .ca-out:empty { display: none; }
+
+.ca-status {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-block-size: 3.2em;
+  margin: 10px 0 0;
+  border: 1px solid var(--ca-card-line);
+  border-radius: 12px;
+  padding: 6px 12px;
+  background: #fff;
+  color: var(--ca-ink);
+  text-align: center;
+  font-size: 15px;
+}
+
+.ca-scroll {
+  max-inline-size: 100%;
+  min-inline-size: 0;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  padding-block: 4px 8px;
+}
+
+.ca-grid {
+  --ca-grid-top: 6px;
+  --ca-column-top: 9.5px;
+  --ca-place-height: 22px;
+  --ca-carry-height: 38px;
+  --ca-operand-height: 106px;
+  --ca-work-height: 160px;
+  --ca-result-height: 50px;
+  position: relative;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 124px;
+  align-items: stretch;
+  gap: 8px;
+  inline-size: max-content;
+  margin-inline: auto;
+  padding: var(--ca-grid-top) 6px 12px 26px;
+}
+
+.ca-grid:not(:empty)::before {
+  position: absolute;
+  inset-inline-start: 4px;
+  inset-block-start: calc(var(--ca-grid-top) + var(--ca-column-top) + var(--ca-place-height) + var(--ca-carry-height) + var(--ca-operand-height) + var(--ca-operand-height) - 17px);
+  transform: translateY(-50%);
+  color: var(--ca-ink);
+  font: 800 25px/1 Consolas, Menlo, monospace;
+  content: '+';
+  pointer-events: none;
+}
+
+.ca-col {
+  display: grid;
+  grid-template-rows: var(--ca-place-height) var(--ca-carry-height) var(--ca-operand-height) var(--ca-operand-height) var(--ca-work-height) var(--ca-result-height);
+  justify-items: stretch;
+  min-inline-size: 0;
+  border: 1.5px solid var(--ca-card-line);
+  border-radius: 18px;
+  padding: 8px 6px 10px;
+  background: linear-gradient(#fff, #fafbfe);
+  box-shadow: 0 2px 6px rgba(20, 30, 60, .06);
+  text-align: center;
+  transition: border-color .25s ease, box-shadow .25s ease;
+}
+
+.ca-col.ca-active {
+  border-color: var(--ca-color);
+  box-shadow: 0 0 0 3px var(--ca-glow, #2563eb26), 0 4px 12px rgba(20, 30, 60, .10);
+  box-shadow: 0 0 0 3px var(--ca-glow, color-mix(in srgb, var(--ca-color) 23%, transparent)), 0 4px 12px rgba(20, 30, 60, .10);
+}
+
+.ca-place {
+  overflow: hidden;
+  color: var(--ca-muted);
+  font: 700 11px/22px -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  letter-spacing: .04em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.ca-carry {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 4px;
+  min-inline-size: 0;
+  color: var(--ca-ink);
+  font: 700 15px/1 Consolas, Menlo, monospace;
+}
+
+.ca-operand, .ca-work, .ca-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 3px;
+  min-width: 0;
+}
+
+.ca-operand { padding-block-end: 4px; }
+
+.ca-sticks {
+  display: flex;
+  flex-wrap: wrap-reverse;
+  align-content: flex-start;
+  justify-content: center;
+  gap: 3px 1px;
+  inline-size: 100%;
+  min-block-size: var(--ca-rod-height);
+  min-inline-size: 0;
+}
+
+.ca-operand .ca-sticks { min-block-size: var(--ca-operand-sticks-height, 67px); }
+
+.ca-work {
+  padding-block: 5px 4px;
+  border-radius: 8px 8px 0 0;
+  background: #f2f5fa;
+}
+
+.ca-work .ca-sticks { min-block-size: var(--ca-work-sticks-height, 137px); }
+.ca-active .ca-work { background: #eef2fb; }
+
+.ca-result {
+  justify-content: center;
+  border-block-start: 2px solid var(--ca-line);
+  padding-block-start: 4px;
+}
+
+.ca-digit {
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: 33px;
+  min-block-size: 28px;
+  padding-inline: 4px;
+  border: 1px solid var(--ca-color);
+  border-radius: 8px;
+  background-color: var(--ca-color);
+  background-image: linear-gradient(rgba(255,255,255,.22), transparent 58%, rgba(0,0,0,.10));
+  color: var(--ca-digit-ink, var(--ca-ink));
+  font: 800 21px/1 Consolas, Menlo, monospace;
+}
+
+.ca-digit:empty { border-color: transparent; background: none; }
+.ca-result .ca-digit { min-inline-size: 46px; min-block-size: 37px; font-size: 25px; }
+.ca-carry .ca-digit { min-inline-size: 23px; min-block-size: 23px; font-size: 15px; }
+
+.ca-stick, .ca-fly {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: var(--ca-rod-width);
+  height: var(--ca-rod-height);
+  line-height: 0;
+}
+
+.ca-stick svg, .ca-fly svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.ca-stick { transition: transform .35s ease, opacity .35s ease; }
+.ca-new { animation: ca-pop .4s cubic-bezier(.3, 1.5, .5, 1); }
+.ca-squeeze .ca-stick, .ca-stick.ca-squeeze { opacity: 0; transform: scale(.3); }
+
+.ca-fly {
+  position: absolute;
+  z-index: 3;
+  margin: 0;
+  pointer-events: none;
+  filter: drop-shadow(2px 4px 4px rgba(20, 30, 60, .3));
+  transition: transform .6s cubic-bezier(.45, 0, .3, 1);
+}
+
+.ca-out {
+  margin: 4px 0 0;
+  text-align: center;
+  font: 800 24px/1.4 Consolas, Menlo, monospace;
+  overflow-wrap: anywhere;
+}
+
+.ca-out b, .ca-out strong { color: #2563eb; }
+
+@keyframes ca-pop {
+  from { transform: translateY(-12px) scale(.7); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+@media (max-width: 540px) {
+  .ca-panel { gap: 7px 10px; padding: 9px; }
+  .ca-field input { width: 109px; font-size: 16px; }
+  .ca-start { padding-inline: 13px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ca-new { animation: none; }
+  .ca-stick, .ca-col, .ca-fly, .ca-start { transition: none; }
+}
+
+.ca-stick.ca-selected{outline:1px solid #b7860b;border-radius:3px;background:#ffe7aa}
+.ca-status[hidden]{display:none}
+header.top{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+nav.menu{max-width:900px;margin:0 auto;display:flex;flex-wrap:wrap;gap:4px;padding:10px 16px}
+nav.menu a{text-decoration:none;color:var(--muted);padding:6px 10px;border-radius:8px;font-size:14px}
+nav.menu a:hover{background:#eef2ff;color:var(--accent)}
+nav.menu a[aria-current]{background:var(--accent);color:#fff}
+h3{font-size:17px;margin:0 0 .4em}
+ol{margin:.65em 0;padding-inline-start:1.6em}
+li+li{margin-top:.35em}
+.example,.note{border-radius:12px;padding:16px 18px;margin:18px 0}
+.example{background:#f0f6ff;border:1px solid #d6e4ff}
+.note{background:#fff8ec;border:1px solid #f3e2bd}
+.formula{font-size:20px;text-align:center}
+.pager{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:36px}
+.pager a{text-decoration:none;color:#1647a8;background:#eef2ff;padding:10px 16px;border-radius:9px;font-size:15px}
+.ca-borrow-note{align-items:center;color:#705137;font:700 12px/1.25 -apple-system,Segoe UI,Roboto,Arial,sans-serif}
+.ca-col.ca-donor,.ca-col.ca-receiver{border-color:var(--ca-color);box-shadow:0 0 0 2px color-mix(in srgb,var(--ca-color) 21%,transparent)}
+.ca-digit.ca-count{font:700 13px/1.15 -apple-system,Segoe UI,Roboto,Arial,sans-serif}
+@media(max-width:540px){header.top{position:static}.example,.note{padding:13px}}
+.sum-controls{display:flex;flex-wrap:wrap;align-items:end;gap:8px 12px;margin:12px 0}
+.sum-controls label{display:grid;gap:4px;font-weight:600}
+.sum-scroll{inline-size:fit-content;max-block-size:24rem;max-inline-size:100%;overflow:auto;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+.sum-grid{border-spacing:0;min-inline-size:max-content;text-align:center}
+.sum-grid caption{text-align:left;padding:7px 10px;color:var(--muted);font-size:14px}
+.sum-grid th,.sum-grid td{min-inline-size:3rem;padding:4px;border-inline-end:1px solid var(--line);border-block-end:1px solid var(--line)}
+.sum-grid th{background:#eef2fb;color:var(--ink)}
+.sum-grid thead th{position:sticky;inset-block-start:0;z-index:2}
+.sum-grid tr th:first-child{position:sticky;inset-inline-start:0}
+.sum-grid tbody th{z-index:1}
+.sum-grid thead th:first-child{z-index:3}
+.sum-cell{inline-size:2.5rem;min-block-size:2.25rem;padding:2px;text-align:center;font:650 16px/1.15 Consolas,Menlo,monospace}
+.sum-cell.sum-correct{border-color:#33724d;background:#eef8f1;color:#205737}
+.sum-cell[aria-invalid="true"]{border-color:#a92620;background:#fff0ee;color:#982a25}
+.sum-feedback{font-weight:650}
+.sum-answer{margin-top:16px}
+.sum-answer summary{color:var(--accent);font-weight:700;cursor:pointer}
+.sum-answer .sum-scroll{margin-top:8px}
+.sum-grid .borrow-hit{background:#ffe8b0;color:#57370b;font-weight:750}
+.borrow-trace td{padding:5px 9px}
+
+.fraction-example{padding-inline:clamp(10px,2.3vw,18px)}
+.fraction-example h3{margin-block-start:0}
+.fraction-table{
+  width:min(100%,420px);
+  margin:12px auto;
+  border-collapse:collapse;
+  table-layout:fixed;
+  font-variant-numeric:tabular-nums;
+  text-align:center;
+}
+.fraction-table caption{padding-block-end:5px;color:var(--muted);font-size:.875rem}
+.fraction-table th,.fraction-table td{padding:.26rem .18rem}
+.fraction-table thead th{border-bottom:1px solid #b3cbe4;color:var(--muted);font-size:.875rem}
+.fraction-table :is(th,td):first-child{width:43%;text-align:start}
+.fraction-table th[scope="row"]{font-size:.875rem;font-weight:650;overflow-wrap:anywhere}
+.fraction-column .fraction-comma{width:1rem}
+.fraction-column td{font-family:Consolas,Menlo,monospace;font-size:1.125rem}
+.fraction-column .fraction-carry{color:#205e9e;font-weight:700}
+.fraction-column .fraction-answer>*{border-top:2px solid var(--ink);font-weight:700}
+.fraction-pad{display:inline-block;min-inline-size:1.15em;border-radius:4px;background:#e4e9f0;color:#505d70}
+.fraction-exchanges tbody tr+tr>*{border-top:1px solid #cbdcec}
+.fraction-exchanges .fraction-changed{background:#e3eefb;color:#154f8a;font-weight:750}
+.fraction-sr{position:absolute;inline-size:1px;block-size:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+@media(min-width:541px){#addition-table,#subtraction{scroll-margin-top:14rem}}
+@media(min-width:900px){#addition-table,#subtraction{scroll-margin-top:9rem}}
+</style>
+</head>
+<body>
+<header class="top">
+  <nav class="menu" aria-label="Главы учебника">
+    <a href="index.html">Оглавление</a>
+    <a href="01-chto-takoe-chislo.html">1. Что такое число</a>
+    <a href="02-razryady.html">2. Термины</a>
+    <a href="03-sravnenie.html">3. Сравнение чисел</a>
+    <a href="03-osnovaniya.html">4. Разные основания</a>
+    <a href="04-razvernutaya-zapis.html">5. Развёрнутая запись</a>
+    <a href="05-perevod-iz-desyatichnoy.html">6. Из десятичной</a>
+    <a href="07-slozhenie-i-vychitanie.html" aria-current="page">7. Сложение</a>
+    <a href="08-vychitanie.html">8. Вычитание</a>
+    <a href="08-svoystva-chisel.html">9. Свойства чисел</a>
+    <a href="09-alternativnye-alfavity.html">10. Альтернативные алфавиты</a>
+    <a href="10-numeratsiya-slov.html">11. Сравнение и нумерация слов</a>
+    <a href="11-itogi.html">12. Итоги</a>
+  </nav>
+</header>
+<main>
+  <h1>7. Сложение столбиком</h1>
+  <p class="lead">В десятичной системе десять единиц дают один десяток. В основании <i>N</i> связываем по <i>N</i> палочек и переносим полученную группу в соседний разряд слева.</p>
+  <p>Записываем числа <b>в одном основании</b> друг под другом, единицы под единицами. Пустое место в столбце считаем нулём. Движемся справа налево. Ответ записываем в том же основании.</p>
+
+  <h2 id="addition">Как выполнить перенос</h2>
+  <p>В каждом столбце складываем значения двух цифр и прибавляем единицу переноса, если она пришла справа.</p>
+  <ol>
+    <li>Если получилось меньше <i>N</i> палочек, записываем их количество под чертой.</li>
+    <li>Если получилось <i>N</i> палочек или больше, объединяем ровно <i>N</i> из них в одну палочку следующего разряда. Под чертой пишем, сколько палочек осталось, а полученную группу переносим в столбец слева.</li>
+    <li>Если перенос выходит за крайний левый столбец, записываем слева новую цифру <b>1</b>.</li>
+  </ol>
+
+  <div class="example">
+    <h3>Пример 23<sub>4</sub> + 13<sub>4</sub></h3>
+    <ol>
+      <li>В единицах собираем шесть палочек. Четыре объединяем в одну группу, пишем <b>2</b> и переносим <b>1</b>.</li>
+      <li>В следующем столбце собираем четыре группы — две из первого слагаемого, одну из второго и одну из переноса. Пишем <b>0</b> и снова переносим <b>1</b>.</li>
+      <li>В новом старшем разряде записываем <b>1</b>. Ответ — <b>102<sub>4</sub></b>.</li>
+    </ol>
+  </div>
+
+  <div class="note">
+    <h3>Откуда берутся цифра и перенос</h3>
+    <p>Пусть в разряде с весом <i>N</i><sup><i>i</i></sup> собралось <i>s</i> палочек. Делим <i>s</i> на <i>N</i> с остатком и получаем <i>s</i> = <i>qN</i> + <i>r</i>, где 0 ≤ <i>r</i> &lt; <i>N</i>.</p>
+    <p class="formula"><i>sN</i><sup><i>i</i></sup> = <i>rN</i><sup><i>i</i></sup> + <i>qN</i><sup><i>i</i>+1</sup></p>
+    <p>Остаток <i>r</i> даёт цифру в текущем разряде, а частное <i>q</i> — перенос. Две цифры вместе с входящим переносом дают максимум (<i>N</i> − 1) + (<i>N</i> − 1) + 1 = 2<i>N</i> − 1, поэтому перенос равен либо 0, либо 1.</p>
+  </div>
+
+    <section class="interactive column-model" id="column-add" aria-labelledby="column-add-heading">
+    <h3 id="column-add-heading">Сложение на цветных палочках</h3>
+    <p>Выберите основание от 2 до 20 и введите два целых неотрицательных числа в этом основании. В каждом слагаемом может быть до восьми цифр.</p>
+
+    <div class="ca-panel">
+      <label class="ca-field" for="add-column-base">Основание
+        <select id="add-column-base" aria-describedby="add-column-error">
+          <option value="4" selected>4</option>
+        </select>
+      </label>
+      <label class="ca-field" for="add-column-first">Первое слагаемое
+        <input id="add-column-first" type="text" value="23" autocomplete="off" spellcheck="false" autocapitalize="characters" aria-describedby="add-column-error">
+      </label>
+      <label class="ca-field" for="add-column-second">Второе слагаемое
+        <input id="add-column-second" type="text" value="13" autocomplete="off" spellcheck="false" autocapitalize="characters" aria-describedby="add-column-error">
+      </label>
+      <button class="ca-start" id="add-column-start" type="button">Сложить</button>
+    </div>
+    <p class="ca-error" id="add-column-error" role="alert"></p>
+
+    <p class="ca-status" id="add-column-status" role="status" aria-atomic="true"></p>
+    <div class="ca-scroll" id="add-column-scroll" tabindex="0" role="region" aria-label="Первое слагаемое плюс второе по разрядам">
+      <div class="ca-grid" id="add-column-grid"></div>
+    </div>
+    <p class="ca-out" id="add-column-result" role="status" aria-atomic="true"></p>
+  </section>
+
+  <h3 id="addition-table">Таблица сложения</h3>
+  <p>Чтобы каждый раз не вычислять сумму двух цифр заново, можно пользоваться таблицей сложения или запомнить её. В основании <i>N</i> есть <i>N</i> цифр, включая ноль. Запишем их в заголовки строк и столбцов. На каждом пересечении стоит сумма двух цифр в том же основании. Получается <b><i>N</i> × <i>N</i> клеток с ответами</b>.</p>
+  <p>Например, в основании 4 на пересечении строки 3 и столбца 3 стоит <b>12<sub>4</sub></b>. В столбике пишем 2 под чертой и переносим 1 влево. Если единица уже пришла из младшего разряда, сначала прибавляем её к сумме из таблицы, а затем записываем цифру и перенос.</p>
+  <p>При перестановке слагаемых сумма сохраняется. Поэтому клетки по разные стороны от диагонали повторяются.</p>
+
+  <section class="interactive" id="sum-exercise" aria-labelledby="sum-task-title">
+    <h3 id="sum-task-title">Составьте таблицу сложения</h3>
+    <p>В каждой клетке сложите цифру слева с цифрой сверху. Запишите сумму <b>в выбранном основании</b> без ведущих нулей. Для цифр A–J используйте латинские буквы.</p>
+    <form id="sum-form">
+      <div class="sum-controls">
+        <label>Основание <select id="sum-base"><option value="4" selected>4</option></select></label>
+        <button type="submit">Проверить таблицу</button>
+      </div>
+      <p class="sum-feedback" id="sum-feedback" role="status" hidden></p>
+      <div class="sum-scroll" tabindex="0" role="region" aria-label="Таблица для заполнения">
+        <table id="sum-input-table" class="sum-grid"></table>
+      </div>
+    </form>
+    <details id="sum-answer" class="sum-answer">
+      <summary>Показать правильную таблицу</summary>
+      <div class="sum-scroll" tabindex="0" role="region" aria-label="Правильная таблица сложения">
+        <table id="sum-answer-table" class="sum-grid"></table>
+      </div>
+    </details>
+  </section>
+  <p id="subtraction">Таблица сложения помогает <a href="08-vychitanie.html#subtraction-table">найти цифру разности</a>.</p>
+
+  <h2 id="fractional">Сложение чисел с запятой</h2>
+  <p>Совмещаем запятые, чтобы цифры одинакового веса оказались друг под другом. При необходимости дополняем дробную часть справа нулями и начинаем с крайнего правого разряда. Когда в первом разряде после запятой набирается <i>N</i> палочек, переносим одну группу в единицы.</p>
+  <p>Запятую в ответе ставим под запятыми исходных чисел. Незначащие нули в конце дробной части опускаем. Если дробная часть равна нулю, записываем целое число.</p>
+  <div class="example fraction-example">
+    <h3>Сложение (1,3)<sub>4</sub> + (0,13)<sub>4</sub></h3>
+    <p>Совмещаем запятые. В первом слагаемом нет шестнадцатых, поэтому дописываем справа серый ноль. Записи (1,3)<sub>4</sub> и (1,30)<sub>4</sub> обозначают одно число.</p>
+    <table class="fraction-table fraction-column">
+      <caption>Сложение столбиком в основании 4</caption>
+      <thead>
+        <tr><th scope="col">Вес разряда</th><th scope="col">1</th><th class="fraction-comma" scope="col"><span class="fraction-sr">Запятая</span></th><th scope="col">1/4</th><th scope="col">1/16</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">Перенос</th><td class="fraction-carry">1</td><td></td><td></td><td></td></tr>
+        <tr><th scope="row">Первое слагаемое</th><td>1</td><td>,</td><td>3</td><td><span class="fraction-pad"><span aria-hidden="true">0</span><span class="fraction-sr">0, дописан справа для выравнивания</span></span></td></tr>
+        <tr><th scope="row">+ Второе слагаемое</th><td>0</td><td>,</td><td>1</td><td>3</td></tr>
+        <tr class="fraction-answer"><th scope="row">Сумма</th><td>2</td><td>,</td><td>0</td><td>3</td></tr>
+      </tbody>
+    </table>
+    <ol>
+      <li>В шестнадцатых 0 + 3 = 3. Пишем 3.</li>
+      <li>В четвертях 3 + 1 = 4. Четыре четверти дают одну единицу. Пишем 0 и переносим 1 через запятую.</li>
+      <li>В единицах 1 + 0 + 1 = 2. Последняя единица пришла из переноса.</li>
+    </ol>
+    <p class="formula">(1,3)<sub>4</sub> + (0,13)<sub>4</sub> = <b>(2,03)<sub>4</sub></b></p>
+  </div>
+  <nav class="pager" aria-label="Соседние главы">
+    <a href="05-perevod-iz-desyatichnoy.html">← Назад: перевод из десятичной системы</a>
+    <a href="08-vychitanie.html">Дальше: вычитание столбиком →</a>
+  </nav>
+</main>
+<script>
+(() => {
+  'use strict';
+
+  const alphabet = '0123456789ABCDEFGHIJ';
+  const colors = ['#e5483b', '#2b85e4', '#f5c822', '#2bb155', '#9257dc', '#f28f24', '#17b0ab', '#e55a94', '#596782'];
+  const ink = ['#fff', '#fff', '#3a2f00', '#1f2430', '#fff', '#3a2400', '#1f2430', '#fff', '#fff'];
+  const byId = (id) => document.getElementById(id);
+  const baseField = byId('add-column-base');
+  const firstField = byId('add-column-first');
+  const secondField = byId('add-column-second');
+  const start = byId('add-column-start');
+  const feedback = byId('add-column-error');
+  const status = byId('add-column-status');
+  const scroller = byId('add-column-scroll');
+  const grid = byId('add-column-grid');
+  const result = byId('add-column-result');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const fields = [baseField, firstField, secondField];
+  let example;
+  let busy = false;
+
+  function mixColor(color, endpoint, amount) {
+    return 'rgb(' + [1, 3, 5].map((index) => {
+      const value = Number.parseInt(color.slice(index, index + 2), 16);
+      return Math.round(value * (1 - amount) + endpoint * amount);
+    }).join(',') + ')';
+  }
+
+  function drawRodDefinitions() {
+    const ns = 'http://www.w3.org/2000/svg';
+    const host = document.createElementNS(ns, 'svg');
+    host.setAttribute('width', '0');
+    host.setAttribute('height', '0');
+    host.setAttribute('aria-hidden', 'true');
+    host.setAttribute('focusable', 'false');
+    host.style.cssText = 'position:absolute;width:0;height:0;pointer-events:none';
+
+    // The same cylindrical rod shape and gradients as in chapter 03.
+    host.innerHTML = '<defs>' + colors.map((color, index) => {
+      const id = `ca-rod-${index}`;
+      const red = index === 0;
+      const body = red ? '#ec3d2d' : color;
+      const light = red ? '#ffb3a6' : mixColor(color, 255, .62);
+      const shade = red ? '#a81b10' : mixColor(color, 0, .30);
+      const capLight = red ? '#ffb0a4' : light;
+      const capShade = red ? '#c22617' : mixColor(color, 0, .23);
+      const stroke = red ? '#8d160c' : mixColor(color, 0, .45);
+      return `<linearGradient id="${id}-fill" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="${light}"/><stop offset=".4" stop-color="${body}"/><stop offset="1" stop-color="${shade}"/>
+      </linearGradient><radialGradient id="${id}-cap" cx=".38" cy=".35" r=".8">
+        <stop offset="0" stop-color="${capLight}"/><stop offset=".7" stop-color="${body}"/><stop offset="1" stop-color="${capShade}"/>
+      </radialGradient><g id="${id}">
+        <path d="M-5,-34 L-5,0 A5,2.1 0 0 0 5,0 L5,-34 Z" fill="url(#${id}-fill)" stroke="${stroke}" stroke-width=".5"/>
+        <ellipse cx="0" cy="-34" rx="5" ry="2.1" fill="url(#${id}-cap)" stroke="${stroke}" stroke-width=".5"/>
+      </g>`;
+    }).join('') + '</defs>';
+    document.body.prepend(host);
+  }
+
+  function stick(place) {
+    return `<span class="ca-stick" aria-hidden="true"><svg viewBox="-7 -38.1 14 42.2" focusable="false"><use href="#ca-rod-${place}"/></svg></span>`;
+  }
+
+  const sticks = (count, place) => stick(place).repeat(count);
+  const formatted = (number, base) => `<span class="ca-number">${number}<sub>${base}</sub></span>`;
+
+  function readNumber(field, base, caption) {
+    const record = field.value.trim().toUpperCase().replace(/^0+(?=.)/, '');
+    let error = '';
+    if (!record) {
+      error = `${caption}. Введите число.`;
+    } else {
+      const bad = Array.from(record).find((digit) => alphabet.indexOf(digit) < 0 || alphabet.indexOf(digit) >= base);
+      if (bad !== undefined) {
+        error = `${caption}. Цифра «${bad}» недопустима в основании ${base}. Используйте цифры от 0 до ${alphabet[base - 1]}.`;
+      } else if (record.length > 8) {
+        error = `${caption}. Введите число длиной до восьми цифр.`;
+      }
+    }
+    field.setAttribute('aria-invalid', String(Boolean(error)));
+    return { record, error };
+  }
+
+  function makePlan(first, second, base) {
+    const steps = [];
+    const count = Math.max(first.length, second.length);
+    let carry = 0;
+    for (let place = 0; place < count || carry; place += 1) {
+      const left = alphabet.indexOf(first.charAt(first.length - place - 1) || ' ');
+      const right = alphabet.indexOf(second.charAt(second.length - place - 1) || ' ');
+      const total = Math.max(left, 0) + Math.max(right, 0) + carry;
+      const outgoing = Math.floor(total / base);
+      steps.push({ place, left, right, incoming: carry, total, digit: total % base, outgoing });
+      carry = outgoing;
+    }
+    return steps;
+  }
+
+  function operand(digit, place, side) {
+    return `<div class="ca-operand ${side}">
+      <div class="ca-sticks" aria-hidden="true">${sticks(Math.max(digit, 0), place)}</div>
+      <span class="ca-digit">${digit < 0 ? '' : alphabet[digit]}</span>
+    </div>`;
+  }
+
+  function drawBoard() {
+    const operandMax = Math.max(...example.steps.map((step) => Math.max(step.left, step.right)));
+    const workMax = Math.max(...example.steps.map((step) => step.total));
+    const stickBand = (count) => Math.max(1, Math.ceil(count / 10)) * 35 - 3;
+    const operandHeight = stickBand(operandMax);
+    const workHeight = stickBand(workMax);
+    // The column width fits ten rods per row.
+    grid.style.setProperty('--ca-operand-sticks-height', `${operandHeight}px`);
+    grid.style.setProperty('--ca-operand-height', `${operandHeight + 39}px`);
+    grid.style.setProperty('--ca-work-sticks-height', `${workHeight}px`);
+    grid.style.setProperty('--ca-work-height', `${workHeight + 19}px`);
+    grid.innerHTML = example.steps.slice().reverse().map(({ place, left, right }) => `
+      <div class="ca-col" data-place="${place}" style="--ca-color:${colors[place]};--ca-digit-ink:${ink[place]}">
+        <div class="ca-place">${place ? `${example.base}<sup>${place}</sup>` : 'Единицы'}</div>
+        <div class="ca-carry"></div>
+        ${operand(left, place, 'ca-first')}
+        ${operand(right, place, 'ca-second')}
+        <div class="ca-work"><div class="ca-sticks" aria-hidden="true"></div></div>
+        <div class="ca-result"><span class="ca-digit" aria-label="Цифра в ответе"></span></div>
+      </div>`).join('');
+    scroller.scrollLeft = scroller.scrollWidth;
+  }
+
+  function updateControls() {
+    fields.forEach((field) => { field.disabled = busy; });
+    start.disabled = busy || !example;
+  }
+
+  function prepare(commit = false) {
+    if (busy) return;
+    const base = Number(baseField.value);
+    const first = readNumber(firstField, base, 'Первое слагаемое');
+    const second = readNumber(secondField, base, 'Второе слагаемое');
+    const error = first.error || second.error;
+    feedback.hidden = !error;
+    feedback.textContent = error;
+    result.hidden = true;
+    if (error) {
+      example = undefined;
+      grid.replaceChildren();
+      scroller.hidden = true;
+      status.hidden = true;
+    } else {
+      if (commit) {
+        firstField.value = first.record;
+        secondField.value = second.record;
+      }
+      example = { base, first: first.record, second: second.record, steps: makePlan(first.record, second.record, base) };
+      scroller.hidden = false;
+      status.hidden = false;
+      status.textContent = 'Нажмите «Сложить». Начнём с крайнего правого разряда.';
+      drawBoard();
+    }
+    updateControls();
+  }
+
+  const columnAt = (place) => grid.querySelector(`.ca-col[data-place="${place}"]`);
+  const wait = (ms) => new Promise((resolve) => setTimeout(resolve, reducedMotion.matches ? Math.min(ms, 200) : ms));
+  const centerOf = (element) => {
+    const { left, top, width, height } = element.getBoundingClientRect();
+    return { x: left + width / 2, y: top + height / 2 };
+  };
+  const translate = (from, to) => `translate(${to.x - from.x}px,${to.y - from.y}px)`;
+
+  function showColumns(col, next) {
+    const first = col.getBoundingClientRect();
+    const last = next ? next.getBoundingClientRect() : first;
+    const view = scroller.getBoundingClientRect();
+    const left = Math.min(first.left, last.left);
+    const right = Math.max(first.right, last.right);
+    if (left < view.left) scroller.scrollLeft += left - view.left;
+    else if (right > view.right) scroller.scrollLeft += right - view.right;
+  }
+
+  async function moveElements(elements, keyframesFor, duration) {
+    if (reducedMotion.matches || !elements.length || typeof grid.animate !== 'function') return;
+    const motions = elements.map((item, index) => item.animate(keyframesFor(item, index), {
+      duration, easing: 'cubic-bezier(.3,.1,.25,1)', fill: 'both'
+    }));
+    await Promise.allSettled(motions.map((motion) => motion.finished));
+    motions.forEach((motion) => motion.cancel());
+  }
+
+  function columnExplanation(step, base) {
+    const terms = [alphabet[Math.max(step.left, 0)], alphabet[Math.max(step.right, 0)]];
+    if (step.incoming) terms.push('1');
+    const result = step.total.toString(base).toUpperCase();
+    return `${step.place ? `Разряд ${step.place}` : 'Единицы'}. ${terms.join(' + ')} = ${result} в основании ${base}.`;
+  }
+
+  function writeDigit(col, digit) {
+    const written = col.querySelector('.ca-result .ca-digit');
+    written.removeAttribute('aria-label');
+    written.textContent = alphabet[digit];
+    written.classList.add('ca-new');
+  }
+
+  async function carryGroup(col, next, step, area) {
+    const items = [...area.children].slice(0, example.base);
+    const center = centerOf(area);
+    const middle = { x: center.x, y: area.getBoundingClientRect().bottom - 21 };
+    items.forEach((item) => item.classList.add('ca-selected'));
+    status.textContent = `Объединяем ${example.base} палочек в одну палочку следующего разряда.`;
+    await wait(360);
+    await moveElements(items, (item) => [
+      { opacity: 1, transform: 'none' },
+      { opacity: .15, transform: `${translate(centerOf(item), middle)} scale(.45)` }
+    ], 400);
+    items.forEach((item) => item.remove());
+
+    const marker = next.querySelector('.ca-carry');
+    const draw = stick(step.place + 1);
+    grid.insertAdjacentHTML('beforeend', draw);
+    const flying = grid.lastElementChild;
+    flying.classList.add('ca-fly');
+    const bounds = grid.getBoundingClientRect();
+    flying.style.left = `${middle.x - bounds.left - grid.clientLeft - flying.offsetWidth / 2}px`;
+    flying.style.top = `${middle.y - bounds.top - grid.clientTop - flying.offsetHeight / 2}px`;
+    writeDigit(col, step.digit);
+    status.textContent = `Пишем ${alphabet[step.digit]} под чертой и переносим 1 в столбец слева.`;
+    await wait(250);
+    await moveElements([flying], (item) => [
+      { transform: 'none', opacity: 1 },
+      { transform: translate(centerOf(item), centerOf(marker)), opacity: .9 }
+    ], 610);
+    flying.remove();
+    marker.innerHTML = `<span class="ca-digit ca-carry-digit" aria-label="Перенос 1">1</span>${draw}`;
+    await wait(200);
+  }
+
+  async function showStep(step) {
+    const col = columnAt(step.place);
+    const next = step.outgoing ? columnAt(step.place + 1) : null;
+    const area = col.querySelector('.ca-work .ca-sticks');
+    const sources = [...col.querySelectorAll('.ca-first .ca-stick,.ca-second .ca-stick,.ca-carry .ca-stick')];
+    col.classList.add('ca-active');
+    showColumns(col, next);
+    status.textContent = columnExplanation(step, example.base);
+    area.innerHTML = sticks(step.total, step.place);
+
+    await moveElements([...area.children], (item, index) => [
+      { transform: translate(centerOf(item), centerOf(sources[index])), opacity: .75 },
+      { transform: 'none', opacity: 1 }
+    ], 530);
+    await wait(360);
+
+    if (next) {
+      await carryGroup(col, next, step, area);
+    } else {
+      writeDigit(col, step.digit);
+      status.textContent = `Пишем ${alphabet[step.digit]} под чертой.`;
+      await wait(390);
+    }
+    col.classList.remove('ca-active');
+  }
+
+  async function runAddition() {
+    if (busy || !example) return;
+    const wasFocused = document.activeElement === start;
+    busy = true;
+    result.hidden = true;
+    updateControls();
+    drawBoard();
+    try {
+      for (const step of example.steps) await showStep(step);
+
+      const answer = example.steps.map((step) => alphabet[step.digit]).reverse().join('');
+      result.innerHTML = `${formatted(example.first, example.base)} + ${formatted(example.second, example.base)} = <b>${formatted(answer, example.base)}</b>`;
+      result.hidden = false;
+      status.textContent = 'Все столбцы сложены. Прочитайте результат слева направо.';
+    } finally {
+      busy = false;
+      updateControls();
+      if (wasFocused && document.activeElement === document.body) start.focus({ preventScroll: true });
+    }
+  }
+
+  drawRodDefinitions();
+  baseField.replaceChildren(...Array.from({ length: 19 }, (_, index) => {
+    const base = index + 2;
+    return new Option(String(base), String(base), base === 4, base === 4);
+  }));
+  baseField.addEventListener('change', () => prepare(true));
+  [firstField, secondField].forEach((field) => {
+    field.addEventListener('input', () => prepare());
+    field.addEventListener('change', () => prepare(true));
+    field.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        prepare(true);
+        if (!start.disabled) runAddition();
+      }
+    });
+  });
+  start.addEventListener('click', runAddition);
+  prepare(true);
+})();
+</script>
+<script>
+(() => {
+  'use strict';
+
+  const alphabet = '0123456789ABCDEFGHIJ';
+  const base = document.getElementById('sum-base');
+  const form = document.getElementById('sum-form');
+  const exercise = document.getElementById('sum-input-table');
+  const answer = document.getElementById('sum-answer');
+  const answerTable = document.getElementById('sum-answer-table');
+  const feedback = document.getElementById('sum-feedback');
+
+  function tableMarkup(radix, editable) {
+    const digits = [...alphabet.slice(0, radix)];
+    const caption = editable ? `Основание ${radix} · ${radix} × ${radix} клеток` : `Ответы для основания ${radix}`;
+    const headers = digits.map((digit) => `<th scope="col">${digit}</th>`).join('');
+    const rows = digits.map((first, row) => {
+      const cells = digits.map((second, column) => {
+        const total = (row + column).toString(radix).toUpperCase();
+        if (!editable) return `<td>${total}</td>`;
+        const keyboard = radix <= 10 ? 'numeric' : 'text';
+        return `<td><input class="sum-cell" type="text" inputmode="${keyboard}" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="${first} плюс ${second} в основании ${radix}" data-answer="${total}"></td>`;
+      }).join('');
+      return `<tr><th scope="row">${first}</th>${cells}</tr>`;
+    }).join('');
+    return `<caption>${caption}</caption><thead><tr><th scope="col">+</th>${headers}</tr></thead><tbody>${rows}</tbody>`;
+  }
+
+  function reset() {
+    const radix = Number(base.value);
+    exercise.innerHTML = tableMarkup(radix, true);
+    answerTable.innerHTML = tableMarkup(radix, false);
+    answer.open = false;
+    feedback.hidden = true;
+    exercise.parentElement.scrollLeft = exercise.parentElement.scrollTop = 0;
+    answerTable.parentElement.scrollLeft = answerTable.parentElement.scrollTop = 0;
+  }
+
+  function check(event) {
+    event.preventDefault();
+    const cells = [...exercise.querySelectorAll('.sum-cell')];
+    let correct = 0;
+    let incorrect = 0;
+    for (const cell of cells) {
+      const value = cell.value.trim().toUpperCase();
+      const matches = value === cell.dataset.answer;
+      const wrong = value !== '' && !matches;
+      cell.classList.toggle('sum-correct', matches);
+      cell.setAttribute('aria-invalid', String(wrong));
+      if (matches) correct += 1;
+      if (wrong) incorrect += 1;
+    }
+    const missing = cells.length - correct - incorrect;
+    feedback.hidden = false;
+    feedback.textContent = correct === cells.length
+      ? `Верно. Заполнены все ${cells.length} клеток.`
+      : `Верных ответов ${correct} из ${cells.length}. Ошибок ${incorrect}. Пустых клеток ${missing}.`;
+  }
+
+  base.replaceChildren(...Array.from({ length: 19 }, (_, index) => {
+    const radix = index + 2;
+    return new Option(String(radix), String(radix), radix === 4, radix === 4);
+  }));
+  base.addEventListener('change', reset);
+  form.addEventListener('submit', check);
+  exercise.addEventListener('input', (event) => {
+    const cell = event.target;
+    cell.classList.remove('sum-correct');
+    cell.removeAttribute('aria-invalid');
+    feedback.hidden = true;
+  });
+  reset();
+})();
+</script>
+</body>
+</html>

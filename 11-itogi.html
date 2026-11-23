@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>12. Итоги. Как читать записи чисел и работать с ними</title>
+<style>
+:root{--accent:#2563eb;--bg:#f7f8fa;--card:#fff;--line:#e3e7ee;--ink:#1f2430;--muted:#5b6472}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+header.top{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+nav.menu{max-width:900px;margin:0 auto;display:flex;flex-wrap:wrap;gap:4px;padding:10px 16px}
+nav.menu a{text-decoration:none;color:var(--muted);padding:6px 10px;border-radius:8px;font-size:14px}
+nav.menu a:hover{background:#eef2ff;color:var(--accent)}
+nav.menu a[aria-current]{background:var(--accent);color:#fff}
+main{max-width:900px;margin:0 auto;padding:24px 16px 40px}
+h1{font-size:28px;margin:.2em 0 .4em}
+h2{font-size:21px;margin:1.6em 0 .5em;border-left:4px solid var(--accent);padding-left:10px}
+h3{font-size:17px;margin:0 0 .4em}
+p{margin:.55em 0}
+a{color:#1647a8}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.lead{font-size:18px;color:var(--muted)}
+.memo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.memo div{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.memo div:last-child{grid-column:1/-1}
+.memo p:last-child{margin-bottom:0}
+.example,.selfcheck{border-radius:12px;padding:14px 18px;margin:16px 0}
+.example{background:#f0f6ff;border:1px solid #d6e4ff}
+.expanded-equation{margin:.65em 0 .9em;text-align:center;font-size:19px}
+.expanded-equation span{display:block}
+.horner-chain{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:6px;margin:9px 0 16px;text-align:center}
+.horner-chain b{min-width:32px;padding:3px 7px;border:1px solid #bcd0ff;border-radius:8px;background:#fff;font-size:18px}
+.horner-link{display:grid;min-width:53px;line-height:1.2;color:#1647a8}
+.horner-link small{white-space:nowrap}
+.horner-link span{font-size:22px}
+.division-figure{margin:12px 0}
+.division-corner{border-collapse:separate;border-spacing:0;margin:auto;font:20px/1.35 Consolas,Menlo,monospace}
+.division-corner td{min-width:.9em;height:1.5em;padding:0 1px;text-align:center;border-left:2px solid transparent;border-bottom:2px solid transparent}
+.division-corner td.division-under{border-bottom-color:var(--ink)}
+.division-corner td.division-side{border-left-color:var(--ink)}
+.division-remainder{background:#ffe08a;font-weight:700}
+.division-leading{background:#cfe0ff;font-weight:700}
+.selfcheck{background:#f3fbf4;border:1px solid #cdeccf}
+.example ol,.selfcheck ol{padding-inline-start:22px;margin:.5em 0}
+.example li,.selfcheck li{margin:.45em 0}
+.selfcheck details{margin:.25em 0 .65em}
+.selfcheck summary{width:fit-content;color:#1647a8;cursor:pointer}
+.selfcheck details p{margin:.35em 0 .65em}
+.pager{display:flex;flex-wrap:wrap;justify-content:space-between;margin-top:28px;gap:10px}
+.pager a{text-decoration:none;background:#eef2ff;padding:10px 16px;border-radius:9px;font-size:15px}
+@media(max-width:540px){
+  header.top{position:static}
+  .memo{grid-template-columns:minmax(0,1fr)}
+  .example,.selfcheck{padding:13px}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <nav class="menu" aria-label="Главы учебника">
+    <a href="index.html">Оглавление</a>
+    <a href="01-chto-takoe-chislo.html">1. Что такое число</a>
+    <a href="02-razryady.html">2. Термины</a>
+    <a href="03-sravnenie.html">3. Сравнение чисел</a>
+    <a href="03-osnovaniya.html">4. Разные основания</a>
+    <a href="04-razvernutaya-zapis.html">5. Развёрнутая запись</a>
+    <a href="05-perevod-iz-desyatichnoy.html">6. Из десятичной</a>
+    <a href="07-slozhenie-i-vychitanie.html">7. Сложение</a>
+    <a href="08-vychitanie.html">8. Вычитание</a>
+    <a href="08-svoystva-chisel.html">9. Свойства чисел</a>
+    <a href="09-alternativnye-alfavity.html">10. Альтернативные алфавиты</a>
+    <a href="10-numeratsiya-slov.html">11. Сравнение и нумерация слов</a>
+    <a href="11-itogi.html" aria-current="page">12. Итоги</a>
+  </nav>
+</header>
+<main>
+  <h1>12. Итоги. Как читать записи чисел и работать с ними</h1>
+  <p class="lead">Перед решением определи основание, значения знаков и формат ответа. Затем выбери правило по тому, что требуется найти.</p>
+
+  <h2>Памятка</h2>
+  <div class="memo">
+    <div>
+      <h3><a href="02-razryady.html">Алфавит, основание и разряд</a></h3>
+      <p>В основании <i>N</i> цифры имеют значения от 0 до <i>N</i> − 1. Одна группа старшего разряда состоит из <i>N</i> групп соседнего младшего. Цифра со значением <i>d</i> в разряде <i>i</i> даёт вклад <i>d</i> · <i>N</i><sup><i>i</i></sup>. Цифру можно обозначить и буквой, если её значение задано.</p>
+    </div>
+    <div>
+      <h3>Перевод и сравнение</h3>
+      <p><a href="04-razvernutaya-zapis.html">Чтобы прочитать запись</a>, сложи вклады или примени схему Горнера. <a href="05-perevod-iz-desyatichnoy.html">Чтобы записать неотрицательное целое в новом основании</a>, дели на новое основание до нулевого частного и читай остатки снизу вверх.</p>
+      <p><a href="03-sravnenie.html">При сравнении неотрицательных целых в одном основании</a> сравни длины записей без ведущих нулей. Если длины равны, решает первая различающаяся цифра слева. Если у дробных записей целые части равны, выровняй дробные части нулями справа и сравни их слева направо. Для разных оснований сначала приведи записи к одному основанию.</p>
+    </div>
+    <div>
+      <h3><a href="07-slozhenie-i-vychitanie.html">Сложение</a> и <a href="08-vychitanie.html">вычитание</a></h3>
+      <p>Совмести одинаковые разряды, а в дробных записях — запятые. Считай справа налево. В шестиричной системе 55<sub>6</sub> + 1<sub>6</sub> = 100<sub>6</sub> с двумя переносами. При обратном вычитании 100<sub>6</sub> − 1<sub>6</sub> = 55<sub>6</sub> заём проходит через промежуточный ноль.</p>
+    </div>
+    <div>
+      <h3><a href="08-svoystva-chisel.html">Диапазон, чётность и остатки</a></h3>
+      <p>Положительные целые с <i>k</i> цифрами идут от <i>N</i><sup><i>k</i>−1</sup> до <i>N</i><sup><i>k</i></sup> − 1. Если ведущие нули разрешены, на <i>k</i> позициях можно записать <i>N</i><sup><i>k</i></sup> чисел.</p>
+      <p>С целыми границами <i>a</i> и <i>b</i> включительно получаем <i>b</i> − <i>a</i> + 1. Исключённую границу сдвигаем внутрь на единицу. В пустом диапазоне 0 целых.</p>
+      <p>При чётном основании чётность видна по последней цифре, при нечётном — по сумме цифр. <i>k</i> младших цифр дают остаток по модулю <i>N</i><sup><i>k</i></sup>.</p>
+    </div>
+    <div>
+      <h3><a href="10-numeratsiya-slov.html">Номер слова</a></h3>
+      <p>В полном алфавитном списке слов заданной длины с повторениями и допустимым нулевым знаком в начале значение записи равно индексу с нуля. Прибавь 1, чтобы получить порядковый номер.</p>
+    </div>
+  </div>
+
+  <section id="conversion" aria-labelledby="conversion-title">
+    <h2 id="conversion-title">Перевод в обе стороны</h2>
+    <div class="example">
+      <h3>Развёрнутая запись числа</h3>
+      <p>Умножаем каждую цифру числа 123<sub>6</sub> на вес её разряда. Отсчёт степеней начинаем справа с нуля.</p>
+      <p class="expanded-equation">
+        <span>123<sub>6</sub> = 1 · 6<sup>2</sup> + 2 · 6<sup>1</sup> + 3 · 6<sup>0</sup></span>
+        <span>= 36 + 12 + 3 = <b>51<sub>10</sub></b></span>
+      </p>
+      <p>По схеме Горнера начинаем со старшей цифры. На каждом шаге умножаем накопленное значение на 6 и прибавляем следующую цифру.</p>
+      <div class="horner-chain" id="recap-horner" role="img" aria-label="1 умножаем на 6 и прибавляем 2, получаем 8. 8 умножаем на 6 и прибавляем 3, получаем 51.">
+        <b>1</b><span class="horner-link"><small>× 6 + 2</small><span>→</span></span>
+        <b>8</b><span class="horner-link"><small>× 6 + 3</small><span>→</span></span><b>51</b>
+      </div>
+
+      <h3>Деление столбиком</h3>
+      <p>Чтобы вернуть запись в основание 6, делим 51 на 6, а затем делим полученное частное 8 на 6. В обоих столбиках считаем в десятичной системе.</p>
+      <div class="division-figure" role="img" aria-label="51 делим на 6, получаем частное 8 и остаток 3. Затем 8 делим на 6, получаем частное 1 и остаток 2.">
+        <table class="division-corner" aria-hidden="true">
+          <tbody>
+            <tr><td></td><td>5</td><td>1</td><td></td><td class="division-side division-under">6</td><td></td><td></td></tr>
+            <tr><td>−</td><td class="division-under">4</td><td class="division-under">8</td><td></td><td class="division-side">8</td><td></td><td class="division-side division-under">6</td></tr>
+            <tr><td></td><td></td><td class="division-remainder">3</td><td>−</td><td class="division-under">6</td><td></td><td class="division-side division-leading">1</td></tr>
+            <tr><td></td><td></td><td></td><td></td><td class="division-remainder">2</td><td></td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Последнее частное <b>1</b> меньше основания, поэтому его сразу записываем первой цифрой. Затем читаем остатки справа налево — <b>2</b>, <b>3</b>. Получаем <b>51<sub>10</sub> = 123<sub>6</sub></b>.</p>
+    </div>
+  </section>
+
+  <h2>Одна задача, несколько правил</h2>
+  <div class="example">
+    <p>В алфавите <b>Е, Л, Н, О, С, Ц</b> буквы обозначают цифры от 0 до 5. Прибавим <b>Л</b> к <b>ЛЦ</b>.</p>
+    <ol>
+      <li><b>Читаем запись.</b> ЛЦ — это 15<sub>6</sub> = 1 · 6 + 5 = 11<sub>10</sub>.</li>
+      <li><b>Складываем.</b> В единицах 5 + 1 = 6. Пишем Е (0), переносим единицу и получаем Н (2) в старшем разряде. Ответ <b>НЕ</b>, то есть 20<sub>6</sub> = 12<sub>10</sub>.</li>
+      <li><b>Читаем свойства результата.</b> Основание 6 чётное, поэтому достаточно последней цифры 0. Число чётное и даёт остаток 0 при делении на 6. В полном списке двухбуквенных слов значение 12 даёт <b>13-е место</b>.</li>
+    </ol>
+  </div>
+
+  <h2>Проверь себя</h2>
+  <div class="selfcheck">
+    <p>Выбери способ решения и получи ответ. Затем раскрой разбор.</p>
+    <ol>
+      <li>Что больше, 23<sub>5</sub> или 102<sub>3</sub>?
+        <details><summary>Разбор</summary><p>Переводим в общую систему. 23<sub>5</sub> = 13<sub>10</sub>, а 102<sub>3</sub> = 11<sub>10</sub>. Больше <b>23<sub>5</sub></b>.</p></details>
+      </li>
+      <li>Сколько целых чисел удовлетворяют условию 4 &lt; <i>x</i> ≤ 12?
+        <details><summary>Разбор</summary><p>Начинаем с 5 и заканчиваем на 12. Получаем 12 − 5 + 1 = <b>8</b>.</p></details>
+      </li>
+      <li>Чётно ли 121<sub>3</sub> и какой остаток оно даёт при делении на 9?
+        <details><summary>Разбор</summary><p>Сумма цифр 1 + 2 + 1 = 4, поэтому число <b>чётное</b>. Так как 9 = 3<sup>2</sup>, берём две младшие цифры. Получаем 21<sub>3</sub> = <b>7<sub>10</sub></b>.</p></details>
+      </li>
+      <li>Какое двухбуквенное слово из того же полного списка стоит на девятом месте?
+        <details><summary>Разбор</summary><p>Индекс 9 − 1 = 8<sub>10</sub> = 12<sub>6</sub>. Заменяем цифры буквами и получаем <b>ЛН</b>.</p></details>
+      </li>
+    </ol>
+  </div>
+
+  <nav class="pager" aria-label="Соседние главы">
+    <a href="10-numeratsiya-slov.html">← Сравнение и нумерация слов</a>
+    <a href="index.html">Оглавление</a>
+  </nav>
+</main>
+</body>
+</html>
