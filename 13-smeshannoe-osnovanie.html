@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>13. Системы счисления со смешанным основанием</title>
+<style>
+:root{--accent:#2563eb;--bg:#f7f8fa;--card:#fff;--line:#e3e7ee;--ink:#1f2430;--muted:#525e71}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+header.top{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+nav.menu{max-width:900px;margin:0 auto;display:flex;flex-wrap:wrap;gap:4px;padding:10px 16px}
+nav.menu a{text-decoration:none;color:var(--muted);padding:6px 10px;border-radius:8px;font-size:14px}
+nav.menu a:hover{background:#eef2ff;color:var(--accent)}
+nav.menu a[aria-current]{background:var(--accent);color:#fff}
+main{max-width:900px;margin:0 auto;padding:24px 16px 40px}
+h1{font-size:clamp(25px,5vw,30px);line-height:1.25;margin:.2em 0 .4em}
+h2{font-size:21px;line-height:1.35;margin:1.65em 0 .55em;border-left:4px solid var(--accent);padding-left:10px}
+h3{font-size:17px;margin:0 0 .4em;line-height:1.4}
+p{margin:.55em 0}
+a{color:#1647a8}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+[hidden]{display:none!important}
+.lead{font-size:18px;color:var(--muted);margin:0 0 20px}
+.example,.interactive,.note,.selfcheck{border-radius:12px;padding:14px 18px;margin:16px 0}
+.example{background:#f0f6ff;border:1px solid #d6e4ff}
+.interactive{background:#fffaf0;border:1px solid #eadbb0}
+.note{background:#fff8e7;border:1px solid #ebdbb2}
+.selfcheck{background:#f3fbf4;border:1px solid #cdeccf}
+.selfcheck h2{margin:.2em 0 .5em;border-left-color:#2b8246}
+.selfcheck h3{margin:.7em 0 .2em}
+.example ol,ul,ol{padding-inline-start:24px;margin:.5em 0}
+li{margin:.3em 0}
+.word-sample{max-width:20em;padding:4px 16px 5px 42px;border:1px solid #d6e4ff;background:var(--card);border-radius:10px;font-variant-numeric:tabular-nums}
+.formula{font-size:17px;margin:.65em 0 .85em;font-weight:650;line-height:1.5;overflow-wrap:anywhere;color:#172644;font-variant-numeric:tabular-nums}
+.table-wrap{overflow-x:auto;max-width:100%;margin:12px 0}
+table{border-collapse:collapse;font-size:15px;max-width:100%;background:#fff}
+caption{text-align:left;font-weight:650;color:#324365;padding-bottom:.35em}
+th,td{border:1px solid #d6e0ef;padding:5px 8px;text-align:left;font-variant-numeric:tabular-nums}
+th{background:#edf3ff;font-weight:650}
+td.active,th.active{background:#dbe8ff;color:#183f91}
+.model-controls,.model-actions{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:end;margin:10px 0}
+.model-controls label{display:grid;gap:3px;min-width:0;max-width:100%;font-size:14px;color:#36435c}
+button,input,select{font:inherit;max-width:100%;min-height:40px}
+input,select{padding:6px 8px;border:1px solid #aebbd0;border-radius:8px;color:var(--ink);background:#fff}
+input{width:min(100%,14rem)}
+button{border:1px solid #cedcf9;border-radius:8px;background:#edf3ff;color:#194ba3;padding:6px 12px;cursor:pointer}
+button.primary{background:#235ad7;border-color:#235ad7;color:white}
+button:disabled{opacity:.55;cursor:default}
+.model-stage{margin:12px 0;overflow-wrap:anywhere}
+.model-status,.error{margin:.5em 0;overflow-wrap:anywhere}
+.model-status:empty,.error:empty{display:none}
+.error{color:#8b3529;font-weight:600}
+.mixed-cells{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;max-width:540px;margin:12px 0}
+.mixed-cell{padding:7px 3px;border:1px solid #d6e1f1;border-radius:10px;background:#fff;text-align:center;line-height:1.3;min-width:0}
+.mixed-cell span,.mixed-cell small{display:block;font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.mixed-cell strong{display:block;color:#1d448e;font:700 24px/1.2 -apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:4px 0;font-variant-numeric:tabular-nums}
+.mixed-cell.active{background:#e5eeff;border-color:#6597ed}
+.selfcheck details{margin-top:10px}
+.selfcheck summary{width:fit-content;color:#1647a8;cursor:pointer}
+.pager{display:flex;flex-wrap:wrap;justify-content:space-between;margin-top:28px;gap:10px}
+.pager a{text-decoration:none;background:#eef2ff;padding:10px 16px;border-radius:9px;font-size:15px}
+@media(max-width:540px){
+  header.top{position:static}
+  .example,.note,.interactive,.selfcheck{padding:12px}
+  .mixed-cells{gap:4px}
+  .mixed-cell span,.mixed-cell small{font-size:11px}
+  th,td{padding:4px 6px}
+}
+
+.mixed-word-model [hidden] { display: none !important; }
+.mixed-word-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  gap: .75rem;
+  align-items: end;
+}
+.mixed-word-controls label { display: grid; gap: .3rem; min-width: 0; font-weight: 600; }
+.mixed-word-controls input, .mixed-word-controls select {
+  box-sizing: border-box;
+  min-width: 0;
+  width: 100%;
+  min-height: 2.55rem;
+  padding: .35rem .55rem;
+  font: inherit;
+  font-weight: 400;
+}
+.mixed-word-controls [aria-invalid="true"] { border-color: #b42318; }
+.mixed-word-error { color: #a52318; }
+.mixed-word-error:empty { margin: 0; }
+.mixed-word-stage { min-width: 0; }
+.mixed-word-step-title { margin: .85rem 0 .45rem; }
+.mixed-word-note { margin: .65rem 0; }
+.mixed-word-formula { margin: .65rem 0; overflow-wrap: anywhere; }
+.mixed-word-cells {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: .25rem;
+  max-width: 26rem;
+}
+.mixed-word-cells .mixed-cell {
+  display: grid;
+  gap: .13rem;
+  align-content: start;
+  justify-items: center;
+  text-align: center;
+  min-width: 0;
+  padding: .32rem .12rem;
+  border: 1px solid #d8e1ef;
+  border-radius: .4rem;
+  background: #fff;
+  font-size: .75rem;
+  line-height: 1.3;
+}
+.mixed-word-cells .mixed-cell strong { font-size: 1.25rem; }
+.mixed-word-cells .active, .mixed-word-table .active { background: #eaf1ff; }
+.mixed-word-cells .active { border-color: var(--accent, #2563eb); }
+.mixed-word-table { max-width: 26rem; }
+.mixed-word-table table { width: 100%; table-layout: fixed; margin: 0; }
+.mixed-word-table th, .mixed-word-table td { padding: .3rem .2rem; text-align: center; }
+.mixed-word-table th:first-child { width: 43%; text-align: left; }
+.mixed-word-actions { display: flex; flex-wrap: wrap; gap: .45rem .6rem; align-items: center; }
+.mixed-word-actions button { min-height: 2.5rem; padding-inline: .65rem; }
+.mixed-word-actions [aria-disabled="true"] { opacity: .55; cursor: default; }
+.mixed-word-announcement {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+#mixed-pixel-model {
+  --mxp-line: #d9e4f6;
+  --mxp-muted: #5b6472;
+  --mxp-focus: var(--accent, #2563eb);
+  --mxp-selected: #e8f1ff;
+  min-inline-size: 0;
+}
+
+#mixed-pixel-model .mxp-panel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px 13px;
+  margin-block: 10px;
+}
+
+#mixed-pixel-model .mxp-panel label {
+  display: grid;
+  gap: 3px;
+  font-size: 14px;
+}
+
+#mixed-pixel-model .mxp-panel input {
+  width: 70px;
+  height: 42px;
+  font-variant-numeric: tabular-nums;
+}
+
+#mixed-pixel-model .mxp-controls { display: flex; flex-wrap: wrap; gap: 6px; }
+#mixed-pixel-model .mxp-controls button { min-width: 40px; min-height: 42px; padding-inline: 9px; }
+#mixed-pixel-model .mxp-error { color: #9c231a; font-size: 14px; }
+#mixed-pixel-model .mxp-panel input[aria-invalid="true"] { border-color: #9c231a; }
+
+#mixed-pixel-model .mxp-selection {
+  margin: 9px 0 5px;
+  border: 1px solid #b6cbf7;
+  border-radius: 10px;
+  padding: 6px 9px;
+  background: var(--mxp-selected);
+  color: #1d3975;
+  font-weight: 700;
+}
+
+#mixed-pixel-model .mxp-axis-note { color: var(--mxp-muted); font-size: 14px; }
+
+#mixed-pixel-model .mxp-frames {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+#mixed-pixel-model .mxp-frame {
+  min-inline-size: 0;
+  border: 1px solid var(--mxp-line);
+  border-radius: 12px;
+  padding: 5px 7px 8px;
+  background: #fff;
+}
+
+#mixed-pixel-model .mxp-frame.mxp-active-frame { border-color: var(--mxp-focus); }
+#mixed-pixel-model .mxp-frame-title { margin: 0; color: #1d3975; text-align: center; font-weight: 700; }
+#mixed-pixel-model .mxp-frame-grid { display: grid; gap: 3px; }
+
+#mixed-pixel-model :is(.mxp-row, .mxp-axis) {
+  display: grid;
+  grid-template-columns: 16px repeat(5, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 3px;
+}
+
+#mixed-pixel-model :is(.mxp-axis span, .mxp-row span) { align-self: center; text-align: center; color: var(--mxp-muted); font-size: 12px; }
+
+#mixed-pixel-model .mxp-cell {
+  min-width: 0;
+  min-height: 30px;
+  border: 1px solid #dce6f4;
+  border-radius: 5px;
+  padding: 0;
+  background: #f5f8ff;
+  color: #1f395e;
+  font-size: 13px;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+#mixed-pixel-model .mxp-cell:hover { border-color: var(--mxp-focus); background: #dceaff; }
+#mixed-pixel-model .mxp-cell[aria-selected="true"] { border-color: #1849bb; background: var(--mxp-focus); color: #fff; font-weight: 700; }
+
+#mixed-pixel-model .mxp-strip-heading { margin: 12px 0 4px; font-size: 16px; }
+#mixed-pixel-model .mxp-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; }
+
+#mixed-pixel-model .mxp-band {
+  position: relative;
+  display: grid;
+  align-content: start;
+  min-width: 0;
+  min-height: 64px;
+  border: 1px solid var(--mxp-line);
+  border-radius: 9px;
+  padding: 3px 2px 18px;
+  background: #f5f8ff;
+  color: #1d3975;
+  text-align: center;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+#mixed-pixel-model .mxp-band.mxp-active-band { border-color: var(--mxp-focus); background: var(--mxp-selected); }
+
+#mixed-pixel-model .mxp-marker {
+  position: absolute;
+  inset-block-end: 3px;
+  inset-inline-start: clamp(12px, var(--mxp-position, 50%), calc(100% - 12px));
+  min-width: 22px;
+  transform: translateX(-50%);
+  border-radius: 6px;
+  padding: 0 3px;
+  background: var(--mxp-focus);
+  color: #fff;
+  line-height: 1.3;
+  font-weight: 700;
+}
+
+#mixed-pixel-model .mxp-calculations {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 10px 0 0;
+}
+
+#mixed-pixel-model .mxp-calculations > div {
+  min-width: 0;
+  border: 1px solid var(--mxp-line);
+  border-radius: 11px;
+  padding: 7px 9px;
+  background: #fff;
+  overflow-wrap: anywhere;
+}
+
+#mixed-pixel-model .mxp-calculations dt { font-weight: 700; }
+#mixed-pixel-model .mxp-calculations dd { margin: 0; }
+#mixed-pixel-model .mxp-formula-pattern { color: var(--mxp-muted); font-size: 14px; }
+#mixed-pixel-model .mxp-equation { color: #1d3975; font-weight: 700; font-variant-numeric: tabular-nums; }
+#mixed-pixel-model .mxp-inverse { display: grid; gap: 3px; font-size: 14px; }
+
+@media (max-width: 600px) {
+  #mixed-pixel-model .mxp-frames, #mixed-pixel-model .mxp-calculations { grid-template-columns: minmax(0, 1fr); }
+  #mixed-pixel-model .mxp-cell { min-height: 35px; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <nav class="menu" aria-label="Главы учебника">
+    <a href="index.html">Оглавление</a>
+    <a href="01-chto-takoe-chislo.html">1. Что такое число</a>
+    <a href="02-razryady.html">2. Термины</a>
+    <a href="03-sravnenie.html">3. Сравнение чисел</a>
+    <a href="03-osnovaniya.html">4. Разные основания</a>
+    <a href="04-razvernutaya-zapis.html">5. Развёрнутая запись</a>
+    <a href="05-perevod-iz-desyatichnoy.html">6. Из десятичной</a>
+    <a href="07-slozhenie-i-vychitanie.html">7. Сложение</a>
+    <a href="08-vychitanie.html">8. Вычитание</a>
+    <a href="08-svoystva-chisel.html">9. Свойства чисел</a>
+    <a href="09-alternativnye-alfavity.html">10. Альтернативные алфавиты</a>
+    <a href="10-numeratsiya-slov.html">11. Сравнение и нумерация слов</a>
+    <a href="11-itogi.html">12. Итоги</a>
+    <a href="13-smeshannoe-osnovanie.html" aria-current="page">13. Смешанное основание</a>
+  </nav>
+</header>
+<main>
+  <h1>13. Системы счисления со смешанным основанием</h1>
+  <p class="lead">Секунды и минуты дают перенос при 60, часы — при 24. Такой же принцип помогает находить номер слова в списке и определять место пикселя в последовательности кадров.</p>
+<h2>Как устроены разряды времени</h2>
+  <p>На часах 23:59:45. Какое время будет через 100 секунд? Разложим 100 секунд на 1 минуту и 40 секунд, чтобы можно было складывать по разрядам.</p>
+  <section class="example">
+    <h3>Через полночь</h3>
+    <ol>
+      <li>В секундах получаем 45 + 40 = 85. Отделяем 60 секунд, оставляем 25 и переносим 1 минуту.</li>
+      <li>В минутах получаем 59 + 1 + 1 = 61. Отделяем 60 минут, оставляем 1 и переносим 1 час.</li>
+      <li>В часах получаем 23 + 1 = 24. Отделяем 24 часа, в разряде часов остаётся 0 и начинается новый день.</li>
+    </ol>
+    <div class="formula">23:59:45 + 100 секунд → 00:01:25 следующего дня</div>
+    <p>Для перехода от секунд к минутам берём 60, от минут к часам тоже 60, а от часов к суткам берём 24.</p>
+  </section>
+
+  <div id="mixed-clock-model"></div>
+
+  <h2>Как находятся веса разрядов</h2>
+  <p>В <strong>системе счисления со смешанным основанием</strong> число допустимых цифр задаётся для каждой позиции. Соседние разряды могут иметь разные основания. Нумеруем разряды справа налево с нуля. Пусть <i>b</i><sub>i</sub> — количество цифр в разряде <i>i</i>. Цифра <i>a</i><sub>i</sub> принимает значения от 0 до <i>b</i><sub>i</sub> − 1.</p>
+  <p>Вес младшего разряда равен 1. Если собрать <i>b</i><sub>i</sub> групп веса <i>w</i><sub>i</sub>, получится одна группа следующего разряда. Отсюда получаем вес каждой следующей позиции.</p>
+  <div class="formula"><i>w</i><sub>0</sub> = 1, &nbsp; <i>w</i><sub>i + 1</sub> = <i>b</i><sub>i</sub> · <i>w</i><sub>i</sub></div>
+  <p>Отсчитывая время в секундах, получаем веса 1, 60, 60 · 60 и 24 · 60 · 60. Значение всей записи, как и прежде, равно сумме вкладов цифр.</p>
+  <div class="formula"><i>x</i> = <i>a</i><sub>0</sub> · <i>w</i><sub>0</sub> + <i>a</i><sub>1</sub> · <i>w</i><sub>1</sub> + … + <i>a</i><sub>k</sub> · <i>w</i><sub>k</sub></div>
+  <section class="note">
+    <h3>Чтение слева направо</h3>
+    <p>По схеме Горнера начинаем со значения старшей цифры. При переходе из разряда <i>i</i> + 1 в разряд <i>i</i> умножаем накопленное число на <i>b</i><sub>i</sub> и прибавляем <i>a</i><sub>i</sub>. Пусть <i>H</i><sub>i + 1</sub> — значение уже прочитанной части в единицах разряда <i>i</i> + 1. Её вклад равен <i>H</i><sub>i + 1</sub> · <i>w</i><sub>i + 1</sub>. Подставим <i>w</i><sub>i + 1</sub> = <i>b</i><sub>i</sub> · <i>w</i><sub>i</sub> и добавим вклад текущей цифры. Получим (<i>H</i><sub>i + 1</sub> · <i>b</i><sub>i</sub> + <i>a</i><sub>i</sub>) · <i>w</i><sub>i</sub>.</p>
+    <p>Коэффициент при <i>w</i><sub>i</sub> — это значение прочитанной части в единицах разряда <i>i</i>. Поэтому начинаем с <i>H</i><sub>k</sub> = <i>a</i><sub>k</sub> и на каждом шаге используем формулу.</p>
+    <div class="formula"><i>H</i><sub>i</sub> = <i>H</i><sub>i + 1</sub> · <i>b</i><sub>i</sub> + <i>a</i><sub>i</sub></div>
+    <p>В конце <i>w</i><sub>0</sub> = 1, поэтому <i>x</i> = <i>H</i><sub>0</sub>. Например, в 23:59:45 имеется (23 · 60 + 59) · 60 + 45 = 86 385 секунд от начала суток. Множитель 24 понадобился бы для перехода от суток к часам.</p>
+  </section>
+  <p>Чтобы восстановить запись по значению, идём в обратную сторону и делим с остатком. Первое деление на <i>b</i><sub>0</sub> даёт младшую цифру, потому что веса всех старших позиций кратны <i>b</i><sub>0</sub>. Делим получившееся частное на <i>b</i><sub>1</sub>, находим следующую цифру и продолжаем. Найденные остатки читаем в обратном порядке.</p>
+
+  <h2>Номера слов с разными правилами для позиций</h2>
+  <p>Составляем четырёхбуквенные слова из букв И, Н, С, Т, А, В, К. На первом месте может стоять только согласная, на последнем — только гласная. Буквы можно повторять, выбор буквы в одной позиции не ограничивает выбор в остальных. Порядок букв в каждом списке задаёт их значения от нуля.</p>
+  <div class="table-wrap">
+    <table>
+      <caption>Буквы, количество вариантов и веса позиций</caption>
+      <thead><tr><th scope="col">Позиция слева</th><th scope="col">Буквы по возрастанию значения</th><th scope="col">Вариантов</th><th scope="col">Вес</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Первая</th><td>В, К, Н, С, Т</td><td>5</td><td>98</td></tr>
+        <tr><th scope="row">Вторая</th><td>А, В, И, К, Н, С, Т</td><td>7</td><td>14</td></tr>
+        <tr><th scope="row">Третья</th><td>А, В, И, К, Н, С, Т</td><td>7</td><td>2</td></tr>
+        <tr><th scope="row">Четвёртая</th><td>А, И</td><td>2</td><td>1</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Всего 5 · 7 · 7 · 2 = 490 слов. Располагаем их по первой различающейся букве, пользуясь порядком для её позиции. Если зафиксировать первую букву, справа остаётся 7 · 7 · 2 = 98 вариантов. Поэтому вес первой позиции равен 98. Так же получаются остальные веса.</p>
+  <p>Начало списка показывает, как перебираются позиции. Быстрее всего меняется последняя буква. Когда её варианты закончились, меняется предпоследняя.</p>
+  <ol class="word-sample" aria-label="Первые пять слов списка">
+    <li>ВААА</li>
+    <li>ВААИ</li>
+    <li>ВАВА</li>
+    <li>ВАВИ</li>
+    <li>ВАИА</li>
+  </ol>
+  <p>Для каждой меньшей буквы в первой различающейся позиции можно подставить любую допустимую последовательность справа. Таких последовательностей ровно столько, каков вес позиции. Складываем числа слов из этих непересекающихся групп.</p>
+  <p>Значение записи равно <strong>индексу с нуля</strong>, то есть количеству слов перед ней. При нумерации с единицы к индексу прибавляем 1. Буква может иметь разные значения в разных местах. Например, И во второй позиции имеет значение 2, а в четвёртой имеет значение 1.</p>
+
+  <section class="example">
+    <h3>Задача 1. На каком месте стоит НИКА</h3>
+    <p>Ищем каждую букву в списке её позиции. Н стоит на месте с индексом 2, И имеет индекс 2, К имеет индекс 3, А имеет индекс 0. Получаем (2, 2, 3, 0).</p>
+    <div class="formula">2 · 98 + 2 · 14 + 3 · 2 + 0 · 1 = 230</div>
+    <p>При чтении по Горнеру получится ((2 · 7 + 2) · 7 + 3) · 2 + 0 = 230. Перед НИКА стоят 230 слов, поэтому его <strong>номер 231</strong>.</p>
+  </section>
+
+  <section class="example">
+    <h3>Задача 2. Какое слово стоит на месте 108</h3>
+    <p>Вычитаем 1 из номера и получаем индекс 107. Делим на основания справа налево в порядке 2, 7, 7, 5.</p>
+    <div class="table-wrap">
+      <table>
+        <caption>Разряды индекса 107</caption>
+        <thead><tr><th scope="col">Позиция слева</th><th scope="col">Деление с остатком</th><th scope="col">Цифра</th><th scope="col">Буква</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Четвёртая</th><td>107 = 53 · 2 + 1</td><td>1</td><td>И</td></tr>
+          <tr><th scope="row">Третья</th><td>53 = 7 · 7 + 4</td><td>4</td><td>Н</td></tr>
+          <tr><th scope="row">Вторая</th><td>7 = 1 · 7 + 0</td><td>0</td><td>А</td></tr>
+          <tr><th scope="row">Первая</th><td>1 = 0 · 5 + 1</td><td>1</td><td>К</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Читаем цифры от старшей к младшей. Запись (1, 0, 4, 1) даёт слово <strong>КАНИ</strong>. Проверка по весам даёт 1 · 98 + 0 · 14 + 4 · 2 + 1 = 107, номер 108.</p>
+  </section>
+
+  <h2>Сложение с разными основаниями</h2>
+  <p>Выровняем записи по позициям и пойдём справа налево. В каждой позиции складываем две цифры и входящий перенос. Делим сумму на основание <strong>текущего</strong> разряда. Под чертой пишем остаток, частное переносим влево.</p>
+
+  <section class="example">
+    <h3>Задача 3. Какое слово стоит на 100 позиций дальше НИКА</h3>
+    <p>Сначала запишем сам шаг 100 в разрядах нашего списка. Последовательные деления дают 100 = 50 · 2 + 0, 50 = 7 · 7 + 1, 7 = 1 · 7 + 0, 1 = 0 · 5 + 1. В обратном порядке остатки образуют (1, 0, 1, 0).</p>
+    <p>Складываем (2, 2, 3, 0) и (1, 0, 1, 0) непосредственно по разрядам. Начинаем с правого столбца.</p>
+    <div class="table-wrap">
+      <table>
+        <caption>Сложение столбиком в основаниях 5, 7, 7, 2</caption>
+        <thead><tr><th scope="col">Позиция слева</th><th scope="col">Первая</th><th scope="col">Вторая</th><th scope="col">Третья</th><th scope="col">Четвёртая</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Основание разряда</th><td>5</td><td>7</td><td>7</td><td>2</td></tr>
+          <tr><th scope="row">Цифры НИКА</th><td>2</td><td>2</td><td>3</td><td>0</td></tr>
+          <tr><th scope="row">Прибавляем</th><td>1</td><td>0</td><td>1</td><td>0</td></tr>
+          <tr><th scope="row">Цифры суммы</th><td><b>3</b></td><td><b>2</b></td><td><b>4</b></td><td><b>0</b></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Справа налево суммы равны 0, 4, 2 и 3. Каждая меньше основания своего разряда, поэтому переносов не возникает. Получаем (3, 2, 4, 0), а по спискам позиций — <strong>СИНА</strong>.</p>
+    <p>Теперь вычислим индекс результата по Горнеру и найдём его номер.</p>
+    <div class="formula">((3 · 7 + 2) · 7 + 4) · 2 + 0 = 330</div>
+    <p>Индекс равен 330, поэтому СИНА стоит на <strong>месте 331</strong>.</p>
+  </section>
+
+  <section class="note">
+    <h3>Почему перенос сохраняет сумму</h3>
+    <p>Пусть в разряде веса <i>w</i><sub>i</sub> собрано <i>s</i> групп. Разделим <i>s</i> на <i>b</i><sub>i</sub> и получим частное <i>q</i> и остаток <i>r</i>. Каждые <i>b</i><sub>i</sub> групп составляют одну группу слева, поэтому в соседний разряд переходят <i>q</i> групп, а здесь остаются <i>r</i>.</p>
+    <div class="formula"><i>s</i> · <i>w</i><sub>i</sub> = (<i>q</i> · <i>b</i><sub>i</sub> + <i>r</i>) · <i>w</i><sub>i</sub> = <i>q</i> · <i>w</i><sub>i + 1</sub> + <i>r</i> · <i>w</i><sub>i</sub></div>
+    <p>При сложении двух допустимых записей перенос равен 0 или 1. Справа входящий перенос равен нулю, а в каждом следующем разряде две цифры и входящая единица дают не больше 2<i>b</i><sub>i</sub> − 1.</p>
+  </section>
+
+  <section class="example">
+    <h3>Перенос через несколько позиций</h3>
+    <p>Прибавим 1 к (2, 6, 6, 1). В правом разряде 1 + 1 = 2, поэтому пишем 0 и переносим 1. В каждом из двух средних разрядов получаем 6 + 1 = 7. Оба раза пишем 0 и снова переносим 1. Слева 2 + 1 = 3 и перенос заканчивается.</p>
+    <div class="formula">(2, 6, 6, 1) + (0, 0, 0, 1) = (3, 0, 0, 0)</div>
+    <p>Крайняя допустимая запись (4, 6, 6, 1) имеет индекс 489 и соответствует последнему слову с номером 490. Если прибавить 1, перенос пройдёт и через первый разряд. Получится индекс 490, для которого потребовалась бы ещё одна позиция. В четырёхбуквенном списке такого слова нет.</p>
+  </section>
+
+  <section id="mixed-word-model" aria-labelledby="mixed-word-title">
+    <h3 id="mixed-word-title">Слово, номер и сдвиг</h3>
+  </section>
+
+  <h2>От координат пикселя к одному индексу</h2>
+  <p>Представим короткую последовательность из 3 кадров, по 4 строки и 5 столбцов в каждом. Храним пиксели подряд. Сначала идут все столбцы первой строки, затем следующей строки, а после последней строки начинается новый кадр.</p>
+  <p>Кадры, строки и столбцы нумеруем с нуля. Три координаты имеют соответственно 3, 4 и 5 допустимых значений. Вес столбца равен 1, строки — 5, а кадра — 4 · 5 = 20. Всего имеется 3 · 4 · 5 = 60 пикселей с индексами от 0 до 59.</p>
+  <section class="example">
+    <h3>Семь позиций вперёд</h3>
+    <p>Начинаем с координат (1, 2, 3). Это второй кадр, третья строка и четвёртый столбец. По весам получаем 1 · 20 + 2 · 5 + 3 = 33. Та же запись по Горнеру даёт (1 · 4 + 2) · 5 + 3 = 33.</p>
+    <p>Переходим на 7 позиций вперёд, к индексу 33 + 7 = 40. Восстанавливаем координаты с конца.</p>
+    <ol>
+      <li>40 = 8 · 5 + 0. Столбец имеет индекс 0.</li>
+      <li>8 = 2 · 4 + 0. Строка имеет индекс 0.</li>
+      <li>2 = 0 · 3 + 2. Кадр имеет индекс 2.</li>
+    </ol>
+    <p>Получаем <strong>(2, 0, 0)</strong>, то есть первый пиксель третьего кадра. Проверка даёт 2 · 20 + 0 · 5 + 0 = 40.</p>
+  </section>
+
+  <div id="mixed-pixel-model"></div>
+
+  <div id="mixed-practice"></div>
+
+  <section aria-labelledby="mixed-sources-title">
+    <h2 id="mixed-sources-title">Источники</h2>
+    <ul>
+      <li>Переход между часами, минутами и секундами и связь оснований с весами разрядов. <a href="https://mastering.dyalog.com/Mathematical-Functions.html">Mastering Dyalog APL, раздел 13.2</a>.</li>
+      <li>Переход между координатами и индексом при обходе массива по строкам. <a href="https://numpy.org/doc/stable/reference/generated/numpy.ravel_multi_index.html">Документация NumPy о вычислении индекса</a> и <a href="https://numpy.org/doc/stable/reference/generated/numpy.unravel_index.html">о восстановлении координат</a>.</li>
+    </ul>
+  </section>
+  <nav class="pager" aria-label="Соседние главы">
+    <a href="11-itogi.html">← Назад к итогам</a>
+    <a href="index.html">Оглавление</a>
+  </nav>
+</main>
+<script>
+const mixed = (() => {
+  function limit(bases) {
+    if (!Array.isArray(bases) || !bases.length || Array.from(bases).some((base) => !Number.isSafeInteger(base) || base < 2)) {
+      throw new RangeError('Основания должны быть целыми числами не меньше двух.');
+    }
+    const size = bases.reduce((product, base) => product * base, 1);
+    if (!Number.isSafeInteger(size)) throw new RangeError('Слишком большой диапазон.');
+    return size;
+  }
+
+  function checkDigits(digits, bases) {
+    if (!Array.isArray(digits) || digits.length !== bases.length ||
+        bases.some((base, i) => !Number.isSafeInteger(digits[i]) || digits[i] < 0 || digits[i] >= base)) {
+      throw new RangeError('В каждом разряде нужна цифра от нуля до основания минус один.');
+    }
+  }
+
+  function encode(number, bases) {
+    const size = limit(bases);
+    if (!Number.isSafeInteger(number) || number < 0 || number >= size) {
+      throw new RangeError(`Число должно быть от 0 до ${size - 1}.`);
+    }
+    const digits = Array(bases.length);
+    const steps = [];
+    let value = number;
+    for (let i = bases.length - 1; i >= 0; i -= 1) {
+      const base = bases[i];
+      const remainder = value % base;
+      const quotient = (value - remainder) / base;
+      digits[i] = remainder;
+      steps.push({ i, base, value, quotient, remainder });
+      value = quotient;
+    }
+    return { digits, steps };
+  }
+
+  function decode(digits, bases) {
+    limit(bases);
+    checkDigits(digits, bases);
+    let value = 0;
+    const steps = bases.map((base, i) => {
+      const before = value;
+      const digit = digits[i];
+      value = before * base + digit;
+      return { i, base, before, digit, value };
+    });
+    return { value, steps };
+  }
+
+  function add(left, right, bases) {
+    limit(bases);
+    checkDigits(left, bases);
+    checkDigits(right, bases);
+    const digits = Array(bases.length);
+    const steps = [];
+    let carry = 0;
+    for (let i = bases.length - 1; i >= 0; i -= 1) {
+      const base = bases[i];
+      const incoming = carry;
+      const sum = left[i] + right[i] + incoming;
+      if (!Number.isSafeInteger(sum)) throw new RangeError('Слишком большая сумма цифр.');
+      const digit = sum % base;
+      carry = (sum - digit) / base;
+      digits[i] = digit;
+      steps.push({ i, base, left: left[i], right: right[i], incoming, sum, digit, carry });
+    }
+    return { digits, carry, steps };
+  }
+
+  return { limit, encode, decode, add };
+})();
+
+function initMixedClock(root) {
+  const bases = [2, 24, 60, 60];
+  const labels = ['Сутки', 'Часы', 'Минуты', 'Секунды'];
+  const initial = [0, 23, 59, 58];
+  let digits = initial.slice();
+  let ticks = 0;
+  const transfers = [null, '24 часа → 1 сутки', '60 минут → 1 час', '60 секунд → 1 минута'];
+
+  root.innerHTML = `<section class="interactive" aria-labelledby="clock-title">
+    <h3 id="clock-title">Секунда за секундой</h3>
+    <p>Добавляйте по одной секунде. Посмотрите, как перенос доходит до суток.</p>
+    <div class="mixed-cells" id="clock-cells"></div>
+    <p id="clock-message" class="model-status" aria-live="polite"></p>
+    <div class="model-actions">
+      <button type="button" class="primary" id="clock-next">+1 секунда</button>
+      <button type="button" id="clock-reset">Сначала</button>
+    </div>
+  </section>`;
+  const cells = root.querySelector('#clock-cells');
+  const message = root.querySelector('#clock-message');
+  const next = root.querySelector('#clock-next');
+  const reset = root.querySelector('#clock-reset');
+
+  function render(steps = []) {
+    const carrying = new Set(steps.filter((step) => step.carry).map((step) => step.i));
+    cells.innerHTML = digits.map((digit, index) => `
+      <div class="mixed-cell${carrying.has(index) ? ' active' : ''}">
+        <span>${labels[index]}</span>
+        <strong>${index ? String(digit).padStart(2, '0') : digit}</strong>
+        <small>${index ? `Перенос при ${bases[index]}` : 'Старший разряд'}</small>
+      </div>`).join('');
+    const readout = digits.slice(1).map((digit) => String(digit).padStart(2, '0')).join(':');
+    const details = Array.from(carrying, (index) => transfers[index]);
+    message.textContent = `На часах ${readout}. ${details.length ? details.join(', ') + '.' : ticks ? 'Прибавилась одна секунда.' : ''}`;
+    next.disabled = ticks === 3;
+    reset.disabled = ticks === 0;
+  }
+
+  next.addEventListener('click', () => {
+    const result = mixed.add(digits, [0, 0, 0, 1], bases);
+    digits = result.digits;
+    ticks += 1;
+    render(result.steps);
+  });
+  reset.addEventListener('click', () => {
+    digits = initial.slice();
+    ticks = 0;
+    render();
+    next.focus();
+  });
+  render();
+}
+
+function initMixedPractice(root) {
+  const range = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
+  const tuple = (digits) => `(${digits.join(', ')})`;
+  let stage = 0;
+  let exercise;
+
+  root.innerHTML = `<section class="selfcheck" aria-labelledby="mixed-practice-title">
+    <h2 id="mixed-practice-title">Самопроверка</h2>
+    <p>Сначала прочитайте запись, затем восстановите цифры и выполните сложение с переносами.</p>
+    <form id="mixed-practice-form" novalidate>
+      <h3 id="mixed-practice-type"></h3>
+      <p id="mixed-practice-question"></p>
+      <label for="mixed-practice-answer">Ваш ответ</label>
+      <div class="model-controls">
+        <input id="mixed-practice-answer" type="text" maxlength="45" autocomplete="off" aria-describedby="mixed-practice-question">
+        <button type="submit" class="primary">Проверить</button>
+        <button type="button" id="mixed-practice-next">Следующее задание</button>
+      </div>
+      <p id="mixed-practice-status" class="model-status" aria-live="polite"></p>
+    </form>
+    <details id="mixed-practice-solution">
+      <summary>Показать решение</summary>
+      <p id="mixed-practice-explanation"></p>
+    </details>
+  </section>`;
+  const get = (id) => root.querySelector(`#${id}`);
+  const input = get('mixed-practice-answer');
+  const feedback = get('mixed-practice-status');
+  const solution = get('mixed-practice-solution');
+  const next = get('mixed-practice-next');
+
+  function generate() {
+    const bases = [range(3, 6), range(4, 7), range(2, 3)];
+    const beginning = `Основания слева направо ${tuple(bases)}.`;
+    if (stage === 0) {
+      const digits = bases.map((base, index) => range(index === 0 ? 1 : 0, base - 1));
+      const result = mixed.decode(digits, bases).value;
+      return { title: '1. Из записи в число',
+        question: `${beginning} Чему равна запись ${tuple(digits)} в десятичной системе?`,
+        answer: [result],
+        explanation: `По схеме Горнера (${digits[0]} · ${bases[1]} + ${digits[1]}) · ${bases[2]} + ${digits[2]} = ${result}.` };
+    }
+    if (stage === 1) {
+      const value = range(bases[1] * bases[2], mixed.limit(bases) - 1);
+      const result = mixed.encode(value, bases);
+      const divisions = result.steps.map(({ value, quotient, base, remainder }) => `${value} = ${quotient} · ${base} + ${remainder}`);
+      return { title: '2. Из числа в запись',
+        question: `${beginning} Запишите число ${value} в этих основаниях. Введите три цифры через пробел.`,
+        answer: result.digits,
+        explanation: `Делим справа налево. ${divisions.join('. ')}. Читаем остатки в обратном порядке и получаем ${tuple(result.digits)}.` };
+    }
+    const left = [range(0, bases[0] - 2), bases[1] - 1, bases[2] - 1];
+    const right = [0, 0, 1];
+    const answer = mixed.add(left, right, bases).digits;
+    return { title: '3. Сложение с переносами',
+      question: `${beginning} Сложите ${tuple(left)} и ${tuple(right)} по разрядам. Введите три цифры через пробел.`,
+      answer,
+      explanation: `Справа ${left[2]} + 1 = ${bases[2]}. В среднем разряде ${left[1]} + 1 = ${bases[1]}. В каждом из них пишем 0 и передаём единицу влево. Слева получается ${left[0]} + 1 = ${answer[0]}. Ответ ${tuple(answer)}.` };
+  }
+
+  function render() {
+    exercise = generate();
+    get('mixed-practice-type').textContent = exercise.title;
+    get('mixed-practice-question').textContent = exercise.question;
+    get('mixed-practice-explanation').textContent = exercise.explanation;
+    next.textContent = stage === 2 ? 'Новый набор' : 'Следующее задание';
+    input.value = '';
+    feedback.textContent = '';
+    solution.open = false;
+  }
+
+  get('mixed-practice-form').addEventListener('submit', (event) => {
+    event.preventDefault();
+    const tokens = input.value.trim().replace(/^\((.*)\)$/, '$1').split(/[\s,]+/);
+    if (tokens.some((token) => !/^\d+$/.test(token)) || tokens.length !== exercise.answer.length) {
+      feedback.textContent = stage === 0 ? 'Введите одно целое число.' : 'Введите три цифры через пробел.';
+      return;
+    }
+    const correct = exercise.answer.every((digit, index) => digit === Number(tokens[index]));
+    feedback.textContent = correct ? 'Верно.' : 'Проверьте основания в каждом разряде и попробуйте ещё раз.';
+  });
+  next.addEventListener('click', () => {
+    stage = (stage + 1) % 3;
+    render();
+    input.focus();
+  });
+  render();
+}
+
+function initMixedWordModel(root, mixed) {
+  const alphabets = ['ВКНСТ', 'АВИКНСТ', 'АВИКНСТ', 'АИ'];
+  const bases = alphabets.map((letters) => letters.length);
+  const total = bases.reduce((product, base) => product * base, 1);
+  const blank = () => bases.map(() => null);
+  const split = (digits) => digits.map((digit, index) => alphabets[index][digit]);
+  const state = {steps: [], step: 0};
+
+  const model = document.createElement('div');
+  model.className = 'mixed-word-model';
+  model.innerHTML = `
+    <div class="model-controls mixed-word-controls">
+      <label>Действие
+        <select data-mixed-mode>
+          <option value="word">Слово → номер</option>
+          <option value="number">Номер → слово</option>
+          <option value="shift">Сдвиг вперёд</option>
+        </select>
+      </label>
+      <label>Слово из четырёх русских букв
+        <input type="text" data-mixed-input="word" value="НИКА" autocomplete="off" autocapitalize="characters" spellcheck="false">
+      </label>
+      <label hidden>Номер от 1 до ${total}
+        <input type="text" data-mixed-input="number" value="108" inputmode="numeric" autocomplete="off">
+      </label>
+      <label hidden>Сдвиг на число мест от 0 до ${total - 1}
+        <input type="text" data-mixed-input="shift" value="100" inputmode="numeric" autocomplete="off">
+      </label>
+    </div>
+    <p class="error mixed-word-error" data-mixed-error role="status" aria-atomic="true"></p>
+    <div class="model-stage mixed-word-stage" data-mixed-stage></div>
+    <p class="mixed-word-announcement" data-mixed-announcement role="status" aria-atomic="true"></p>
+    <div class="model-actions mixed-word-actions" data-mixed-actions>
+      <button type="button" data-mixed-back aria-label="Предыдущий шаг">Назад</button>
+      <span data-mixed-progress></span>
+      <button type="button" data-mixed-next aria-label="Следующий шаг">Далее</button>
+    </div>`;
+  root.classList.add('interactive');
+  root.appendChild(model);
+  const find = (selector) => model.querySelector(selector);
+  const mode = find('[data-mixed-mode]');
+  const fields = {
+    word: find('[data-mixed-input="word"]'),
+    number: find('[data-mixed-input="number"]'),
+    shift: find('[data-mixed-input="shift"]'),
+  };
+  const stage = find('[data-mixed-stage]');
+  const error = find('[data-mixed-error]');
+  const announcement = find('[data-mixed-announcement]');
+  let suffix = 1;
+  while (document.getElementById(`mixed-word-error-${suffix}`)) suffix++;
+  error.id = `mixed-word-error-${suffix}`;
+  const actions = find('[data-mixed-actions]');
+  const back = find('[data-mixed-back]');
+  const next = find('[data-mixed-next]');
+  const progress = find('[data-mixed-progress]');
+
+  function cells(digits, active = -1, showLetters = false) {
+    return `<div class="mixed-cells mixed-word-cells">${bases.map((base, index) => {
+      const digit = digits[index];
+      const activeClass = index === active ? ' active' : '';
+      const value = digit === null ? '—' : digit;
+      const shown = showLetters && digit !== null
+        ? `<strong>${alphabets[index][digit]}</strong><span>цифра ${digit}</span>`
+        : `<strong>${value}</strong>`;
+      return `<div class="mixed-cell${activeClass}"><span>Позиция ${index + 1}</span><span>Осн. ${base}</span>${shown}</div>`;
+    }).join('')}</div>`;
+  }
+
+  function addTable(left, right, carries, result, active) {
+    const row = (name, values) => `<tr><th scope="row">${name}</th>${values.map((value, index) =>
+      `<td${index === active ? ' class="active"' : ''}>${value === null ? '—' : value}</td>`).join('')}</tr>`;
+    const headers = bases.map((_, index) => `<th scope="col"${index === active ? ' class="active"' : ''}>${index + 1}</th>`).join('');
+    return `<div class="table-wrap mixed-word-table"><table>
+      <thead><tr><th scope="col">Позиция</th>${headers}</tr></thead>
+      <tbody>${row('Основание', bases)}${row('Входящий перенос', carries)}${row('Слово', left)}${row('Сдвиг', right)}${row('Сумма', result)}</tbody>
+    </table></div>`;
+  }
+
+  function frame(title, note, visual = '', formula = '', result = false) {
+    return {title, note, visual, formula, result};
+  }
+
+  function readWord() {
+    const letters = Array.from(fields.word.value.trim().toUpperCase());
+    if (letters.length !== bases.length) return {message: 'Введите слово из четырёх русских букв.'};
+    const digits = letters.map((letter, index) => alphabets[index].indexOf(letter));
+    const invalid = digits.indexOf(-1);
+    if (invalid !== -1) {
+      return {message: `В позиции ${invalid + 1} допустимы буквы ${Array.from(alphabets[invalid]).join(', ')}.`};
+    }
+    return {letters: letters.join(''), digits};
+  }
+
+  function readInteger(field, minimum, maximum) {
+    const text = field.value.trim();
+    if (!/^\d+$/.test(text)) return null;
+    const value = Number(text);
+    return Number.isSafeInteger(value) && value >= minimum && value <= maximum ? value : null;
+  }
+
+  function decoding(digits, decoded) {
+    return decoded.steps.map(({i, base, before, digit, value}) => frame(
+      `Схема Горнера. Позиция ${i + 1}`,
+      i === 0
+        ? 'Начинаем с нуля. После первой позиции накопленное значение равно первой цифре.'
+        : 'Умножаем накопленное значение на основание текущей позиции и прибавляем её цифру.',
+      cells(digits, i, true),
+      `${before} · ${base} + ${digit} = ${value}`,
+    ));
+  }
+
+  function encoding(encoded, title, showLetters) {
+    const found = blank();
+    return encoded.steps.map(({i, base, value, quotient, remainder}) => {
+      found[i] = remainder;
+      return frame(
+        `${title}. Позиция ${i + 1}`,
+        i === 0
+          ? 'Остаток даёт первую цифру. Нулевое частное означает, что значение целиком поместилось в четыре позиции.'
+          : 'В эту позицию записываем остаток. С частным переходим к позиции слева.',
+        cells(found, i, showLetters),
+        `${value} : ${base} = ${quotient}, остаток ${remainder}`,
+      );
+    });
+  }
+
+  function wordSteps(word) {
+    const decoded = mixed.decode(word.digits, bases);
+    return [
+      frame('Заменяем буквы цифрами', 'Каждая буква получает номер от нуля в алфавите своей позиции.', cells(word.digits, -1, true)),
+      ...decoding(word.digits, decoded),
+      frame('Находим порядковый номер', `Слово <b>${word.letters}</b> имеет номер <b>${decoded.value + 1}</b>. Нумерация слов начинается с единицы.`,
+        cells(word.digits, -1, true), `${decoded.value} + 1 = ${decoded.value + 1}`, true),
+    ];
+  }
+
+  function numberSteps(number) {
+    const index = number - 1;
+    const encoded = mixed.encode(index, bases);
+    return [
+      frame('Переходим от номера к индексу', 'Индекс отсчитываем от нуля. Затем делим его на основания позиций справа налево.',
+        cells(blank()), `${number} − 1 = ${index}`),
+      ...encoding(encoded, 'Делим на основание', true),
+      frame('Восстанавливаем слово', `Читаем буквы слева направо. Номеру <b>${number}</b> соответствует слово <b>${split(encoded.digits).join('')}</b>.`,
+        cells(encoded.digits, -1, true), '', true),
+    ];
+  }
+
+  function shiftSteps(word, distance, encoded, addition) {
+    const resultDigits = blank();
+    const carries = blank();
+    const shiftedWord = split(addition.digits).join('');
+    const columns = addition.steps.map(({i, base, left, right, incoming, sum, digit, carry}) => {
+      resultDigits[i] = digit;
+      carries[i] = incoming;
+      if (i > 0) carries[i - 1] = carry;
+      const carryNote = carry ? `Переносим ${carry} в позицию ${i} слева.` : 'Переноса влево нет.';
+      return frame(
+        `Складываем столбиком. Позиция ${i + 1}`,
+        `К двум цифрам прибавляем входящий перенос ${incoming}. Остаток ${digit} записываем в сумму. ${carryNote}`,
+        addTable(word.digits, encoded.digits, carries, resultDigits, i),
+        `${left} + ${right} + ${incoming} = ${sum}; &nbsp; ${sum} = ${carry} · ${base} + ${digit}`,
+      );
+    });
+    const decoded = mixed.decode(addition.digits, bases);
+    return [
+      frame('Готовим сдвиг', `Слово <b>${word.letters}</b> уже записано цифрами. Число мест сдвига <b>${distance}</b> переведём в ту же систему с основаниями по позициям.`,
+        cells(word.digits, -1, true)),
+      ...encoding(encoded, 'Кодируем сдвиг', false),
+      ...columns,
+      frame('Читаем полученные буквы', `Цифры суммы дают слово <b>${shiftedWord}</b>. Теперь найдём его порядковый номер.`,
+        cells(addition.digits, -1, true)),
+      ...decoding(addition.digits, decoded),
+      frame('Переходим к порядковому номеру', `После сдвига получаем слово <b>${shiftedWord}</b>, его номер <b>${decoded.value + 1}</b>.`,
+        cells(addition.digits, -1, true), `${decoded.value} + 1 = ${decoded.value + 1}`, true),
+    ];
+  }
+
+  function render() {
+    const current = state.steps[state.step];
+    stage.hidden = !current;
+    actions.hidden = !current;
+    if (!current) {
+      stage.replaceChildren();
+      announcement.textContent = '';
+      return;
+    }
+    stage.innerHTML = `<p class="mixed-word-step-title"><strong>${current.title}</strong></p>
+      ${current.visual}
+      ${current.formula ? `<p class="formula mixed-word-formula">${current.formula}</p>` : ''}
+      <p class="mixed-word-note"${current.result ? ' data-mixed-result' : ''}>${current.note}</p>`;
+    back.setAttribute('aria-disabled', String(state.step === 0));
+    next.setAttribute('aria-disabled', String(state.step === state.steps.length - 1));
+    progress.textContent = `Шаг ${state.step + 1} из ${state.steps.length}`;
+    announcement.textContent = Array.from(stage.querySelectorAll('p'), (line) => line.textContent).join(' ');
+  }
+
+  function invalid(field, message) {
+    field.setAttribute('aria-invalid', 'true');
+    field.setAttribute('aria-describedby', error.id);
+    error.textContent = message;
+    render();
+  }
+
+  function update() {
+    const operation = mode.value;
+    fields.word.parentElement.hidden = operation === 'number';
+    fields.number.parentElement.hidden = operation !== 'number';
+    fields.shift.parentElement.hidden = operation !== 'shift';
+    for (const field of Object.values(fields)) {
+      field.removeAttribute('aria-invalid');
+      field.removeAttribute('aria-describedby');
+    }
+    error.textContent = '';
+    state.steps = [];
+    state.step = 0;
+
+    if (operation === 'number') {
+      const number = readInteger(fields.number, 1, total);
+      if (number === null) return invalid(fields.number, `Введите целый десятичный номер от 1 до ${total}.`);
+      state.steps = numberSteps(number);
+    } else {
+      const word = readWord();
+      if (word.message) return invalid(fields.word, word.message);
+      if (operation === 'word') {
+        state.steps = wordSteps(word);
+      } else {
+        const distance = readInteger(fields.shift, 0, total - 1);
+        if (distance === null) return invalid(fields.shift, `Введите целое десятичное число от 0 до ${total - 1}.`);
+        const encoded = mixed.encode(distance, bases);
+        const added = mixed.add(word.digits, encoded.digits, bases);
+        if (added.carry) {
+          const available = total - 1 - mixed.decode(word.digits, bases).value;
+          return invalid(fields.shift, `Сдвиг выходит за конец списка. Для этого слова введите сдвиг от 0 до ${available}.`);
+        }
+        state.steps = shiftSteps(word, distance, encoded, added);
+      }
+    }
+    render();
+  }
+
+  function move(offset) {
+    const destination = state.step + offset;
+    if (destination < 0 || destination >= state.steps.length) return;
+    state.step = destination;
+    render();
+  }
+
+  mode.addEventListener('change', update);
+  for (const field of Object.values(fields)) field.addEventListener('input', update);
+  back.addEventListener('click', () => move(-1));
+  next.addEventListener('click', () => move(1));
+  update();
+}
+
+function initMixedPixelModel(root, mixed) {
+  const bases = [3, 4, 5];
+  const [frameCount, rowCount, columnCount] = bases;
+  const frameSize = rowCount * columnCount;
+  const limit = frameCount * frameSize - 1;
+  const frameStops = [0, 33, 40];
+  let selection = 33;
+
+  const cellMarkup = (frame, row, col) => {
+    const { value } = mixed.decode([frame, row, col], bases);
+    const label = `Кадр ${frame}, строка ${row}, столбец ${col}, индекс ${value}`;
+    return `<button type="button" class="mxp-cell" role="gridcell" data-mxp-index="${value}"
+      aria-label="${label}" aria-selected="false" tabindex="-1">${value}</button>`;
+  };
+
+  const frames = Array.from({ length: frameCount }, (_, frame) => `
+    <div class="mxp-frame" data-mxp-frame="${frame}">
+      <p class="mxp-frame-title" id="mxp-frame-title-${frame}">Кадр ${frame}</p>
+      <div class="mxp-frame-grid" role="grid" aria-labelledby="mxp-frame-title-${frame}" aria-rowcount="${rowCount + 1}" aria-colcount="${columnCount + 1}">
+        <div class="mxp-axis" role="row">
+          <span role="columnheader" aria-label="Номер строки"></span>
+          ${Array.from({ length: columnCount }, (_, col) => `<span role="columnheader">${col}</span>`).join('')}
+        </div>
+        ${Array.from({ length: rowCount }, (_, row) => `<div class="mxp-row" role="row">
+          <span role="rowheader">${row}</span>
+          ${Array.from({ length: columnCount }, (_, col) => cellMarkup(frame, row, col)).join('')}
+        </div>`).join('')}
+      </div>
+    </div>`).join('');
+
+  const bands = Array.from({ length: frameCount }, (_, frame) => `
+    <div class="mxp-band" data-mxp-band="${frame}">
+      <span>Кадр ${frame}</span>
+      <b>${frame * frameSize}–${(frame + 1) * frameSize - 1}</b>
+      <span class="mxp-marker" aria-hidden="true" hidden></span>
+    </div>`).join('');
+
+  root.classList.add('interactive');
+  root.setAttribute('role', 'region');
+  root.setAttribute('aria-labelledby', 'mxp-heading');
+  root.innerHTML = `
+    <h3 id="mxp-heading">От пикселя к индексу и обратно</h3>
+    <p>Выберите пиксель или введите его линейный индекс.</p>
+    <div class="mxp-panel">
+      <label for="mxp-index">Индекс
+        <input id="mxp-index" type="number" min="0" max="${limit}" step="1" required aria-describedby="mxp-error">
+      </label>
+      <div class="mxp-controls" aria-label="Изменить индекс" role="group">
+        <button type="button" class="ghost" id="mxp-back" aria-label="Вычесть один из индекса">−1</button>
+        <button type="button" class="ghost" id="mxp-next" aria-label="Прибавить один к индексу">+1</button>
+        <button type="button" id="mxp-add-seven" aria-label="Прибавить семь к индексу">+7</button>
+      </div>
+    </div>
+    <p id="mxp-error" class="mxp-error" role="status" hidden></p>
+    <p class="mxp-selection" id="mxp-selection" role="status" aria-atomic="true"></p>
+    <p class="mxp-axis-note">Номер строки указан слева, номер столбца — сверху. В сетке можно двигаться клавишами со стрелками.</p>
+    <div class="mxp-frames">${frames}</div>
+    <h4 class="mxp-strip-heading">Те же кадры в линейном списке</h4>
+    <div class="mxp-strip" aria-label="Кадры в линейном списке индексов" role="group">${bands}</div>
+    <dl class="mxp-calculations">
+      <div>
+        <dt>Из координат в индекс</dt>
+        <dd class="mxp-formula-pattern">(кадр · 4 + строка) · 5 + столбец</dd>
+        <dd id="mxp-equation" class="mxp-equation"></dd>
+      </div>
+      <div>
+        <dt>Из индекса в координаты</dt>
+        <dd id="mxp-inverse" class="mxp-inverse"></dd>
+      </div>
+    </dl>`;
+
+  const at = (key) => root.querySelector(`#mxp-${key}`);
+  const field = at('index');
+  const buttons = [[-1, at('back')], [1, at('next')], [7, at('add-seven')]];
+  const cells = [...root.querySelectorAll('[data-mxp-index]')];
+  const cards = [...root.querySelectorAll('[data-mxp-frame]')];
+  const strip = [...root.querySelectorAll('[data-mxp-band]')];
+
+  function warn(text = '') {
+    const error = at('error');
+    error.textContent = text;
+    error.hidden = !text;
+    field.setAttribute('aria-invalid', String(Boolean(text)));
+  }
+
+  function show(index) {
+    selection = index;
+    const { digits: [frame, row, col] } = mixed.encode(index, bases);
+    const { value } = mixed.decode([frame, row, col], bases);
+    const rowNumber = Math.floor(index / columnCount);
+
+    frameStops[frame] = index;
+    field.value = String(index);
+    warn();
+    for (const [delta, button] of buttons) button.disabled = index + delta < 0 || index + delta > limit;
+    cells.forEach((cell, offset) => {
+      cell.setAttribute('aria-selected', String(offset === index));
+      cell.tabIndex = frameStops[Math.floor(offset / frameSize)] === offset ? 0 : -1;
+    });
+    cards.forEach((card, offset) => card.classList.toggle('mxp-active-frame', offset === frame));
+    strip.forEach((band, offset) => {
+      const current = offset === frame;
+      const marker = band.querySelector('.mxp-marker');
+      band.classList.toggle('mxp-active-band', current);
+      marker.hidden = !current;
+      if (current) {
+        const percentage = (index - frame * frameSize + .5) * 100 / frameSize;
+        marker.style.setProperty('--mxp-position', `${percentage}%`);
+        marker.textContent = String(index);
+        band.setAttribute('aria-current', 'true');
+      } else band.removeAttribute('aria-current');
+    });
+
+    at('selection').textContent = `Индекс ${index}. Кадр ${frame}, строка ${row}, столбец ${col}`;
+    at('equation').textContent = `(${frame} · ${rowCount} + ${row}) · ${columnCount} + ${col} = ${value}`;
+    at('inverse').innerHTML = `
+      <span><b>${index} = ${rowNumber} · ${columnCount} + ${col}</b>. Остаток ${col} даёт номер столбца.</span>
+      <span><b>${rowNumber} = ${frame} · ${rowCount} + ${row}</b>. Остаток ${row} даёт номер строки, частное ${frame} — номер кадра.</span>`;
+  }
+
+  field.addEventListener('input', () => {
+    if (!field.validity.valid || !Number.isInteger(field.valueAsNumber)) {
+      warn(`Введите целый индекс от 0 до ${limit}.`);
+      return;
+    }
+    show(field.valueAsNumber);
+  });
+  for (const [delta, button] of buttons) {
+    button.addEventListener('click', () => show(selection + delta));
+  }
+
+  root.querySelector('.mxp-frames').addEventListener('click', (event) => {
+    const cell = event.target.closest('[data-mxp-index]');
+    if (cell) show(Number(cell.dataset.mxpIndex));
+  });
+  root.querySelector('.mxp-frames').addEventListener('keydown', (event) => {
+    const cell = event.target.closest('[data-mxp-index]');
+    if (!cell) return;
+    const index = Number(cell.dataset.mxpIndex);
+    const { digits: [frame, row, col] } = mixed.encode(index, bases);
+    const changes = {
+      ArrowLeft: col > 0 ? -1 : 0,
+      ArrowRight: col + 1 < columnCount ? 1 : 0,
+      ArrowUp: row > 0 ? -columnCount : 0,
+      ArrowDown: row + 1 < rowCount ? columnCount : 0,
+      Home: event.ctrlKey ? frame * frameSize - index : -col,
+      End: event.ctrlKey ? (frame + 1) * frameSize - 1 - index : columnCount - 1 - col,
+    };
+    if (!Object.hasOwn(changes, event.key)) return;
+    event.preventDefault();
+    const destination = index + changes[event.key];
+    show(destination);
+    cells[destination].focus();
+  });
+
+  show(selection);
+}
+
+initMixedClock(document.getElementById('mixed-clock-model'));
+initMixedWordModel(document.getElementById('mixed-word-model'), mixed);
+initMixedPixelModel(document.getElementById('mixed-pixel-model'), mixed);
+initMixedPractice(document.getElementById('mixed-practice'));
+</script>
+</body>
+</html>
