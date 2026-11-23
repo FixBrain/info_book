@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Проверочная работа 2. Арифметика и свойства чисел — Числа и системы счисления</title>
+<style>
+:root{--accent:#2563eb;--bg:#f7f8fa;--card:#fff;--line:#e3e7ee;--ink:#1f2430;--muted:#535d6f}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
+[hidden]{display:none!important}
+a{color:#164aad}
+header{background:var(--card);border-bottom:1px solid var(--line)}
+main,nav,footer{max-width:880px;margin:0 auto;padding-left:16px;padding-right:16px}
+nav{display:flex;flex-wrap:wrap;gap:8px 18px;padding-top:12px;padding-bottom:12px;font-size:15px}
+main{padding-top:24px;padding-bottom:32px}
+h1{margin:0 0 8px;font-size:clamp(25px,5vw,34px);line-height:1.2}
+.lead{color:var(--muted);margin:0 0 16px;font-size:17px}
+.progress{display:flex;flex-wrap:wrap;gap:4px 20px;margin:16px 0;color:var(--muted)}
+.progress strong{color:var(--ink)}
+.question{margin:0 0 14px;padding:18px 20px;border:1px solid var(--line);border-radius:14px;background:var(--card);min-width:0}
+.question h2{font-size:19px;margin:0 0 7px;color:#172441;line-height:1.35}
+.question p{margin:7px 0}
+.math-context{margin:10px 0 12px;font-weight:650;font-size:18px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.math-context p{margin:4px 0}
+.part{min-width:0;border:0;padding:0;margin:11px 0 4px}
+.part legend{max-width:100%;padding:0;margin-bottom:4px;font-weight:600;overflow-wrap:anywhere}
+.entry{font:inherit;color:inherit;border:1px solid #aab7cc;border-radius:8px;padding:7px 10px;width:min(100%,28rem);min-height:40px;background:#fff}
+.entry:disabled{color:#354258;background:#f4f6fa;opacity:1}
+.choices{display:flex;align-items:flex-start;gap:6px 10px;flex-wrap:wrap}
+.choice{min-width:0;display:flex;align-items:baseline;gap:8px;padding:5px 10px;border:1px solid #dce2ed;border-radius:8px;background:#f7f9fe;cursor:pointer}
+.choice input{accent-color:var(--accent);margin:0;flex:none}
+.choice span{overflow-wrap:anywhere}
+fieldset:disabled .choice{cursor:default}
+.feedback{font-size:14px;overflow-wrap:anywhere}
+.correct{color:#236637}
+.incorrect{color:#8b4430}
+.task-score{font-weight:650}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 10px}
+button{font:inherit;font-weight:650;color:#164aad;background:#eaf0ff;border:1px solid #d5e1ff;border-radius:8px;padding:8px 14px;min-height:42px;cursor:pointer}
+button.primary{background:var(--accent);border-color:var(--accent);color:white}
+button:disabled{opacity:.53;cursor:default}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.result:empty{display:none}
+.result{background:#eef4ff;border:1px solid #d5e1ff;padding:12px 15px;border-radius:10px;margin:12px 0}
+.storage{color:#8b4430;margin:.6em 0}
+footer{border-top:1px solid var(--line);padding-top:12px;padding-bottom:30px}
+@media(max-width:540px){.question{padding:14px}.math-context{font-size:17px}nav{gap:5px 12px}}
+</style>
+</head>
+<body>
+<header>
+  <nav aria-label="Навигация по учебнику">
+    <a href="index.html">Оглавление</a>
+    <a href="08-svoystva-chisel.html">9. Свойства чисел и их записей</a>
+    <a href="09-alternativnye-alfavity.html">10. Альтернативные алфавиты</a>
+  </nav>
+</header>
+<main>
+  <h1>Проверочная работа 2. Арифметика и свойства чисел</h1>
+  <p class="lead">Девять заданий по главам 7–9. Для зачёта нужно набрать 7 из 14 баллов.</p>
+  <p>Вводите ответы без индекса основания. Буквенные цифры A–J пишите латиницей. Дробную часть отделяйте запятой.</p>
+  <p class="progress"><strong id="assessment-attempt" tabindex="-1"></strong><span id="assessment-best"></span></p>
+  <noscript>Для генерации заданий и проверки ответов включите JavaScript в браузере.</noscript>
+  <form id="assessment-form" novalidate>
+    <div id="assessment-tasks"></div>
+    <div class="controls">
+      <button type="submit" class="primary" id="assessment-submit" disabled>Проверить работу</button>
+      <button type="button" id="assessment-retry" hidden>Новая попытка</button>
+      <button type="button" id="assessment-download" disabled>Скачать результат</button>
+    </div>
+    <div class="result" id="assessment-score" role="status" tabindex="-1"></div>
+    <p class="storage" id="assessment-storage" role="status" hidden>Браузер ограничил сохранение. Вы можете скачать результат до закрытия страницы.</p>
+  </form>
+</main>
+<footer>
+  <a href="09-alternativnye-alfavity.html">Дальше — 10. Альтернативные алфавиты</a>
+</footer>
+<script>
+const assessment = {"id": 2, "title": "Проверочная работа 2. Арифметика и свойства чисел", "max": 14, "threshold": 7};
+
+function makeAssessmentTasks(random) {
+  const digits = '0123456789ABCDEFGHIJ';
+  const pick = (from, to) => from + Math.floor(random() * (to - from + 1));
+  const places = (length, make) => Array.from({length}, (_, index) => make(index));
+  const symbols = (values) => values.map((digit) => digits[digit]).join('');
+  const number = (values, base) => values.reduce((total, digit) => total * base + digit, 0);
+  const record = (value, base) => value.toString(base).toUpperCase();
+  const marked = (value, base) => `${value}<sub>${base}</sub>`;
+  const calculation = (left, operator, right, base) => `${marked(left, base)} ${operator} ${marked(right, base)}`;
+  const response = (label, expected, normalization = 'record', points = 1) => ({
+    label, expected, normalization, points, kind: 'text',
+  });
+  const placeOptions = (length) => places(length, (position) => ({value: String(position), label: `Разряд № ${position}`}));
+  const fraction = (value, base) => {
+    const scale = base ** 2;
+    const integer = record(Math.floor(value / scale), base);
+    const tail = record(value % scale, base).padStart(2, '0').replace(/0+$/, '');
+    return tail ? `${integer},${tail}` : integer;
+  };
+  const tasks = [];
+
+  {
+    const base = pick(3, 16);
+    const length = pick(3, 4);
+    const left = places(length, (index) => index === 0 ? pick(1, base - 2) : pick(0, base - 1));
+    const right = left.map((digit, index) => pick(index === 0 ? 1 : 0, base - 1 - digit));
+    tasks.push({
+      title: 'Сложение без переносов',
+      prompt: `Сложите числа по разрядам. Запишите сумму в системе с основанием ${base}.`,
+      context: calculation(symbols(left), '+', symbols(right), base),
+      parts: [response('Сумма', record(number(left, base) + number(right, base), base))],
+    });
+  }
+
+  {
+    const base = pick(3, 16);
+    const length = pick(3, 4);
+    const left = places(length, (index) => pick(index === 0 ? 2 : 0, base - 1));
+    const right = left.map((digit, index) => index === 0 ? pick(1, digit - 1) : pick(0, digit));
+    tasks.push({
+      title: 'Вычитание без займа',
+      prompt: `Вычтите числа по разрядам. Запишите разность в системе с основанием ${base}.`,
+      context: calculation(symbols(left), '−', symbols(right), base),
+      parts: [response('Разность', record(number(left, base) - number(right, base), base))],
+    });
+  }
+
+  {
+    const base = pick(4, 16);
+    const length = pick(4, 5);
+    const start = pick(0, 1);
+    const end = pick(start + 1, length - (start === 0 ? 2 : 1));
+    const left = [];
+    const right = [];
+    let incoming = 0;
+    for (let position = 0; position < length; position++) {
+      const minimum = position === length - 1 ? 1 : 0;
+      let total;
+      if (position === start) total = pick(base, 2 * (base - 1));
+      else if (position > start && position <= end) total = base - 1;
+      else total = pick(2 * minimum, base - 1 - incoming);
+      const digit = pick(Math.max(minimum, total - (base - 1)), Math.min(base - 1, total - minimum));
+      left.unshift(digit);
+      right.unshift(total - digit);
+      incoming = total + incoming >= base ? 1 : 0;
+    }
+    const expected = places(end - start + 1, (index) => String(start + index));
+    tasks.push({
+      title: 'Цепочка переносов',
+      prompt: `Сложите числа и запишите результат в системе с основанием ${base}. Считайте разряды справа налево, начиная с № 0 для единиц.`,
+      context: calculation(symbols(left), '+', symbols(right), base),
+      parts: [
+        response('Сумма', record(number(left, base) + number(right, base), base)),
+        {
+          kind: 'checkbox', label: 'Отметьте все разряды, из которых единица переносится влево, в том числе в новый столбец.',
+          options: placeOptions(length), expected, points: 1,
+          answer: expected.map((position) => `№ ${position}`).join(', '),
+        },
+      ],
+    });
+  }
+
+  {
+    const base = pick(2, 16);
+    const length = pick(4, 5);
+    const target = pick(0, 1);
+    const source = pick(target + 2, length - 1);
+    const left = places(length, (position) => {
+      if (position < target) return pick(0, base - 1);
+      if (position === target) return pick(0, base - 2);
+      if (position < source) return 0;
+      return pick(position === source || position === length - 1 ? 1 : 0, base - 1);
+    });
+    const right = left.map((digit, position) => {
+      if (position < target) return pick(0, digit);
+      if (position === target) return pick(digit + 1, base - 1);
+      return 0;
+    });
+    left.reverse();
+    right.reverse();
+    tasks.push({
+      title: 'Заём через нули',
+      prompt: `Вычтите числа и запишите результат в системе с основанием ${base}. Считайте разряды справа налево, начиная с № 0 для единиц.`,
+      context: calculation(symbols(left), '−', record(number(right, base), base), base),
+      parts: [
+        response('Разность', record(number(left, base) - number(right, base), base)),
+        {
+          kind: 'radio', label: `Из какого разряда начался заём для разряда № ${target}? Укажите разряд, который первым отдал единицу.`,
+          options: placeOptions(length), expected: String(source), points: 1, answer: `Разряд № ${source}`,
+        },
+      ],
+    });
+  }
+
+  {
+    const base = pick(4, 16);
+    const unit = base ** 2;
+    const addDigit = pick(1, base - 1);
+    const addLeft = pick(1, base - 2) * unit + addDigit * base;
+    const addRight = pick(0, base - 2) * unit + pick(base - addDigit, base - 1) * base + pick(1, base - 1);
+    const terms = pick(0, 1) ? [addLeft, addRight] : [addRight, addLeft];
+    const minuendDigit = pick(1, base - 1);
+    const minuendWhole = pick(1, base - 1);
+    const subLeft = minuendWhole * unit + minuendDigit * base;
+    const subRight = pick(0, minuendWhole - 1) * unit + pick(minuendDigit, base - 1) * base + pick(1, base - 1);
+    const expression = (left, operator, right) => calculation(`(${fraction(left, base)})`, operator, `(${fraction(right, base)})`, base);
+    tasks.push({
+      title: 'Числа с запятой',
+      prompt: `Вычислите оба выражения. Запишите ответы с запятой в системе с основанием ${base}, без незначащих нулей в конце дробной части.`,
+      context: `а) ${expression(terms[0], '+', terms[1])}<br>б) ${expression(subLeft, '−', subRight)}`,
+      parts: [
+        response('а) Сумма', fraction(addLeft + addRight, base)),
+        response('б) Разность', fraction(subLeft - subRight, base)),
+      ],
+    });
+  }
+
+  {
+    const base = pick(2, 20);
+    const length = pick(3, 4);
+    const minimum = base ** (length - 1);
+    const maximum = base ** length - 1;
+    const distance = pick(1, Math.min(12, maximum - minimum));
+    const lower = pick(minimum, maximum - distance);
+    const upper = lower + distance;
+    const lowerClosed = pick(0, 1);
+    const upperClosed = pick(0, 1);
+    tasks.push({
+      title: 'Диапазон и количество чисел',
+      prompt: `Первые два ответа запишите в системе с основанием ${base}. Укажите наименьшее и наибольшее числа, у которых ровно ${length} разряда без ведущих нулей. Затем посчитайте целые числа в указанном промежутке. За первые два ответа вместе начисляется 1 балл.`,
+      context: `${marked(record(lower, base), base)} ${lowerClosed ? '≤' : '&lt;'} x ${upperClosed ? '≤' : '&lt;'} ${marked(record(upper, base), base)}`,
+      parts: [
+        response('Наименьшее число', record(minimum, base), 'record', 0),
+        response('Наибольшее число', record(maximum, base), 'record', 0),
+        response('Количество целых чисел в промежутке (в десятичной системе)', String(distance - 1 + lowerClosed + upperClosed), 'integer'),
+      ],
+      rubric: [{parts: [0, 1], points: 1}],
+    });
+  }
+
+  {
+    const evenBase = 2 * pick(1, 10);
+    const oddBase = 2 * pick(1, 9) + 1;
+    const example = (base) => {
+      const length = pick(3, 5);
+      const values = places(length, (index) => pick(index === 0 ? 1 : 0, base - 1));
+      const earlierParity = values.slice(0, length - 2).reduce((total, digit) => total + digit, 0) % 2;
+      const requiredParity = 1 - earlierParity;
+      values[length - 2] = requiredParity + 2 * pick(0, Math.floor((base - 1 - requiredParity) / 2));
+      return {text: symbols(values), isOdd: number(values, base) % 2 === 1};
+    };
+    const evenExample = example(evenBase);
+    const oddExample = example(oddBase);
+    const rationale = (label, {isOdd}, criterion) => {
+      const options = [
+        {value: 'last-even', label: 'Чётное. Достаточно проверить, что значение младшей цифры чётно.'},
+        {value: 'last-odd', label: 'Нечётное. Достаточно проверить, что значение младшей цифры нечётно.'},
+        {value: 'sum-even', label: 'Чётное. В этом основании чётность определяет сумма значений всех цифр, и она чётна.'},
+        {value: 'sum-odd', label: 'Нечётное. В этом основании чётность определяет сумма значений всех цифр, и она нечётна.'},
+      ];
+      for (let index = options.length - 1; index > 0; index--) {
+        const swap = pick(0, index);
+        [options[index], options[swap]] = [options[swap], options[index]];
+      }
+      const expected = `${criterion}-${isOdd ? 'odd' : 'even'}`;
+      return {label, kind: 'radio', options, expected, points: 1, answer: options.find((option) => option.value === expected).label};
+    };
+    tasks.push({
+      title: 'Чётность в двух основаниях',
+      prompt: 'Для каждого числа выберите вывод и причину, по которой чётность можно определить в указанном основании.',
+      context: `а) ${marked(evenExample.text, evenBase)}<br>б) ${marked(oddExample.text, oddBase)}`,
+      parts: [
+        rationale(`а) Число в основании ${evenBase}`, evenExample, 'last'),
+        rationale(`б) Число в основании ${oddBase}`, oddExample, 'sum'),
+      ],
+    });
+  }
+
+  {
+    const base = pick(2, 20);
+    const count = pick(2, 3);
+    const length = count + pick(1, 3);
+    const values = places(length, (index) => pick(index === 0 ? 1 : 0, base - 1));
+    const pattern = pick(0, 5);
+    if (pattern === 0) values.fill(0, length - count);
+    if (pattern === 1 || pattern === 2) {
+      values[length - count] = 0;
+      values[length - 1] = pick(1, base - 1);
+    }
+    const remainder = number(values.slice(-count), base);
+    tasks.push({
+      title: 'Остаток от деления на степень основания',
+      prompt: `Найдите остаток от деления. Запишите его в системе с основанием ${base}, без ведущих нулей.`,
+      context: `Делимое <b>${marked(symbols(values), base)}</b>, делитель <b>${base}<sup>${count}</sup></b>`,
+      parts: [response('Остаток', record(remainder, base))],
+    });
+  }
+
+  {
+    const base = pick(2, 10);
+    const width = pick(2, 5);
+    const increment = pick(0, 1);
+    const zeros = '0'.repeat(width);
+    const maximum = digits[base - 1].repeat(width);
+    tasks.push({
+      title: 'Счётчик с фиксированной разрядностью',
+      prompt: `Число позиций счётчика в основании ${base} равно ${width}. Что он покажет после указанного изменения? Запишите ровно столько цифр, сколько позиций в счётчике, включая ведущие нули.`,
+      context: `Начальное состояние <b>${increment ? maximum : zeros}</b><sub>${base}</sub>, изменение <b>${increment ? '+1' : '−1'}</b>`,
+      parts: [response('Показание счётчика', increment ? zeros : maximum, 'literal')],
+    });
+  }
+
+  return tasks;
+}
+
+function assessmentRandom(seed) {
+  let value = seed >>> 0;
+  return () => {
+    value = (value + 0x6D2B79F5) >>> 0;
+    let bits = Math.imul(value ^ (value >>> 15), value | 1);
+    bits ^= bits + Math.imul(bits ^ (bits >>> 7), bits | 61);
+    return ((bits ^ (bits >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+(() => {
+  'use strict';
+
+  const key = `ss-assessment:v1:${assessment.id}`;
+  const byId = (id) => document.getElementById(id);
+  const form = byId('assessment-form');
+  const taskList = byId('assessment-tasks');
+  const submit = byId('assessment-submit');
+  const retry = byId('assessment-retry');
+  const download = byId('assessment-download');
+  const score = byId('assessment-score');
+
+  function newSeed() {
+    if (window.crypto?.getRandomValues) return crypto.getRandomValues(new Uint32Array(1))[0];
+    return Math.floor(Math.random() * 4294967296);
+  }
+
+  function parseProgress(text) {
+    try {
+      const progress = JSON.parse(text);
+      if (!progress || !Number.isInteger(progress.seed) || progress.seed < 0 || progress.seed > 0xFFFFFFFF ||
+          !Number.isInteger(progress.attempt) || progress.attempt < 1 || !progress.values || typeof progress.values !== 'object' ||
+          Object.values(progress.values).some((value) => typeof value !== 'string' && !Array.isArray(value)) ||
+          !Number.isInteger(progress.best) || progress.best < 0 || progress.best > assessment.max ||
+          (progress.completedAt && typeof progress.completedAt !== 'string') ||
+          (progress.last && (typeof progress.last.report !== 'string' || !Number.isInteger(progress.last.attempt)))) {
+        return null;
+      }
+      return progress;
+    } catch {
+      return null;
+    }
+  }
+
+  function loadProgress() {
+    try {
+      return parseProgress(localStorage.getItem(key));
+    } catch {
+      return null;
+    }
+  }
+
+  let progress = loadProgress() ?? { seed: newSeed(), attempt: 1, values: {}, completedAt: null, best: 0, last: null };
+  let tasks;
+
+  function saveProgress() {
+    try {
+      localStorage.setItem(key, JSON.stringify(progress));
+    } catch {
+      byId('assessment-storage').hidden = false;
+    }
+  }
+
+  function nameOf(taskIndex, partIndex) {
+    return `answer-${taskIndex + 1}-${partIndex + 1}`;
+  }
+
+  function normalize(value, mode) {
+    const text = String(value ?? '').trim();
+    if (mode === 'record') return text.replace(/\s/g, '').replace('.', ',').toUpperCase();
+    if (mode === 'digits') return text.replace(/\s/g, '').toUpperCase();
+    if (mode === 'symbol') return text.normalize('NFKC');
+    if (mode === 'integer') {
+      const integer = text.replace('−', '-');
+      return /^[+-]?\d+$/.test(integer) ? String(BigInt(integer)) : null;
+    }
+    if (mode === 'list') {
+      const entries = text.split(/[,;\s]+/).map((entry) => normalize(entry, 'integer'));
+      return entries.includes(null) ? null : entries.join(',');
+    }
+    return text;
+  }
+
+  function isCorrect(part, value) {
+    if (part.kind === 'checkbox') {
+      const expected = new Set(part.expected);
+      return Array.isArray(value) && new Set(value).size === expected.size && value.every((item) => expected.has(item));
+    }
+    return typeof value === 'string' && value.trim() !== '' &&
+      normalize(value, part.normalization) === normalize(part.expected, part.normalization);
+  }
+
+  function evaluate() {
+    return tasks.map((task, taskIndex) => {
+      const answers = task.parts.map((part, partIndex) => progress.values[nameOf(taskIndex, partIndex)]);
+      const correct = task.parts.map((part, partIndex) => isCorrect(part, answers[partIndex]));
+      const groups = task.rubric ?? [];
+      const max = task.parts.reduce((sum, part) => sum + part.points, 0) +
+        groups.reduce((sum, group) => sum + group.points, 0);
+      const points = task.parts.reduce((sum, part, index) => sum + (correct[index] ? part.points : 0), 0) +
+        groups.reduce((sum, group) => sum + (group.parts.every((index) => correct[index]) ? group.points : 0), 0);
+      return { answers, correct, max, points };
+    });
+  }
+
+  function asText(part, value) {
+    if (value === undefined || value === '' || (Array.isArray(value) && !value.length)) return 'Без ответа';
+    if (!part.options) return String(value);
+    const label = (id) => part.options.find((option) => option.value === id)?.label ?? id;
+    return Array.isArray(value) ? value.map(label).join(', ') : label(value);
+  }
+
+  function expectedAnswer(part) {
+    return part.answer ?? asText(part, part.expected);
+  }
+
+  function element(tag, className, text) {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  function renderPart(part, taskIndex, partIndex) {
+    const field = element('fieldset', `part part-${part.kind}`);
+    field.dataset.part = partIndex + 1;
+    const name = nameOf(taskIndex, partIndex);
+    const value = progress.values[name];
+    const legend = element('legend', '', part.label);
+    field.append(legend);
+
+    if (part.kind === 'text') {
+      const input = element('input', 'entry');
+      input.type = 'text';
+      input.name = name;
+      input.maxLength = 100;
+      input.autocomplete = 'off';
+      input.spellcheck = false;
+      input.setAttribute('aria-label', part.label);
+      input.value = typeof value === 'string' ? value : '';
+      if (part.placeholder) input.placeholder = part.placeholder;
+      if (part.normalization === 'integer') input.inputMode = 'numeric';
+      field.append(input);
+    } else {
+      const options = element('div', 'choices');
+      for (const option of part.options) {
+        const label = element('label', 'choice');
+        const input = document.createElement('input');
+        input.type = part.kind;
+        input.name = name;
+        input.value = option.value;
+        input.checked = part.kind === 'checkbox' ? Array.isArray(value) && value.includes(option.value) : value === option.value;
+        label.append(input, element('span', '', option.label));
+        options.append(label);
+      }
+      field.append(options);
+    }
+    return field;
+  }
+
+  function renderTask(task, index, result) {
+    const section = element('section', 'question');
+    section.dataset.task = index + 1;
+    const heading = element('h2', '', `${index + 1}. ${task.title}`);
+    heading.id = `task-heading-${index + 1}`;
+    section.setAttribute('aria-labelledby', heading.id);
+    section.append(heading, element('p', 'prompt', task.prompt));
+    if (task.context) {
+      const context = element('div', 'math-context');
+      context.innerHTML = task.context;
+      section.append(context);
+    }
+    task.parts.forEach((part, partIndex) => {
+      const field = renderPart(part, index, partIndex);
+      if (progress.completedAt) {
+        field.disabled = true;
+        const correct = result.correct[partIndex];
+        const hint = correct ? 'Верно.' : `Верный ответ — ${expectedAnswer(part)}.`;
+        field.append(element('p', `feedback ${correct ? 'correct' : 'incorrect'}`, hint));
+      }
+      section.append(field);
+    });
+    if (progress.completedAt) {
+      section.append(element('p', 'task-score', `За задание — ${result.points} из ${result.max}.`));
+    }
+    return section;
+  }
+
+  function render() {
+    tasks = makeAssessmentTasks(assessmentRandom(progress.seed));
+    const results = evaluate();
+    taskList.replaceChildren(...tasks.map((task, index) => renderTask(task, index, results[index])));
+    byId('assessment-attempt').textContent = `Попытка ${progress.attempt}`;
+    byId('assessment-best').textContent = progress.last ? `Лучший результат — ${progress.best} из ${assessment.max}.` : '';
+    retry.hidden = !progress.completedAt;
+    download.disabled = !progress.last;
+    updateSubmit();
+    score.replaceChildren();
+    if (progress.completedAt) {
+      const points = results.reduce((sum, result) => sum + result.points, 0);
+      score.append(element('strong', '', `${points} из ${assessment.max} баллов. `),
+        document.createTextNode(points >= assessment.threshold ? 'Работа зачтена.' : 'Порог пока не достигнут.'));
+    }
+  }
+
+  function updateSubmit() {
+    const answered = Object.values(progress.values).some((value) => Array.isArray(value) ? value.length : value.trim());
+    submit.disabled = Boolean(progress.completedAt) || !answered;
+  }
+
+  function plainContext(html) {
+    if (!html) return '';
+    const template = document.createElement('template');
+    template.innerHTML = html;
+    for (const index of template.content.querySelectorAll('sub, sup')) {
+      const marker = index.tagName === 'SUB' ? '_' : '^';
+      index.replaceWith(document.createTextNode(marker + index.textContent));
+    }
+    for (const paragraph of template.content.querySelectorAll('p')) paragraph.append('\n');
+    return template.content.textContent.trim().replace(/\s+/g, ' ');
+  }
+
+  function makeReport(results, points) {
+    const date = new Date(progress.completedAt).toLocaleString('ru-RU');
+    const status = points >= assessment.threshold ? 'Работа зачтена.' : 'Порог пока не достигнут.';
+    const lines = [assessment.title, `Попытка ${progress.attempt} от ${date}`, `Результат — ${points} из ${assessment.max}. ${status}`,
+      `Лучший результат — ${progress.best} из ${assessment.max}.`];
+    tasks.forEach((task, index) => {
+      const { answers, max, points: taskPoints } = results[index];
+      lines.push('', `${index + 1}. ${task.title} — ${taskPoints} из ${max}.`, task.prompt);
+      if (task.context) lines.push(plainContext(task.context));
+      task.parts.forEach((part, partIndex) => {
+        lines.push(`  ${part.label}`, `  Ваш ответ — ${asText(part, answers[partIndex])}.`,
+          `  Верный ответ — ${expectedAnswer(part)}.`);
+      });
+    });
+    return lines.join('\r\n') + '\r\n';
+  }
+
+  form.addEventListener('input', (event) => {
+    if (!(event.target instanceof HTMLInputElement) || progress.completedAt) return;
+    const { name, type, value } = event.target;
+    progress.values[name] = type === 'checkbox' ?
+      Array.from(form.querySelectorAll(`input[name="${name}"]:checked`), (input) => input.value) : value;
+    updateSubmit();
+    saveProgress();
+  });
+
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (submit.disabled) return;
+    const results = evaluate();
+    const points = results.reduce((sum, result) => sum + result.points, 0);
+    progress = { ...progress, completedAt: new Date().toISOString(), best: Math.max(progress.best, points) };
+    progress.last = { attempt: progress.attempt, report: makeReport(results, points) };
+    saveProgress();
+    render();
+    score.focus();
+  });
+
+  retry.addEventListener('click', () => {
+    if (!progress.completedAt) return;
+    const previousVariant = JSON.stringify(tasks);
+    let seed = newSeed();
+    while (JSON.stringify(makeAssessmentTasks(assessmentRandom(seed))) === previousVariant) seed = (seed + 1) >>> 0;
+    progress = { ...progress, seed, attempt: progress.attempt + 1, values: {}, completedAt: null };
+    saveProgress();
+    render();
+    byId('assessment-attempt').focus();
+  });
+
+  download.addEventListener('click', () => {
+    if (!progress.last) return;
+    const url = URL.createObjectURL(new Blob(['\uFEFF', progress.last.report], { type: 'text/plain;charset=utf-8' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `proverka-${assessment.id}-popytka-${progress.last.attempt}.txt`;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
+
+  window.addEventListener('storage', (event) => {
+    if (event.key !== key) return;
+    const updated = loadProgress();
+    if (!updated) return;
+    progress = updated;
+    render();
+  });
+
+  saveProgress();
+  render();
+})();
+</script>
+</body>
+</html>
