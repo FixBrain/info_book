@@ -282,6 +282,74 @@ button:disabled{opacity:.55;cursor:default}
   #mixed-pixel-model .mxp-frames, #mixed-pixel-model .mxp-calculations { grid-template-columns: minmax(0, 1fr); }
   #mixed-pixel-model .mxp-cell { min-height: 35px; }
 }
+#mixed-digits{scroll-margin-top:14rem}
+@media(min-width:900px){#mixed-digits{scroll-margin-top:9rem}}
+.mixed-teaching-figure{margin:14px 0;padding:12px 15px;border:1px solid #d6e4ff;border-radius:12px;background:#f0f6ff}
+.mixed-teaching-figure figcaption{font-weight:650;color:#263d67;margin:0 0 .45em}
+.mixed-place-guide,.mixed-digit-band{display:grid;gap:6px;margin:0}
+.mixed-place-guide{grid-template-columns:repeat(3,minmax(0,1fr))}
+.mixed-digit-band{grid-template-columns:repeat(4,minmax(0,1fr));padding:0;list-style:none}
+.mixed-digit-first-band{grid-template-columns:repeat(5,minmax(0,1fr))}
+.mixed-digit-first-band+.mixed-digit-first-band{margin-top:6px}
+.mixed-place-guide>div,.mixed-digit-band>li{min-width:0;margin:0;padding:5px 3px;border:1px solid #d6e0ef;border-radius:8px;background:#fff;text-align:center;line-height:1.4}
+.mixed-place-guide dd{margin:0}
+.mixed-place-guide dt,.mixed-digit-band span{color:var(--muted);font-size:14px}
+.mixed-place-guide dd:last-child{font-size:13px;color:#324365}
+.mixed-place-guide strong,.mixed-digit-band strong{font-variant-numeric:tabular-nums;color:#172644}
+.mixed-digit-band span{display:block}
+.mixed-digit-band .mixed-carry-cell,.mixed-letter-mark{background:#fff5d7;border-color:#dcc68e}
+.mixed-teaching-figure .formula:last-child{margin-bottom:0}
+#mixed-letter-transition span{display:inline-block}
+.mixed-carry-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:0;list-style:none}
+.mixed-carry-steps>li{min-width:0;margin:0;padding:9px 12px;border:1px solid #eadbb0;border-radius:9px;background:#fffaf0}
+.mixed-carry-steps .formula{margin:3px 0}
+.mixed-teaching-table :is(td,th):not(:first-child){text-align:center}
+.mixed-predict summary{width:fit-content;color:#1647a8;cursor:pointer}
+@media(max-width:540px){
+  #mixed-digits{scroll-margin-top:14px}
+  .mixed-teaching-figure{padding:9px}
+  .mixed-digit-band,.mixed-place-guide{gap:3px}
+  .mixed-digit-band strong,.mixed-place-guide dd:last-child{font-size:13px}
+  .mixed-digit-first-band strong{font-size:clamp(11px,3.7vw,13px);white-space:nowrap}
+  .mixed-carry-steps{grid-template-columns:minmax(0,1fr)}
+  .mixed-teaching-table :is(th,td){padding-inline:4px}
+}
+.mixed-division-figure{background:#fff;margin:12px 0}
+.mixed-division-run{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;max-width:30rem;padding:0;list-style:none}
+.mixed-division-run>li{position:relative;min-width:0;margin:0;border:1px solid #d6e0ef;border-radius:8px;padding:6px 2px;text-align:center}
+.mixed-division-run>li:not(:last-child)::after{content:'→';position:absolute;left:100%;top:34%;width:14px;font-weight:700;color:#194ba3}
+.mixed-division-run>li>span{display:block;font-size:13px;line-height:1.3;color:var(--muted)}
+.mixed-division-figure .division-corner{border-collapse:separate;border-spacing:0;margin:0 auto 4px;font:19px/1.25 Consolas,Menlo,monospace}
+.mixed-division-figure .division-corner td{min-width:1em;height:1.45em;padding:0 3px;text-align:right;border:0;border-left:2px solid transparent;border-bottom:2px solid transparent}
+.mixed-division-figure .division-corner .division-side{border-left-color:var(--ink);text-align:left}
+.mixed-division-figure .division-corner .division-under{border-bottom-color:var(--ink)}
+.mixed-division-quotient{color:#194ba3;background:#edf3ff;font-weight:700}
+.mixed-division-remainder{color:#533500;background:#fff0bd;font-weight:700}
+.mixed-division-legend{font-size:14px;margin:.55em 0 0}
+.mixed-division-legend b{padding:1px 3px;border-radius:3px}
+@media(max-width:540px){
+  .mixed-division-figure .division-corner{font-size:16px}
+  .mixed-division-figure .division-corner td{padding-inline:1px}
+  .mixed-division-run>li>span{font-size:11px}
+}
+.mixed-division-figure [hidden]{display:none!important}
+.mdiv-controls label{display:grid;gap:4px;width:fit-content;font-size:14px;color:#36435c}
+.mdiv-controls input{width:7rem}
+.mdiv-actions{align-items:center}
+.mdiv-actions [aria-disabled="true"]{opacity:.55;cursor:default}
+.mixed-division-run .mdiv-current{background:#f6f9ff;border-color:#8db1f0}
+.mixed-division-run .division-corner{background:transparent}
+.mixed-division-run .division-corner .mdiv-pending{color:var(--muted);background:transparent;font-weight:400}
+.mdiv-status{margin:.65em 0;font-size:15px}
+.mdiv-block{margin:.65em 0 0}
+.mdiv-block p{font-size:14px;margin:.3em 0}
+.mdiv-block-strip{display:grid;grid-template-columns:repeat(var(--mdiv-count),minmax(0,1fr));gap:4px;max-width:24rem;margin:0;padding:0;list-style:none}
+.mdiv-block-strip>li{min-width:0;margin:0;padding:3px 1px;border:1px solid #d6e0ef;border-radius:6px;background:#fff;text-align:center;line-height:1.3}
+.mdiv-block-strip small{display:block;font-size:12px}
+.mdiv-block-strip .mdiv-block-selected{background:#fff0bd;border-color:#d4b769;color:#533500}
+.mdiv-record{grid-template-columns:repeat(3,minmax(0,1fr));max-width:24rem}
+.mdiv-record .mixed-cell strong{font-size:19px}
+.mdiv-transfer{position:fixed;z-index:15;pointer-events:none;display:block;padding:0 4px;border:1px solid #8db1f0;border-radius:4px;line-height:1.25;color:#194ba3;background:#edf3ff;font-weight:700}
 </style>
 </head>
 <body>
@@ -305,39 +373,167 @@ button:disabled{opacity:.55;cursor:default}
 </header>
 <main>
   <h1>13. Системы счисления со смешанным основанием</h1>
-  <p class="lead">Секунды и минуты дают перенос при 60, часы — при 24. Такой же принцип помогает находить номер слова в списке и определять место пикселя в последовательности кадров.</p>
-<h2>Как устроены разряды времени</h2>
-  <p>На часах 23:59:45. Какое время будет через 100 секунд? Разложим 100 секунд на 1 минуту и 40 секунд, чтобы можно было складывать по разрядам.</p>
-  <section class="example">
-    <h3>Через полночь</h3>
-    <ol>
-      <li>В секундах получаем 45 + 40 = 85. Отделяем 60 секунд, оставляем 25 и переносим 1 минуту.</li>
-      <li>В минутах получаем 59 + 1 + 1 = 61. Отделяем 60 минут, оставляем 1 и переносим 1 час.</li>
-      <li>В часах получаем 23 + 1 = 24. Отделяем 24 часа, в разряде часов остаётся 0 и начинается новый день.</li>
-    </ol>
-    <div class="formula">23:59:45 + 100 секунд → 00:01:25 следующего дня</div>
-    <p>Для перехода от секунд к минутам берём 60, от минут к часам тоже 60, а от часов к суткам берём 24.</p>
-  </section>
+  <p class="lead">В привычной записи у всех разрядов одно и то же основание. Посмотрим, как считать, если в одном разряде допустимы две цифры, а в соседнем — пять.</p>
 
-  <div id="mixed-clock-model"></div>
+  <h2 id="mixed-digits">Три позиции с основаниями 3, 2 и 5</h2>
+  <p>В <strong>системе счисления со смешанным основанием</strong> основание задаётся отдельно для каждой позиции. Оно показывает, сколько цифр в ней допустимо, начиная с 0. В этом примере основания слева направо — (3, 2, 5). В записи (1, 1, 4) слева стоит 1, в середине 1, справа 4.</p>
+
+  <figure class="mixed-teaching-figure" id="mixed-digit-capacities">
+    <figcaption>Допустимые цифры и веса</figcaption>
+    <dl class="mixed-place-guide">
+      <div><dt>Слева</dt><dd><strong>0, 1, 2</strong></dd><dd>Основание 3 · вес 10</dd></div>
+      <div><dt>В середине</dt><dd><strong>0, 1</strong></dd><dd>Основание 2 · вес 5</dd></div>
+      <div><dt>Справа</dt><dd><strong>0, 1, 2, 3, 4</strong></dd><dd>Основание 5 · вес 1</dd></div>
+    </dl>
+  </figure>
+  <p>Справа считаем единицами. Пять единиц собираются в одну группу веса 5 для средней позиции. Две такие группы собираются в одну группу веса 10 для левой. Всего получаем 3 · 2 · 5 = 30 записей со значениями от 0 до 29. Даже когда цифра слева равна 0, в списке по-прежнему указываем все три позиции.</p>
+
+  <p>Например, (0, 1, 2) — это одна группа из пяти и ещё две единицы, то есть 7. В (1, 0, 3) есть одна группа из десяти и ещё три единицы, поэтому значение равно 13.</p>
+  <p>Как в <a href="07-slozhenie-i-vychitanie.html">сложении столбиком</a>, идём справа налево. Для переноса берём основание текущего разряда.</p>
+  <p>Начинаем с (0, 0, 0) и каждый раз прибавляем единицу справа. Сначала меняется только правая цифра. Когда все её варианты исчерпаны, справа снова пишем 0 и прибавляем единицу в средней позиции.</p>
+  <figure class="mixed-teaching-figure" id="mixed-digit-start">
+    <figcaption>Как начинается счёт</figcaption>
+    <ol class="mixed-digit-band mixed-digit-first-band" role="list" start="0" aria-label="Значения от 0 до 4">
+      <li><strong>(0, 0, 0)</strong><span>0</span></li>
+      <li><strong>(0, 0, 1)</strong><span>1</span></li>
+      <li><strong>(0, 0, 2)</strong><span>2</span></li>
+      <li><strong>(0, 0, 3)</strong><span>3</span></li>
+      <li class="mixed-carry-cell"><strong>(0, 0, 4)</strong><span>4</span></li>
+    </ol>
+    <ol class="mixed-digit-band mixed-digit-first-band" role="list" start="5" aria-label="Значения от 5 до 9">
+      <li class="mixed-carry-cell"><strong>(0, 1, 0)</strong><span>5</span></li>
+      <li><strong>(0, 1, 1)</strong><span>6</span></li>
+      <li><strong>(0, 1, 2)</strong><span>7</span></li>
+      <li><strong>(0, 1, 3)</strong><span>8</span></li>
+      <li class="mixed-carry-cell"><strong>(0, 1, 4)</strong><span>9</span></li>
+    </ol>
+    <ol class="mixed-digit-band mixed-digit-first-band" role="list" start="10" aria-label="Следующие два значения">
+      <li class="mixed-carry-cell"><strong>(1, 0, 0)</strong><span>10</span></li>
+      <li><strong>(1, 0, 1)</strong><span>11</span></li>
+    </ol>
+  </figure>
+  <p>Правая цифра проходит ряд 0, 1, 2, 3, 4 и повторяет его через каждые пять записей. Средняя цифра равна 0 в первых пяти записях и 1 в следующих пяти. Этот порядок повторяется каждые десять записей. Левая цифра равна 0 в первой десятке, 1 во второй и 2 в третьей.</p>
+  <ul>
+    <li>После (0, 0, 4) прибавление единицы даёт пять единиц. Собираем из них одну группу в средней позиции. Так получается (0, 1, 0).</li>
+    <li>После (0, 1, 4) справа снова собирается группа из пяти. В средней позиции теперь две такие группы, а основание там равно 2. Собираем из них одну группу слева. Справа и в середине пишем 0, поэтому получается (1, 0, 0).</li>
+  </ul>
+
+  <figure class="mixed-teaching-figure" id="mixed-digit-figure">
+    <figcaption>Четыре записи подряд</figcaption>
+    <ol class="mixed-digit-band" role="list" start="18">
+      <li><strong>(1, 1, 3)</strong><span>18</span></li>
+      <li class="mixed-carry-cell"><strong>(1, 1, 4)</strong><span>19</span></li>
+      <li class="mixed-carry-cell"><strong>(2, 0, 0)</strong><span>20</span></li>
+      <li><strong>(2, 0, 1)</strong><span>21</span></li>
+    </ol>
+    <p class="formula" id="mixed-digit-carry">(1, 1, 4) + (0, 0, 1) = (2, 0, 0)</p>
+  </figure>
+  <p>При переходе от 19 к 20 единица переноса проходит через два разряда. Начинаем справа.</p>
+  <ol class="mixed-carry-steps" id="mixed-digit-carry-steps" role="list">
+    <li><strong>Справа · основание 5</strong><div class="formula">4 + 1 = 1 · 5 + 0</div><div>Пишем 0. Передаём одну группу веса 5 в средний разряд.</div></li>
+    <li><strong>В середине · основание 2</strong><div class="formula">1 + 1 = 1 · 2 + 0</div><div>Пишем 0. Передаём одну группу веса 10 в левый разряд.</div></li>
+    <li><strong>Слева · основание 3</strong><div class="formula">1 + 1 = 2</div><div>Двойка меньше 3. Пишем 2, перенос заканчивается.</div></li>
+  </ol>
 
   <h2>Как находятся веса разрядов</h2>
-  <p>В <strong>системе счисления со смешанным основанием</strong> число допустимых цифр задаётся для каждой позиции. Соседние разряды могут иметь разные основания. Нумеруем разряды справа налево с нуля. Пусть <i>b</i><sub>i</sub> — количество цифр в разряде <i>i</i>. Цифра <i>a</i><sub>i</sub> принимает значения от 0 до <i>b</i><sub>i</sub> − 1.</p>
+  <p>Нумеруем разряды справа налево с нуля. Пусть <i>b</i><sub>i</sub> — основание разряда <i>i</i>. Цифра <i>a</i><sub>i</sub> принимает значения от 0 до <i>b</i><sub>i</sub> − 1.</p>
   <p>Вес младшего разряда равен 1. Если собрать <i>b</i><sub>i</sub> групп веса <i>w</i><sub>i</sub>, получится одна группа следующего разряда. Отсюда получаем вес каждой следующей позиции.</p>
   <div class="formula"><i>w</i><sub>0</sub> = 1, &nbsp; <i>w</i><sub>i + 1</sub> = <i>b</i><sub>i</sub> · <i>w</i><sub>i</sub></div>
-  <p>Отсчитывая время в секундах, получаем веса 1, 60, 60 · 60 и 24 · 60 · 60. Значение всей записи, как и прежде, равно сумме вкладов цифр.</p>
+  <p>Значение всей записи равно сумме вкладов цифр.</p>
   <div class="formula"><i>x</i> = <i>a</i><sub>0</sub> · <i>w</i><sub>0</sub> + <i>a</i><sub>1</sub> · <i>w</i><sub>1</sub> + … + <i>a</i><sub>k</sub> · <i>w</i><sub>k</sub></div>
-  <section class="note">
-    <h3>Чтение слева направо</h3>
+  <section class="example">
+    <h3>Чему равна запись (2, 0, 4)</h3>
+    <p>В основаниях (3, 2, 5) веса справа налево равны 1, 5, 2 · 5 = 10. Умножаем каждую цифру на вес её разряда.</p>
+    <div class="table-wrap">
+      <table class="mixed-teaching-table" id="mixed-digit-weights">
+        <caption>Цифры, веса и вклады</caption>
+        <thead><tr><th scope="col">Разряд</th><th scope="col">№ 2</th><th scope="col">№ 1</th><th scope="col">№ 0</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Основание</th><td>3</td><td>2</td><td>5</td></tr>
+          <tr><th scope="row">Цифра</th><td>2</td><td>0</td><td>4</td></tr>
+          <tr><th scope="row">Вес</th><td>10</td><td>5</td><td>1</td></tr>
+          <tr><th scope="row">Вклад</th><td>20</td><td>0</td><td>4</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="formula">2 · 10 + 0 · 5 + 4 · 1 = 24</div>
+  </section>
+  <section class="note" id="mixed-digit-horner">
+    <h3>Чтение слева направо по схеме Горнера</h3>
     <p>По схеме Горнера начинаем со значения старшей цифры. При переходе из разряда <i>i</i> + 1 в разряд <i>i</i> умножаем накопленное число на <i>b</i><sub>i</sub> и прибавляем <i>a</i><sub>i</sub>. Пусть <i>H</i><sub>i + 1</sub> — значение уже прочитанной части в единицах разряда <i>i</i> + 1. Её вклад равен <i>H</i><sub>i + 1</sub> · <i>w</i><sub>i + 1</sub>. Подставим <i>w</i><sub>i + 1</sub> = <i>b</i><sub>i</sub> · <i>w</i><sub>i</sub> и добавим вклад текущей цифры. Получим (<i>H</i><sub>i + 1</sub> · <i>b</i><sub>i</sub> + <i>a</i><sub>i</sub>) · <i>w</i><sub>i</sub>.</p>
     <p>Коэффициент при <i>w</i><sub>i</sub> — это значение прочитанной части в единицах разряда <i>i</i>. Поэтому начинаем с <i>H</i><sub>k</sub> = <i>a</i><sub>k</sub> и на каждом шаге используем формулу.</p>
     <div class="formula"><i>H</i><sub>i</sub> = <i>H</i><sub>i + 1</sub> · <i>b</i><sub>i</sub> + <i>a</i><sub>i</sub></div>
-    <p>В конце <i>w</i><sub>0</sub> = 1, поэтому <i>x</i> = <i>H</i><sub>0</sub>. Например, в 23:59:45 имеется (23 · 60 + 59) · 60 + 45 = 86 385 секунд от начала суток. Множитель 24 понадобился бы для перехода от суток к часам.</p>
+    <p>В конце <i>w</i><sub>0</sub> = 1, поэтому <i>x</i> = <i>H</i><sub>0</sub>. В записи (2, 0, 4) начинаем с 2. Раскрываем две группы веса 10 в 2 · 2 = 4 группы веса 5. Цифра 0 в средней позиции ничего к ним не добавляет. Раскрываем четыре группы веса 5 в 4 · 5 единиц и прибавляем последнюю цифру 4.</p>
+    <div class="formula">(2 · 2 + 0) · 5 + 4 = 24</div>
   </section>
-  <p>Чтобы восстановить запись по значению, идём в обратную сторону и делим с остатком. Первое деление на <i>b</i><sub>0</sub> даёт младшую цифру, потому что веса всех старших позиций кратны <i>b</i><sub>0</sub>. Делим получившееся частное на <i>b</i><sub>1</sub>, находим следующую цифру и продолжаем. Найденные остатки читаем в обратном порядке.</p>
+  <p>При <a href="05-perevod-iz-desyatichnoy.html">переводе из десятичной системы</a> мы получали цифры делением с остатком. Здесь на каждом шаге делим на основание текущего разряда. В начале списка видно, что правая цифра повторяется каждые пять записей. При делении числа на 5 частное показывает, сколько полных групп по пять записей идёт перед текущей, а остаток от 0 до 4 указывает место внутри текущей пятёрки. Это и есть правая цифра. Вклады старших разрядов кратны 5 и на этот остаток не влияют.</p>
+  <p>В частном каждая пятёрка считается за одну единицу. Берём основание 2 средней позиции и делим частное на 2. Остаток 0 или 1 указывает, какую из двух пятёрок в десятке мы выбрали. Новое частное отсчитывает десятки. Деление на основание 3 даёт остаток 0, 1 или 2 — левую цифру.</p>
+
+  <section class="example" id="mixed-digit-inverse">
+    <h3>Деление столбиком в основаниях 3, 2 и 5</h3>
+    <p>Восстановим запись числа 24. Начинаем с основания 5 справа, затем берём 2 и 3. В следующий столбик передаём частное, а остаток записываем в соответствующий разряд.</p>
+    <figure class="mixed-teaching-figure mixed-division-figure" id="mixed-division-figure">
+      <figcaption>Три деления для трёх цифр</figcaption>
+      <ol class="mixed-division-run" role="list">
+        <li>
+          <div role="img" aria-label="24 делим на 5. Вычитаем 20, получаем частное 4 и остаток 4.">
+            <table class="division-corner" aria-hidden="true"><tbody>
+              <tr><td></td><td>24</td><td class="division-side division-under">5</td></tr>
+              <tr><td>−</td><td class="division-under">20</td><td class="division-side mixed-division-quotient">4</td></tr>
+              <tr><td></td><td class="mixed-division-remainder">4</td><td></td></tr>
+            </tbody></table>
+          </div>
+          <span>Правая цифра</span>
+        </li>
+        <li>
+          <div role="img" aria-label="Частное 4 делим на 2. Вычитаем 4, получаем частное 2 и остаток 0.">
+            <table class="division-corner" aria-hidden="true"><tbody>
+              <tr><td></td><td class="mixed-division-quotient">4</td><td class="division-side division-under">2</td></tr>
+              <tr><td>−</td><td class="division-under">4</td><td class="division-side mixed-division-quotient">2</td></tr>
+              <tr><td></td><td class="mixed-division-remainder">0</td><td></td></tr>
+            </tbody></table>
+          </div>
+          <span>Средняя цифра</span>
+        </li>
+        <li>
+          <div role="img" aria-label="Частное 2 делим на 3. Вычитаем 0, частное равно 0 и остаток равен 2.">
+            <table class="division-corner" aria-hidden="true"><tbody>
+              <tr><td></td><td class="mixed-division-quotient">2</td><td class="division-side division-under">3</td></tr>
+              <tr><td>−</td><td class="division-under">0</td><td class="division-side">0</td></tr>
+              <tr><td></td><td class="mixed-division-remainder">2</td><td></td></tr>
+            </tbody></table>
+          </div>
+          <span>Левая цифра</span>
+        </li>
+      </ol>
+      <p class="mixed-division-legend"><b class="mixed-division-quotient">Частное</b> идёт дальше. <b class="mixed-division-remainder">Остаток</b> даёт цифру.</p>
+    </figure>
+    <p data-mdiv-fallback>Последнее частное 0, поэтому трёх разрядов хватило. Остатки получены справа налево. Читаем их слева направо по позициям и получаем <strong>(2, 0, 4)</strong>.</p>
+  </section>
+
+  <h2>Те же три позиции с буквами</h2>
+  <p>Возьмём <a href="#mixed-digits">те же три позиции с основаниями 3, 2 и 5</a> и поставим в соответствие каждой цифре букву из алфавита её позиции.</p>
+  <figure class="mixed-teaching-figure">
+    <figcaption>Алфавиты с различными основаниями</figcaption>
+    <div class="table-wrap">
+      <table class="mixed-teaching-table" id="mixed-letter-map">
+        <thead><tr><th scope="col">Цифра</th><th scope="col">Слева</th><th scope="col">Середина</th><th scope="col">Справа</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">0</th><td>Е</td><td class="mixed-letter-mark">Л</td><td>Е</td></tr>
+          <tr><th scope="row">1</th><td class="mixed-letter-mark">Л</td><td>Н</td><td class="mixed-letter-mark">Л</td></tr>
+          <tr><th scope="row">2</th><td>Н</td><td>—</td><td>Н</td></tr>
+          <tr><th scope="row">3</th><td>—</td><td>—</td><td>О</td></tr>
+          <tr><th scope="row">4</th><td>—</td><td>—</td><td>С</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Значение буквы зависит от позиции. У буквы Л значение 1 слева и справа, 0 в середине.</p>
+    <p class="formula" id="mixed-letter-transition">ЛНС → НЛЕ &nbsp; <span>(1, 1, 4) → (2, 0, 0)</span></p>
+  </figure>
+  <p>В слове ЛНС справа стоит последняя буква С. При переходе к следующему слову справа пишем Е и переносим единицу в среднюю позицию. Там тоже стояла последняя буква Н, поэтому пишем Л и переносим единицу в левую позицию. Слева Л меняется на Н. Получаем НЛЕ — именно так в числовом примере значение 19 перешло в 20.</p>
 
   <h2>Номера слов с разными правилами для позиций</h2>
-  <p>Составляем четырёхбуквенные слова из букв И, Н, С, Т, А, В, К. На первом месте может стоять только согласная, на последнем — только гласная. Буквы можно повторять, выбор буквы в одной позиции не ограничивает выбор в остальных. Порядок букв в каждом списке задаёт их значения от нуля.</p>
+  <p>Применим тот же способ к четырём позициям. Составляем слова из букв И, Н, С, Т, А, В, К. На первом месте может стоять только согласная, на последнем — только гласная. Буквы можно повторять, выбор буквы в одной позиции не ограничивает выбор в остальных. Порядок букв в каждом списке задаёт их значения от нуля.</p>
   <div class="table-wrap">
     <table>
       <caption>Буквы, количество вариантов и веса позиций</caption>
@@ -430,7 +626,24 @@ button:disabled{opacity:.55;cursor:default}
     <h3 id="mixed-word-title">Слово, номер и сдвиг</h3>
   </section>
 
-  <h2>От координат пикселя к одному индексу</h2>
+  <h2 id="mixed-clock-application">Применение. Как устроены разряды времени</h2>
+  <p>У часов, минут и секунд основания слева направо (24, 60, 60). В 24-часовой записи часы идут от 0 до 23, минуты и секунды — от 0 до 59. Если измерять время в секундах, веса справа налево равны 1, 60 и 60 · 60.</p>
+  <p>По схеме Горнера в 23:59:45 получаем (23 · 60 + 59) · 60 + 45 = 86 385 секунд от начала суток. Основание 24 используется для переноса из часов в сутки.</p>
+  <p>На часах 23:59:45. Какое время будет через 100 секунд? Разложим 100 секунд на 1 минуту и 40 секунд, чтобы можно было складывать по разрядам.</p>
+  <section class="example">
+    <h3>Через полночь</h3>
+    <ol>
+      <li>В секундах получаем 45 + 40 = 85. Отделяем 60 секунд, оставляем 25 и переносим 1 минуту.</li>
+      <li>В минутах получаем 59 + 1 + 1 = 61. Отделяем 60 минут, оставляем 1 и переносим 1 час.</li>
+      <li>В часах получаем 23 + 1 = 24. Отделяем 24 часа, в разряде часов остаётся 0 и начинается новый день.</li>
+    </ol>
+    <div class="formula">23:59:45 + 100 секунд → 00:01:25 следующего дня</div>
+    <p>Для перехода от секунд к минутам берём 60, от минут к часам тоже 60, а от часов к суткам берём 24.</p>
+  </section>
+
+  <div id="mixed-clock-model"></div>
+
+  <h2>Применение. От координат пикселя к одному индексу</h2>
   <p>Представим короткую последовательность из 3 кадров, по 4 строки и 5 столбцов в каждом. Храним пиксели подряд. Сначала идут все столбцы первой строки, затем следующей строки, а после последней строки начинается новый кадр.</p>
   <p>Кадры, строки и столбцы нумеруем с нуля. Три координаты имеют соответственно 3, 4 и 5 допустимых значений. Вес столбца равен 1, строки — 5, а кадра — 4 · 5 = 20. Всего имеется 3 · 4 · 5 = 60 пикселей с индексами от 0 до 59.</p>
   <section class="example">
@@ -443,6 +656,11 @@ button:disabled{opacity:.55;cursor:default}
       <li>2 = 0 · 3 + 2. Кадр имеет индекс 2.</li>
     </ol>
     <p>Получаем <strong>(2, 0, 0)</strong>, то есть первый пиксель третьего кадра. Проверка даёт 2 · 20 + 0 · 5 + 0 = 40.</p>
+  </section>
+
+  <section class="note mixed-predict">
+    <p><strong>Предскажите переход.</strong> Какие координаты у пикселя сразу после (0, 2, 4)?</p>
+    <details><summary>Проверить ответ</summary><p>Следующий пиксель имеет координаты <b>(0, 3, 0)</b>. В основании 5 после столбца 4 начинается следующая строка со столбца 0. Индекс меняется с 14 на 15.</p></details>
   </section>
 
   <div id="mixed-pixel-model"></div>
@@ -1090,10 +1308,200 @@ function initMixedPixelModel(root, mixed) {
   show(selection);
 }
 
+function initMixedDivisionFigure(figure, mixed) {
+  if (!figure) return;
+  const bases = [3, 2, 5];
+  const maximum = mixed.limit(bases) - 1;
+  const places = ['Левый', 'Средний', 'Правый'];
+  const units = ['Считаем единицы', 'Считаем группы по пять', 'Считаем десятки'];
+  const run = figure.querySelector('.mixed-division-run');
+  const legend = figure.querySelector('.mixed-division-legend');
+  const fallback = figure.parentElement.querySelector('[data-mdiv-fallback]');
+  const panels = Array.from(run.children, (panel) => {
+    const picture = panel.querySelector('[role="img"]');
+    const [top, middle, bottom] = picture.querySelector('tbody').rows;
+    const [, dividend] = top.cells;
+    const [minus, subtracted, quotient] = middle.cells;
+    const [, remainder] = bottom.cells;
+    return {panel, picture, dividend, minus, subtracted, quotient, remainder};
+  });
+  const empty = '—';
+  let completed = 0;
+  let encoded;
+  let flying;
+  let motion;
+
+  const controls = document.createElement('div');
+  controls.className = 'mdiv-controls';
+  controls.innerHTML = `
+    <label>Десятичное число от 0 до ${maximum}
+      <input type="text" inputmode="numeric" autocomplete="off" value="24" data-mdiv-number aria-describedby="mixed-division-error">
+    </label>
+    <div class="model-actions mdiv-actions" data-mdiv-actions>
+      <button type="button" data-mdiv-back aria-label="Предыдущее деление">Назад</button>
+      <span data-mdiv-progress></span>
+      <button type="button" data-mdiv-next aria-label="Выполнить следующее деление">Далее</button>
+    </div>
+    <p class="error" id="mixed-division-error" data-mdiv-error role="status"></p>`;
+  run.before(controls);
+
+  const readout = document.createElement('div');
+  readout.className = 'mdiv-readout';
+  readout.innerHTML = `
+    <p class="mdiv-status" data-mdiv-status role="status" aria-atomic="true"></p>
+    <div data-mdiv-block class="mdiv-block" hidden></div>
+    <div data-mdiv-record class="mixed-cells mdiv-record" aria-label="Цифры в порядке записи">
+      ${places.map((place) => `<div class="mixed-cell"><span>${place} разряд</span><strong data-mdiv-digit>${empty}</strong></div>`).join('')}
+    </div>
+    <p class="formula" data-mdiv-result hidden></p>`;
+  legend.after(readout);
+  if (fallback) fallback.hidden = true;
+
+  const number = controls.querySelector('[data-mdiv-number]');
+  const progress = controls.querySelector('[data-mdiv-progress]');
+  const actions = controls.querySelector('[data-mdiv-actions]');
+  const error = controls.querySelector('[data-mdiv-error]');
+  const back = controls.querySelector('[data-mdiv-back]');
+  const next = controls.querySelector('[data-mdiv-next]');
+  const status = readout.querySelector('[data-mdiv-status]');
+  const block = readout.querySelector('[data-mdiv-block]');
+  const recordDigits = Array.from(readout.querySelectorAll('[data-mdiv-digit]'));
+  const result = readout.querySelector('[data-mdiv-result]');
+
+  function stopTransfer() {
+    if (motion) motion.cancel();
+    if (flying) flying.remove();
+    motion = null;
+    flying = null;
+  }
+
+  function transfer(index) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const source = panels[index].quotient;
+    if (typeof source.animate !== 'function') return;
+    const target = panels[index + 1].dividend;
+    const from = source.getBoundingClientRect();
+    const to = target.getBoundingClientRect();
+    const x = from.left + from.width / 2;
+    const y = from.top + from.height / 2;
+    const dx = to.left + to.width / 2 - x;
+    const dy = to.top + to.height / 2 - y;
+    const token = document.createElement('span');
+    token.className = 'mdiv-transfer';
+    token.setAttribute('aria-hidden', 'true');
+    token.textContent = source.textContent;
+    token.style.left = `${x}px`;
+    token.style.top = `${y}px`;
+    document.body.appendChild(token);
+    flying = token;
+    const animation = token.animate([
+      {transform: 'translate(-50%, -50%) translate(0, 0)', opacity: 1},
+      {transform: `translate(-50%, -50%) translate(${dx / 2}px, ${dy / 2 - 8}px)`, opacity: 1},
+      {transform: `translate(-50%, -50%) translate(${dx}px, ${dy}px)`, opacity: .35},
+    ], {duration: 520, easing: 'ease-in-out'});
+    motion = animation;
+    animation.onfinish = () => {
+      token.remove();
+      if (flying === token) {
+        motion = null;
+        flying = null;
+      }
+    };
+  }
+
+  function renderPanels() {
+    const current = Math.max(0, completed - 1);
+    panels.forEach(({panel, picture, dividend, minus, subtracted, quotient, remainder}, index) => {
+      const step = encoded.steps[index];
+      const solved = index < completed;
+      const revealed = index <= completed;
+      panel.classList.toggle('mdiv-current', index === current);
+      dividend.textContent = revealed ? step.value : empty;
+      minus.textContent = solved ? '−' : '';
+      subtracted.textContent = solved ? step.quotient * step.base : empty;
+      quotient.textContent = solved ? step.quotient : empty;
+      remainder.textContent = solved ? step.remainder : empty;
+      remainder.classList.toggle('mdiv-pending', !solved);
+      picture.setAttribute('aria-label', solved
+        ? `${step.value} делим на ${step.base}, вычитаем ${step.quotient * step.base}. Частное ${step.quotient}, остаток ${step.remainder}.`
+        : revealed ? `Делимое ${step.value}, основание ${step.base}.` : `Основание ${step.base}. Делимое даст предыдущее деление.`);
+    });
+  }
+
+  function renderBlock(step, index) {
+    block.hidden = !step;
+    if (!step) return;
+    const groupStart = step.quotient * step.base;
+    const items = Array.from({length: step.base}, (_, offset) => {
+      const selected = offset === step.remainder;
+      return `<li${selected ? ' class="mdiv-block-selected" aria-current="true"' : ''}><strong>${groupStart + offset}</strong><small>Ост. ${offset}</small></li>`;
+    });
+    block.innerHTML = `<p>${units[index]}. Позиция в группе совпадает с остатком.</p><ol role="list" class="mdiv-block-strip" style="--mdiv-count:${step.base}" start="0">${items.join('')}</ol>`;
+  }
+
+  function render() {
+    const unavailable = !encoded;
+    run.hidden = unavailable;
+    legend.hidden = unavailable;
+    readout.hidden = unavailable;
+    actions.hidden = unavailable;
+    if (unavailable) return;
+    renderPanels();
+    progress.textContent = `Шаг ${completed} из ${bases.length}`;
+    back.setAttribute('aria-disabled', String(completed === 0));
+    next.setAttribute('aria-disabled', String(completed === bases.length));
+    const active = encoded.steps[completed - 1];
+    const finished = completed === bases.length;
+    const found = new Map(encoded.steps.slice(0, completed).map((step) => [step.i, step.remainder]));
+    recordDigits.forEach((cell, position) => {
+      cell.textContent = found.has(position) ? found.get(position) : empty;
+      cell.parentElement.classList.toggle('active', active?.i === position);
+    });
+    renderBlock(active, completed - 1);
+    result.hidden = !finished;
+    result.textContent = finished ? `Читаем цифры слева направо. Получаем (${encoded.digits.join(', ')}).` : '';
+    if (!active) {
+      status.textContent = `Начинаем справа. Делим ${encoded.steps[0].value} на 5.`;
+    } else {
+      const move = finished ? 'Последнее частное равно 0.' : `Частное ${active.quotient} переходит в следующее деление на ${encoded.steps[completed].base}.`;
+      status.textContent = `${active.value} = ${active.quotient} · ${active.base} + ${active.remainder}. ${places[active.i]} разряд получает цифру ${active.remainder}. ${move}`;
+    }
+  }
+
+  function update() {
+    stopTransfer();
+    completed = 0;
+    const text = number.value.trim();
+    const value = Number(text);
+    const valid = /^\d+$/.test(text) && Number.isSafeInteger(value) && value <= maximum;
+    number.setAttribute('aria-invalid', String(!valid));
+    error.textContent = valid ? '' : `Введите целое десятичное число от 0 до ${maximum}.`;
+    encoded = valid ? mixed.encode(value, bases) : null;
+    render();
+  }
+
+  back.addEventListener('click', () => {
+    if (!completed) return;
+    stopTransfer();
+    completed -= 1;
+    render();
+  });
+  next.addEventListener('click', () => {
+    if (!encoded || completed === bases.length) return;
+    stopTransfer();
+    completed += 1;
+    render();
+    if (completed < bases.length) transfer(completed - 1);
+  });
+  number.addEventListener('input', update);
+  update();
+}
+
 initMixedClock(document.getElementById('mixed-clock-model'));
 initMixedWordModel(document.getElementById('mixed-word-model'), mixed);
 initMixedPixelModel(document.getElementById('mixed-pixel-model'), mixed);
 initMixedPractice(document.getElementById('mixed-practice'));
+initMixedDivisionFigure(document.getElementById('mixed-division-figure'), mixed);
 </script>
 </body>
 </html>
