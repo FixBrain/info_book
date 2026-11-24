@@ -332,58 +332,55 @@ button:disabled{opacity:.55;cursor:default}
   .mixed-division-figure .division-corner td{padding-inline:1px}
   .mixed-division-run>li>span{font-size:11px}
 }
-.mixed-division-figure [hidden]{display:none!important}
-.mdiv-controls label{display:grid;gap:4px;width:fit-content;font-size:14px;color:#36435c}
-.mdiv-controls input{width:7rem}
-.mdiv-actions{align-items:center}
-.mdiv-actions [aria-disabled="true"]{opacity:.55;cursor:default}
-.mixed-division-run .mdiv-current{background:#f6f9ff;border-color:#8db1f0}
-.mixed-division-run .division-corner{background:transparent}
-.mixed-division-run .division-corner .mdiv-pending{color:var(--muted);background:transparent;font-weight:400}
-.mdiv-status{margin:.65em 0;font-size:15px}
-.mdiv-block{margin:.65em 0 0}
-.mdiv-block p{font-size:14px;margin:.3em 0}
-.mdiv-block-strip{display:grid;grid-template-columns:repeat(var(--mdiv-count),minmax(0,1fr));gap:4px;max-width:24rem;margin:0;padding:0;list-style:none}
-.mdiv-block-strip>li{min-width:0;margin:0;padding:3px 1px;border:1px solid #d6e0ef;border-radius:6px;background:#fff;text-align:center;line-height:1.3}
-.mdiv-block-strip small{display:block;font-size:12px}
-.mdiv-block-strip .mdiv-block-selected{background:#fff0bd;border-color:#d4b769;color:#533500}
-.mdiv-record{grid-template-columns:repeat(3,minmax(0,1fr));max-width:24rem}
-.mdiv-record .mixed-cell strong{font-size:19px}
-.mdiv-transfer{position:fixed;z-index:15;pointer-events:none;display:block;padding:0 4px;border:1px solid #8db1f0;border-radius:4px;line-height:1.25;color:#194ba3;background:#edf3ff;font-weight:700}
-.mlist-controls label{display:grid;gap:3px;width:fit-content;font-size:14px;color:#36435c}
-.mlist-controls input{width:7rem}
-.mlist-actions{align-items:center}
-.mlist-actions [aria-disabled="true"]{opacity:.55;cursor:default}
-.mlist-groups{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;max-width:38rem}
-.mlist-group{min-width:0;padding:6px;border:1px solid #d6e0ef;border-radius:9px;background:#fff}
-.mlist-group h4{margin:0 0 6px;text-align:center;color:#233a62;font-size:15px;line-height:1.25}
-.mlist-group h4 small{display:block;margin-top:2px;color:var(--muted);font-weight:400}
-ol.mlist-rows{display:grid;gap:4px;padding:0;margin:0;list-style:none}
-.mlist-row{min-width:0;margin:0}
-.mlist-cells{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:4px;transition:grid-template-columns .25s ease,gap .25s ease}
-.mlist-groups:not([data-mlist-phase="0"]) .mlist-cells{grid-template-columns:minmax(0,2fr) minmax(0,0fr);gap:0}
-.mlist-groups:not([data-mlist-phase="0"]) .mlist-kept{grid-column:1}
-.mlist-groups[data-mlist-phase="3"] .mlist-group{grid-column:var(--mlist-column)}
-.mlist-cell{min-width:0;padding:3px 1px;border:1px solid #d6e0ef;border-radius:6px;background:#fff;text-align:center;line-height:1.25;transition:background-color .22s,border-color .22s,color .22s}
-.mlist-cell strong{display:block;font-variant-numeric:tabular-nums;white-space:nowrap}
-.mlist-cell small{display:block;font-size:12px;color:var(--muted)}
-.mlist-groups:not([data-mlist-phase="0"]) .mlist-kept{border-color:#6597ed;background:#eaf1ff;color:#133c85}
-.mlist-groups:not([data-mlist-phase="0"]) .mlist-target{border-color:#356cbf;background:#dceaff;box-shadow:0 0 0 1px #356cbf}
-.mlist-groups[data-mlist-phase="3"] .mlist-kept{border-color:#a98125;background:#fff0bd;color:#533500;box-shadow:0 0 0 1px #a98125}
-.mlist-remainders{grid-template-columns:repeat(3,minmax(0,1fr));max-width:23rem}
-.mlist-remainders .mixed-cell strong{font-size:19px}
-.mlist-readout p{margin:.55rem 0 0}
+.mrank-widget [hidden]{display:none!important}
+.mrank-controls{display:flex;flex-wrap:wrap;align-items:end;gap:8px 14px}
+.mrank-controls label{display:grid;width:fit-content;gap:3px;font-size:14px;color:#36435c}
+.mrank-controls select,.mrank-controls input{width:5.2rem;min-width:0}
+.mrank-controls [aria-invalid="true"]{border-color:#ad3021}
+.mrank-bases{min-width:0;margin:0;padding:3px 7px 6px;border:1px solid #d6e0ef;border-radius:8px}
+.mrank-bases legend{color:#36435c;font-size:14px}
+.mrank-bases>div{display:flex;flex-wrap:wrap;gap:5px}
+.mrank-bases input{width:4.4rem}
+.mrank-range,.mrank-error{flex-basis:100%;margin:0;font-size:14px}
+.mrank-range:empty,.mrank-error:empty{display:none}
+.mrank-range{color:var(--muted,#525e71)}
+.mrank-actions{align-items:center;gap:6px}
+.mrank-actions [aria-disabled="true"]{opacity:.55;cursor:default}
+.mrank-readout p{margin:.45em 0}
+.mrank-scroll{max-height:19rem;overflow:auto;overscroll-behavior:contain;border:1px solid #d6e0ef;border-radius:8px;background:#fff}
+.mrank-table{width:100%;max-width:100%;border-collapse:separate;border-spacing:0;background:#fff;table-layout:fixed}
+.mrank-table caption{text-align:left;padding:4px 8px;background:#fff;color:#263d67;font-size:14px}
+.mrank-table thead th{position:sticky;top:0;z-index:1;line-height:1.25;background:#edf3ff;box-shadow:0 1px 0 #d6e0ef}
+.mrank-table :is(th,td){border:0;border-bottom:1px solid #d6e0ef;border-right:1px solid #d6e0ef;padding:3px 2px;text-align:center;vertical-align:middle;font-variant-numeric:tabular-nums}
+.mrank-table thead th:last-child,.mrank-table tr>td:last-child{border-right:0}
+.mrank-table thead th small{display:block;font-size:12px;font-weight:400;color:#36435c}
+.mrank-table tbody{transform-origin:center top}
+.mrank-table tbody tr{height:1.75rem}
+.mrank-table tbody th{background:transparent;font-weight:600}
+.mrank-table tbody td{background:transparent;font-weight:650}
+.mrank-table td[data-mrank-place]:not([rowspan="1"]){background:#fff;color:var(--ink,#1f2430)}
+.mrank-table [data-mrank-group-start]>:is(th,td){border-top:1px solid #a5b9dc}
+.mrank-table [data-mrank-complete]{background:#e8f1ff;color:#163d82}
+.mrank-table [data-mrank-target]{background:#eef4ff;color:#183b77}
+.mrank-table [data-mrank-remainder]{background:#fff0bd;color:#533500}
+.mrank-table [data-mrank-remainder]>.mrank-index-cell{box-shadow:inset 3px 0 #a98125}
+.mrank-digits{grid-template-columns:repeat(var(--mrank-positions,3),minmax(0,1fr));max-width:28rem}
+.mrank-digits .mixed-cell strong{font-size:20px}
+.mrank-result p{margin:.4em 0}
 @media(max-width:540px){
-  .mlist-actions{gap:5px;font-size:14px}
-  .mlist-actions button{padding-inline:9px}
-  .mlist-groups{gap:4px}
-  .mlist-group{padding:3px}
-  .mlist-group h4{font-size:13px}
-  .mlist-cells{gap:2px}
-  .mlist-cell strong{font-size:clamp(10px,3.6vw,14px)}
-  .mlist-cell small{font-size:11px}
+  .mrank-controls{gap:7px 10px}
+  .mrank-bases input{width:3.55rem}
+  .mrank-bases label{font-size:11px}
+  .mrank-table{font-size:13px}
+  .mrank-table thead th small{font-size:11px}
+  .mrank-scroll{max-height:15.5rem}
+  .mrank-actions{gap:4px;font-size:14px}
+  .mrank-actions button{padding-inline:8px}
 }
-@media(prefers-reduced-motion:reduce){.mlist-cell,.mlist-cells{transition:none}}
+#mixed-rank-model{scroll-margin-top:14rem}
+@media(min-width:900px){#mixed-rank-model{scroll-margin-top:9rem}}
+@media(max-width:540px){#mixed-rank-model{scroll-margin-top:14px}}
+
 </style>
 </head>
 <body>
@@ -542,15 +539,15 @@ ol.mlist-rows{display:grid;gap:4px;padding:0;margin:0;list-style:none}
       </ol>
       <p class="mixed-division-legend"><b class="mixed-division-quotient">Частное</b> идёт дальше. <b class="mixed-division-remainder">Остаток</b> даёт цифру.</p>
     </figure>
-    <p data-mdiv-fallback>Последнее частное 0, поэтому трёх разрядов хватило. Остатки получены справа налево. Читаем их слева направо по позициям и получаем <strong>(2, 0, 4)</strong>.</p>
+    <p>Последнее частное 0, поэтому трёх разрядов хватило. Остатки получены справа налево. Читаем их слева направо по позициям и получаем <strong>(2, 0, 4)</strong>.</p>
   </section>
 
-  <h3 id="mixed-list-title">Как список сворачивается при делении</h3>
-  <p>Поменяем местами основания 2 и 5. Для оснований (3, 5, 2) правая цифра меняется от 0 до 1, поэтому в каждой строке две записи. Пять строк с одной и той же старшей цифрой образуют блок из десяти записей. Всего блоков три.</p>
-  <figure class="mixed-teaching-figure" id="mixed-list-figure" aria-labelledby="mixed-list-title">
-    <figcaption>От пар записей к строкам и блокам</figcaption>
-    <p data-mlist-fallback>Делим 17 на 2 и получаем 17 = 8 · 2 + 1. После отсечения младшей цифры остаются 15 строк, из которых 8 идут перед нужной. Сохраняем остаток 1. Затем 8 = 1 · 5 + 3. Пять строк в каждом блоке сворачиваются в одну, всего остаются три блока. Перед нужным блоком один полный блок, а средняя цифра равна 3. Последнее деление 1 = 0 · 3 + 1 даёт старшую цифру 1. Получаем <strong>(1, 3, 1)</strong>.</p>
-  </figure>
+  <h3 id="mixed-list-title">От номера строки к цифрам</h3>
+  <p>Рассмотрим основания (3, 5, 2). В таблице будут все 30 допустимых записей, а слева — их десятичные номера от 0 до 29. Правая цифра чередуется 0, 1 в каждой паре. Средний разряд сохраняет значение две строки, а старший — десять. Поэтому одинаковые соседние ячейки этих столбцов объединены.</p>
+  <p>На каждом шаге делим текущий номер на основание правого разряда. Частное <i>K</i> отсчитывает полные группы строк перед выбранной. Остаток <i>R</i> указывает ячейку в следующей группе, считая с нуля. Записываем <i>R</i> как цифру. Затем сворачиваем каждую группу в одну строку, убираем правый столбец и продолжаем с номером <i>K</i>.</p>
+  <section class="interactive" id="mixed-rank-model" aria-labelledby="mixed-list-title">
+    <noscript><p>Для числа 17 делим последовательно на 2, 5 и 3. Сначала 17 = 8 · 2 + 1. В 30 исходных строках выделяем восемь полных пар и вторую ячейку следующей пары. После сворачивания остаётся 15 строк и номер 8. Затем 8 = 1 · 5 + 3. Сворачиваем по пять строк, остаётся 3 строки и номер 1. Наконец 1 = 0 · 3 + 1. Из остатков получаем (1, 3, 1).</p></noscript>
+  </section>
 
   <h2>Те же три позиции с буквами</h2>
   <p>Возьмём <a href="#mixed-digits">те же три позиции с основаниями 3, 2 и 5</a> и поставим в соответствие каждой цифре букву из алфавита её позиции.</p>
@@ -1349,374 +1346,269 @@ function initMixedPixelModel(root, mixed) {
   show(selection);
 }
 
-function initMixedDivisionFigure(figure, mixed) {
-  if (!figure) return;
-  const bases = [3, 2, 5];
-  const maximum = mixed.limit(bases) - 1;
-  const places = ['Левый', 'Средний', 'Правый'];
-  const units = ['Считаем единицы', 'Считаем группы по пять', 'Считаем десятки'];
-  const run = figure.querySelector('.mixed-division-run');
-  const legend = figure.querySelector('.mixed-division-legend');
-  const fallback = figure.parentElement.querySelector('[data-mdiv-fallback]');
-  const panels = Array.from(run.children, (panel) => {
-    const picture = panel.querySelector('[role="img"]');
-    const [top, middle, bottom] = picture.querySelector('tbody').rows;
-    const [, dividend] = top.cells;
-    const [minus, subtracted, quotient] = middle.cells;
-    const [, remainder] = bottom.cells;
-    return {panel, picture, dividend, minus, subtracted, quotient, remainder};
-  });
-  const empty = '—';
-  let completed = 0;
-  let encoded;
-  let flying;
-  let motion;
-
-  const controls = document.createElement('div');
-  controls.className = 'mdiv-controls';
-  controls.innerHTML = `
-    <label>Десятичное число от 0 до ${maximum}
-      <input type="text" inputmode="numeric" autocomplete="off" value="24" data-mdiv-number aria-describedby="mixed-division-error">
-    </label>
-    <div class="model-actions mdiv-actions" data-mdiv-actions>
-      <button type="button" data-mdiv-back aria-label="Предыдущее деление">Назад</button>
-      <span data-mdiv-progress></span>
-      <button type="button" data-mdiv-next aria-label="Выполнить следующее деление">Далее</button>
-    </div>
-    <p class="error" id="mixed-division-error" data-mdiv-error role="status"></p>`;
-  run.before(controls);
-
-  const readout = document.createElement('div');
-  readout.className = 'mdiv-readout';
-  readout.innerHTML = `
-    <p class="mdiv-status" data-mdiv-status role="status" aria-atomic="true"></p>
-    <div data-mdiv-block class="mdiv-block" hidden></div>
-    <div data-mdiv-record class="mixed-cells mdiv-record" aria-label="Цифры в порядке записи">
-      ${places.map((place) => `<div class="mixed-cell"><span>${place} разряд</span><strong data-mdiv-digit>${empty}</strong></div>`).join('')}
-    </div>
-    <p class="formula" data-mdiv-result hidden></p>`;
-  legend.after(readout);
-  if (fallback) fallback.hidden = true;
-
-  const number = controls.querySelector('[data-mdiv-number]');
-  const progress = controls.querySelector('[data-mdiv-progress]');
-  const actions = controls.querySelector('[data-mdiv-actions]');
-  const error = controls.querySelector('[data-mdiv-error]');
-  const back = controls.querySelector('[data-mdiv-back]');
-  const next = controls.querySelector('[data-mdiv-next]');
-  const status = readout.querySelector('[data-mdiv-status]');
-  const block = readout.querySelector('[data-mdiv-block]');
-  const recordDigits = Array.from(readout.querySelectorAll('[data-mdiv-digit]'));
-  const result = readout.querySelector('[data-mdiv-result]');
-
-  function stopTransfer() {
-    if (motion) motion.cancel();
-    if (flying) flying.remove();
-    motion = null;
-    flying = null;
-  }
-
-  function transfer(index) {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const source = panels[index].quotient;
-    if (typeof source.animate !== 'function') return;
-    const target = panels[index + 1].dividend;
-    const from = source.getBoundingClientRect();
-    const to = target.getBoundingClientRect();
-    const x = from.left + from.width / 2;
-    const y = from.top + from.height / 2;
-    const dx = to.left + to.width / 2 - x;
-    const dy = to.top + to.height / 2 - y;
-    const token = document.createElement('span');
-    token.className = 'mdiv-transfer';
-    token.setAttribute('aria-hidden', 'true');
-    token.textContent = source.textContent;
-    token.style.left = `${x}px`;
-    token.style.top = `${y}px`;
-    document.body.appendChild(token);
-    flying = token;
-    const animation = token.animate([
-      {transform: 'translate(-50%, -50%) translate(0, 0)', opacity: 1},
-      {transform: `translate(-50%, -50%) translate(${dx / 2}px, ${dy / 2 - 8}px)`, opacity: 1},
-      {transform: `translate(-50%, -50%) translate(${dx}px, ${dy}px)`, opacity: .35},
-    ], {duration: 520, easing: 'ease-in-out'});
-    motion = animation;
-    animation.onfinish = () => {
-      token.remove();
-      if (flying === token) {
-        motion = null;
-        flying = null;
-      }
-    };
-  }
-
-  function renderPanels() {
-    const current = Math.max(0, completed - 1);
-    panels.forEach(({panel, picture, dividend, minus, subtracted, quotient, remainder}, index) => {
-      const step = encoded.steps[index];
-      const solved = index < completed;
-      const revealed = index <= completed;
-      panel.classList.toggle('mdiv-current', index === current);
-      dividend.textContent = revealed ? step.value : empty;
-      minus.textContent = solved ? '−' : '';
-      subtracted.textContent = solved ? step.quotient * step.base : empty;
-      quotient.textContent = solved ? step.quotient : empty;
-      remainder.textContent = solved ? step.remainder : empty;
-      remainder.classList.toggle('mdiv-pending', !solved);
-      picture.setAttribute('aria-label', solved
-        ? `${step.value} делим на ${step.base}, вычитаем ${step.quotient * step.base}. Частное ${step.quotient}, остаток ${step.remainder}.`
-        : revealed ? `Делимое ${step.value}, основание ${step.base}.` : `Основание ${step.base}. Делимое даст предыдущее деление.`);
-    });
-  }
-
-  function renderBlock(step, index) {
-    block.hidden = !step;
-    if (!step) return;
-    const groupStart = step.quotient * step.base;
-    const items = Array.from({length: step.base}, (_, offset) => {
-      const selected = offset === step.remainder;
-      return `<li${selected ? ' class="mdiv-block-selected" aria-current="true"' : ''}><strong>${groupStart + offset}</strong><small>Ост. ${offset}</small></li>`;
-    });
-    block.innerHTML = `<p>${units[index]}. Позиция в группе совпадает с остатком.</p><ol role="list" class="mdiv-block-strip" style="--mdiv-count:${step.base}" start="0">${items.join('')}</ol>`;
-  }
-
-  function render() {
-    const unavailable = !encoded;
-    run.hidden = unavailable;
-    legend.hidden = unavailable;
-    readout.hidden = unavailable;
-    actions.hidden = unavailable;
-    if (unavailable) return;
-    renderPanels();
-    progress.textContent = `Шаг ${completed} из ${bases.length}`;
-    back.setAttribute('aria-disabled', String(completed === 0));
-    next.setAttribute('aria-disabled', String(completed === bases.length));
-    const active = encoded.steps[completed - 1];
-    const finished = completed === bases.length;
-    const found = new Map(encoded.steps.slice(0, completed).map((step) => [step.i, step.remainder]));
-    recordDigits.forEach((cell, position) => {
-      cell.textContent = found.has(position) ? found.get(position) : empty;
-      cell.parentElement.classList.toggle('active', active?.i === position);
-    });
-    renderBlock(active, completed - 1);
-    result.hidden = !finished;
-    result.textContent = finished ? `Читаем цифры слева направо. Получаем (${encoded.digits.join(', ')}).` : '';
-    if (!active) {
-      status.textContent = `Начинаем справа. Делим ${encoded.steps[0].value} на 5.`;
-    } else {
-      const move = finished ? 'Последнее частное равно 0.' : `Частное ${active.quotient} переходит в следующее деление на ${encoded.steps[completed].base}.`;
-      status.textContent = `${active.value} = ${active.quotient} · ${active.base} + ${active.remainder}. ${places[active.i]} разряд получает цифру ${active.remainder}. ${move}`;
-    }
-  }
-
-  function update() {
-    stopTransfer();
-    completed = 0;
-    const text = number.value.trim();
-    const value = Number(text);
-    const valid = /^\d+$/.test(text) && Number.isSafeInteger(value) && value <= maximum;
-    number.setAttribute('aria-invalid', String(!valid));
-    error.textContent = valid ? '' : `Введите целое десятичное число от 0 до ${maximum}.`;
-    encoded = valid ? mixed.encode(value, bases) : null;
-    render();
-  }
-
-  back.addEventListener('click', () => {
-    if (!completed) return;
-    stopTransfer();
-    completed -= 1;
-    render();
-  });
-  next.addEventListener('click', () => {
-    if (!encoded || completed === bases.length) return;
-    stopTransfer();
-    completed += 1;
-    render();
-    if (completed < bases.length) transfer(completed - 1);
-  });
-  number.addEventListener('input', update);
-  update();
-}
-
-function initMixedSortedList(figure, mixed) {
-  if (!figure) return;
-  const bases = [3, 5, 2];
-  const total = mixed.limit(bases);
-  const [groupCount, rowCount, columnCount] = bases;
-  const entriesPerBlock = rowCount * columnCount;
-  const tuple = (digits, separator = ', ') => `(${digits.join(separator)})`;
-  const records = [];
-  const groupNodes = [];
-  const rowNodes = [];
-  let completed = 0;
-  let encoded;
-  let emphasis;
-
-  const view = document.createElement('div');
-  view.innerHTML = `
-    <div class="mlist-controls">
-      <label>Десятичное число от 0 до ${total - 1}
-        <input type="text" inputmode="numeric" autocomplete="off" value="17" data-mlist-number aria-describedby="mixed-list-error">
-      </label>
-      <div class="model-actions mlist-actions" data-mlist-actions>
-        <button type="button" data-mlist-back aria-label="Предыдущий шаг списка">Назад</button>
-        <span data-mlist-progress></span>
-        <button type="button" data-mlist-next aria-label="Следующий шаг списка">Далее</button>
-      </div>
-      <p class="error" id="mixed-list-error" data-mlist-error role="status"></p>
-    </div>
-    <div class="mlist-groups" data-mlist-groups></div>
-    <div class="mlist-readout" role="status" aria-atomic="true">
-      <p class="formula" data-mlist-equation hidden></p>
-      <p data-mlist-status></p>
-      <div data-mlist-record class="mixed-cells mlist-remainders" role="group" aria-label="Сохранённые остатки слева направо">
-        ${['Старший', 'Средний', 'Младший'].map((place) => `<div class="mixed-cell"><span>${place} разряд</span><strong data-mlist-digit>—</strong></div>`).join('')}
-      </div>
-      <p class="formula" data-mlist-result hidden></p>
-    </div>`;
-  figure.appendChild(view);
-  figure.querySelector('[data-mlist-fallback]').hidden = true;
-
-  const find = (selector) => view.querySelector(selector);
-  const field = find('[data-mlist-number]');
-  const groups = find('[data-mlist-groups]');
-  const back = find('[data-mlist-back]');
-  const next = find('[data-mlist-next]');
-  const actions = find('[data-mlist-actions]');
-  const progress = find('[data-mlist-progress]');
-  const error = find('[data-mlist-error]');
-  const status = find('[data-mlist-status]');
-  const equation = find('[data-mlist-equation]');
-  const result = find('[data-mlist-result]');
-  const remainders = Array.from(view.querySelectorAll('[data-mlist-digit]'));
-
-  for (let oldest = 0; oldest < groupCount; oldest++) {
-    const group = document.createElement('section');
-    group.className = 'mlist-group';
-    group.dataset.mlistGroup = oldest;
-    group.style.setProperty('--mlist-column', oldest + 1);
-    groupNodes.push(group);
-    group.setAttribute('aria-labelledby', `mixed-list-group-${oldest}`);
-    const from = oldest * entriesPerBlock;
-    group.innerHTML = `<h4 id="mixed-list-group-${oldest}">Слева ${oldest}<small>${from}–${from + entriesPerBlock - 1}</small></h4>`;
-    const rows = document.createElement('ol');
-    rows.className = 'mlist-rows';
-    rows.setAttribute('role', 'list');
-    rows.setAttribute('aria-label', 'Записи блока по порядку');
-    rows.start = 0;
-    for (let middle = 0; middle < rowCount; middle++) {
-      const row = document.createElement('li');
-      row.className = 'mlist-row';
-      row.dataset.mlistRow = middle;
-      rowNodes.push({row, middle});
-      const cells = document.createElement('div');
-      cells.className = 'mlist-cells';
-      for (let last = 0; last < columnCount; last++) {
-        const digits = [oldest, middle, last];
-        const index = from + middle * columnCount + last;
-        const cell = document.createElement('div');
-        cell.dataset.mlistCell = index;
-        cell.className = 'mlist-cell';
-        cell.innerHTML = `<strong>${tuple(digits, ',')}</strong><small>${index}</small>`;
-        cells.appendChild(cell);
-        records.push({cell, digits, index, notation: cell.firstElementChild, label: cell.lastElementChild});
-      }
-      row.appendChild(cells);
-      rows.appendChild(row);
-    }
-    group.appendChild(rows);
-    groups.appendChild(group);
-  }
-
-  function explain(step) {
-    const {value, quotient, remainder} = step;
-    if (completed === 1) {
-      return `От каждой пары оставили префикс из двух цифр. Из 30 записей получилось 15 строк по две исходные записи. Частное ${quotient} показывает, сколько полных строк идёт перед строкой числа ${value}. Остаток ${remainder} сохраняем для младшего разряда.`;
-    }
-    if (completed === 2) {
-      return `Пять строк сворачиваются в один блок из десяти исходных записей. Остались три префикса из одной цифры. Частное ${quotient} показывает число полных блоков перед нужным. Остаток ${remainder} сохраняем для среднего разряда.`;
-    }
-    return `Остаток ${remainder} выбирает блок и даёт старшую цифру. Соединяем её с двумя сохранёнными остатками по порядку разрядов.`;
-  }
-
-  function render() {
-    const steps = encoded ? encoded.steps.slice(0, completed) : [];
-    const step = steps[steps.length - 1];
-    const finished = completed === bases.length;
-    const value = encoded?.steps[0].value;
-    const digits = encoded?.digits;
-    groups.dataset.mlistPhase = completed;
-    groupNodes.forEach((group, position) => { group.hidden = finished && position !== digits[0]; });
-    rowNodes.forEach(({row, middle}) => { row.hidden = completed >= 2 && middle !== (finished ? digits[1] : 0); });
-    for (const {cell, digits: shown, index, notation, label} of records) {
-      const [oldest, middle, last] = shown;
-      const retained = completed === 0 || (finished ? index === value : last === 0 && (completed === 1 || middle === 0));
-      cell.hidden = !retained;
-      cell.classList.toggle('mlist-kept', retained);
-      const targeted = retained && Boolean(step) && (completed === 1 ? index / columnCount === step.quotient : completed === 2 ? oldest === step.quotient : finished);
-      cell.classList.toggle('mlist-target', targeted);
-      if (targeted) cell.setAttribute('aria-current', 'true');
-      else cell.removeAttribute('aria-current');
-      if (!retained) continue;
-      notation.textContent = tuple(completed === 1 ? shown.slice(0, 2) : completed === 2 ? [oldest] : shown, ',');
-      label.textContent = completed === 1 ? `Строка ${index / columnCount}` : completed === 2 ? `Блок ${oldest}` : index;
-    }
-    for (const [position, cell] of remainders.entries()) {
-      const found = steps.find(({i}) => i === position);
-      cell.textContent = found ? found.remainder : '—';
-      cell.parentElement.classList.toggle('active', step?.i === position);
-    }
-    actions.hidden = !encoded;
-    status.hidden = !encoded;
-    progress.textContent = `Шаг ${completed} из ${bases.length}`;
-    back.setAttribute('aria-disabled', String(completed === 0));
-    next.setAttribute('aria-disabled', String(finished));
-    equation.hidden = !step;
-    equation.textContent = step ? `${step.value} = ${step.quotient} · ${step.base} + ${step.remainder}` : '';
-    if (!encoded) status.textContent = '';
-    else if (step) status.textContent = explain(step);
-    else status.textContent = `В списке ${total} записей. Сначала делим ${value} на 2, чтобы узнать, сколько полных пар перед ним.`;
-    result.hidden = !finished;
-    result.textContent = finished ? `${value} → ${tuple(digits)}` : '';
-  }
-
-  function update() {
-    if (emphasis) emphasis.cancel();
-    completed = 0;
+function initMixedRankTable(root, mixed) {
+  if (!root) return;
+  const maximumRows = 100;
+  const defaults = [3, 5, 2, 2];
+  const id = root.id || 'mixed-rank';
+  const plurals = new Intl.PluralRules('ru');
+  const rowCount = (number) => `${number} ${{one: 'строка', few: 'строки', many: 'строк'}[plurals.select(number)]}`;
+  const numberText = (field) => {
     const text = field.value.trim();
     const value = Number(text);
-    const valid = /^\d+$/.test(text) && Number.isSafeInteger(value) && value < total;
-    field.setAttribute('aria-invalid', String(!valid));
-    error.textContent = valid ? '' : `Введите целое десятичное число от 0 до ${total - 1}.`;
-    encoded = valid ? mixed.encode(value, bases) : null;
-    render();
+    return /^\d+$/.test(text) && Number.isSafeInteger(value) ? value : null;
+  };
+  let cursor = 0;
+  let model = null;
+  let tableKey = '';
+  let rows = [];
+  let animations = [];
+
+  const widget = document.createElement('div');
+  widget.className = 'mrank-widget';
+  widget.innerHTML = `
+    <div class="mrank-controls">
+      <label>Число позиций
+        <select data-mrank-count>${defaults.map((_, i) => `<option${i === 2 ? ' selected' : ''}>${i + 1}</option>`).join('')}</select>
+      </label>
+      <fieldset class="mrank-bases" aria-describedby="${id}-error">
+        <legend>Основания слева направо</legend>
+        <div>${defaults.map((base, position) => `<label${position === 3 ? ' hidden' : ''}>Позиция ${position + 1}
+          <input type="text" inputmode="numeric" autocomplete="off" data-mrank-base="${position}" value="${base}">
+        </label>`).join('')}</div>
+      </fieldset>
+      <label>Десятичный индекс
+        <input type="text" inputmode="numeric" autocomplete="off" value="17" data-mrank-number aria-describedby="${id}-range ${id}-error">
+      </label>
+      <p class="mrank-range" id="${id}-range" data-mrank-range></p>
+      <p class="error mrank-error" id="${id}-error" data-mrank-error role="status"></p>
+    </div>
+    <div class="mrank-view" data-mrank-view>
+      <div class="model-actions mrank-actions">
+        <button type="button" data-mrank-back aria-label="Предыдущий шаг таблицы">Назад</button>
+        <span data-mrank-progress></span>
+        <button type="button" data-mrank-next>Далее</button>
+      </div>
+      <div class="mrank-readout" role="status" aria-live="polite" aria-atomic="true">
+        <p class="formula mrank-equation" data-mrank-equation hidden></p>
+        <p data-mrank-status></p>
+      </div>
+      <div class="mrank-scroll" data-mrank-scroll tabindex="0" role="region" aria-label="Таблица записей с прокруткой">
+        <table class="mrank-table" data-mrank-table></table>
+      </div>
+      <div class="mixed-cells mrank-digits" data-mrank-digits role="group" aria-label="Сохранённые цифры слева направо"></div>
+      <div class="mrank-result" data-mrank-result hidden>
+        <p class="formula" data-mrank-answer></p>
+        <p data-mrank-check></p>
+      </div>
+    </div>`;
+  root.appendChild(widget);
+  const find = (selector) => widget.querySelector(selector);
+  const count = find('[data-mrank-count]');
+  const baseFields = Array.from(widget.querySelectorAll('[data-mrank-base]'));
+  const number = find('[data-mrank-number]');
+  const range = find('[data-mrank-range]');
+  const error = find('[data-mrank-error]');
+  const view = find('[data-mrank-view]');
+  const back = find('[data-mrank-back]');
+  const next = find('[data-mrank-next]');
+  const progress = find('[data-mrank-progress]');
+  const equation = find('[data-mrank-equation]');
+  const status = find('[data-mrank-status]');
+  const scroller = find('[data-mrank-scroll]');
+  const table = find('[data-mrank-table]');
+  const digitBoxes = find('[data-mrank-digits]');
+  const result = find('[data-mrank-result]');
+  const answer = find('[data-mrank-answer]');
+  const check = find('[data-mrank-check]');
+  const digitCells = defaults.map((_, i) => {
+    const slot = document.createElement('div');
+    slot.className = 'mixed-cell';
+    slot.innerHTML = `<span>Позиция ${i + 1}</span><strong data-mrank-digit="${i}">—</strong>`;
+    digitBoxes.appendChild(slot);
+    return slot.querySelector('strong');
+  });
+
+  function rebuild(bases) {
+    const key = bases.join(',');
+    if (tableKey === key && table.tBodies.length) return;
+    tableKey = key;
+    const weights = bases.map((_, position) => bases.slice(position + 1).reduce((a, b) => a * b, 1));
+    const records = bases.reduce((a, b) => a * b, 1);
+    const label = bases.length ? `Основания слева направо (${bases.join(', ')})` : 'После последнего сворачивания';
+    table.innerHTML = `<caption>${label}</caption><thead><tr><th scope="col">Индекс</th>${bases.map((base, i) =>
+      `<th scope="col">Поз. ${i + 1}<small>Осн. ${base}</small></th>`).join('')}</tr></thead><tbody></tbody>`;
+    const body = table.tBodies[0];
+    const fragment = document.createDocumentFragment();
+    rows = Array.from({length: records}, (_, index) => {
+      const row = document.createElement('tr');
+      row.dataset.mrankIndex = index;
+      const indexCell = document.createElement('th');
+      indexCell.scope = 'row';
+      indexCell.className = 'mrank-index-cell';
+      indexCell.textContent = index;
+      row.appendChild(indexCell);
+      const digits = weights.map((weight, position) => Math.floor(index / weight) % bases[position]);
+      if (digits.length) indexCell.setAttribute('aria-label', `Индекс ${index}. Запись (${digits.join(', ')})`);
+      weights.forEach((weight, position) => {
+        if (index % weight !== 0) return;
+        const digit = document.createElement('td');
+        digit.rowSpan = weight;
+        digit.dataset.mrankPlace = position;
+        digit.textContent = digits[position];
+        row.appendChild(digit);
+      });
+      fragment.appendChild(row);
+      return row;
+    });
+    body.appendChild(fragment);
   }
-  function move(offset) {
-    const destination = completed + offset;
-    if (!encoded || destination < 0 || destination > bases.length) return;
-    if (emphasis) emphasis.cancel();
-    completed = destination;
-    render();
-    if (offset < 0 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const target = groups.querySelector('.mlist-target');
-    if (target && typeof target.animate === 'function') {
-      emphasis = target.animate([{transform: 'translateY(3px)', opacity: .73}, {transform: 'translateY(0)', opacity: 1}],
-        {duration: 240, easing: 'ease-out'});
-      emphasis.id = 'mixed-list-target';
+
+  function markRows(active, detail, radix) {
+    const completeRows = detail ? detail.quotient * detail.base : 0;
+    rows.forEach((row, index) => {
+      const target = index === active;
+      row.toggleAttribute('data-mrank-target', target);
+      row.toggleAttribute('data-mrank-complete', Boolean(detail) && index < completeRows);
+      row.toggleAttribute('data-mrank-group-start', radix > 0 && index % radix === 0);
+      row.toggleAttribute('data-mrank-complete-group', Boolean(detail) && index < completeRows && index % radix === 0);
+      if (detail) row.dataset.mrankGroup = Math.floor(index / radix);
+      else row.removeAttribute('data-mrank-group');
+      if (target && detail) row.dataset.mrankRemainder = detail.remainder;
+      else row.removeAttribute('data-mrank-remainder');
+      if (target) row.setAttribute('aria-current', 'true');
+      else row.removeAttribute('aria-current');
+    });
+  }
+
+  function keepTargetInView(index) {
+    const row = rows[index];
+    if (!row || scroller.scrollHeight <= scroller.clientHeight) return;
+    const bounds = scroller.getBoundingClientRect();
+    const header = table.tHead.getBoundingClientRect().height;
+    const target = row.getBoundingClientRect();
+    if (target.top < bounds.top + header || target.bottom > bounds.bottom - 2) {
+      const center = bounds.top + header + (bounds.height - header) / 2;
+      scroller.scrollTop += (target.top + target.bottom) / 2 - center;
     }
   }
-  field.addEventListener('input', update);
+
+  function horner(digits, bases) {
+    let expression = String(digits[0]);
+    for (let i = 1; i < digits.length; i++) expression = `${i > 1 ? `(${expression})` : expression} · ${bases[i]} + ${digits[i]}`;
+    return expression;
+  }
+
+  function render() {
+    root.dataset.mrankPhase = cursor;
+    view.hidden = !model;
+    if (!model) return;
+    const {bases, encoded, value} = model;
+    const totalSteps = 2 * bases.length;
+    const removed = Math.floor(cursor / 2);
+    const revealed = Math.ceil(cursor / 2);
+    const activeBases = bases.slice(0, bases.length - removed);
+    const divided = cursor % 2 === 1;
+    const current = encoded.steps[removed];
+    const previous = encoded.steps[removed - 1];
+    const detail = divided ? current : null;
+    const active = removed === 0 ? value : previous.quotient;
+    const radix = activeBases[activeBases.length - 1] || 0;
+    const finished = cursor === totalSteps;
+    rebuild(activeBases);
+    markRows(active, detail, radix);
+    if (cursor === 0) scroller.scrollTop = 0;
+    else keepTargetInView(active);
+    progress.textContent = `Шаг ${cursor} из ${totalSteps}`;
+    back.setAttribute('aria-disabled', String(cursor === 0));
+    next.setAttribute('aria-disabled', String(finished));
+    next.setAttribute('aria-label', finished ? 'Далее. Все шаги выполнены' : divided ? 'Далее. Свернуть группы' : 'Далее. Выполнить деление');
+    equation.hidden = !detail;
+    equation.textContent = detail ? `${detail.value} = ${detail.quotient} · ${detail.base} + ${detail.remainder}` : '';
+    if (detail) {
+      const prior = detail.quotient * detail.base;
+      status.textContent = `Частное K = ${detail.quotient} показывает число полных групп перед выбранной записью. В каждой группе ${rowCount(detail.base)}. Синим выделены строки этих групп (${prior}). Остаток R = ${detail.remainder} указывает номер от нуля внутри следующей группы. Там выделена строка с индексом ${detail.value}. Сохраняем цифру ${detail.remainder} в позиции ${detail.i + 1}.`;
+    } else if (finished) {
+      status.textContent = 'Последнее частное равно 0. Запись собрана. Читаем сохранённые цифры слева направо.';
+    } else if (previous) {
+      status.textContent = `Каждая группа из ${previous.base} строк теперь занимает одну строку. В таблице ${rowCount(rows.length)}. Нужная строка имеет индекс ${active}. Его делим на основание ${current.base}.`;
+    } else {
+      status.textContent = `В таблице ${rowCount(rows.length)}. Начинаем с индекса ${active}. Основание правого разряда равно ${radix}. Одна группа занимает столько же строк.`;
+    }
+    digitBoxes.style.setProperty('--mrank-positions', bases.length);
+    digitCells.forEach((cell, position) => {
+      cell.parentElement.hidden = position >= bases.length;
+      const step = encoded.steps.find(({i}, index) => i === position && index < revealed);
+      cell.textContent = step ? step.remainder : '—';
+      cell.parentElement.classList.toggle('active', detail?.i === position || Boolean(previous && !divided && previous.i === position));
+    });
+    result.hidden = !finished;
+    answer.textContent = finished ? `${value} → (${encoded.digits.join(', ')})` : '';
+    check.textContent = finished && bases.length > 1 ? `Проверим по схеме Горнера. ${horner(encoded.digits, bases)} = ${mixed.decode(encoded.digits, bases).value}.` : '';
+    check.hidden = !check.textContent;
+  }
+
+  function reset() {
+    animations.forEach((animation) => animation.cancel());
+    animations = [];
+    cursor = 0;
+    model = null;
+    let problem = '';
+    const size = Number(count.value);
+    const selected = baseFields.slice(0, size);
+    const bases = selected.map(numberText);
+    baseFields.forEach((field, position) => {
+      field.parentElement.hidden = position >= size;
+      const invalid = position < size && (bases[position] === null || bases[position] < 2 || bases[position] > maximumRows);
+      field.setAttribute('aria-invalid', String(invalid));
+      if (invalid && !problem) problem = `В позиции ${position + 1} введите целое основание от 2 до ${maximumRows}.`;
+    });
+    const product = bases.reduce((a, b) => a * b, 1);
+    if (!problem && product > maximumRows) problem = `Произведение оснований равно ${product}. Для этой таблицы нужно не более ${maximumRows} записей.`;
+    range.textContent = problem ? '' : `Индексы от 0 до ${product - 1}.`;
+    const value = numberText(number);
+    const invalidValue = !problem && (value === null || value >= product);
+    number.setAttribute('aria-invalid', String(invalidValue));
+    if (invalidValue) problem = `Введите целый десятичный индекс от 0 до ${product - 1}.`;
+    error.textContent = problem;
+    if (!problem) model = {bases, value, encoded: mixed.encode(value, bases)};
+    render();
+  }
+
+  function move(offset) {
+    if (!model) return;
+    const destination = cursor + offset;
+    if (destination < 0 || destination > model.bases.length * 2) return;
+    animations.forEach((animation) => animation.cancel());
+    animations = [];
+    const collapse = offset > 0 && destination % 2 === 0;
+    const oldHeight = collapse ? scroller.getBoundingClientRect().height : 0;
+    cursor = destination;
+    render();
+    if (!collapse || window.matchMedia('(prefers-reduced-motion: reduce)').matches || typeof scroller.animate !== 'function') return;
+    const height = scroller.getBoundingClientRect().height;
+    if (oldHeight > height) animations.push(scroller.animate([{height: `${oldHeight}px`}, {height: `${height}px`}], {duration: 260, easing: 'ease-out'}));
+    const folding = table.tBodies[0].animate([
+      {transform: 'translateY(-4px) scaleY(1.045)', opacity: .68},
+      {transform: 'translateY(0) scaleY(1)', opacity: 1},
+    ], {duration: 260, easing: 'ease-out'});
+    folding.id = 'mixed-rank-collapse';
+    animations.push(folding);
+  }
+
+  count.addEventListener('change', reset);
+  baseFields.forEach((field) => field.addEventListener('input', reset));
+  number.addEventListener('input', reset);
   back.addEventListener('click', () => move(-1));
   next.addEventListener('click', () => move(1));
-  update();
+  reset();
 }
 
 initMixedClock(document.getElementById('mixed-clock-model'));
 initMixedWordModel(document.getElementById('mixed-word-model'), mixed);
 initMixedPixelModel(document.getElementById('mixed-pixel-model'), mixed);
 initMixedPractice(document.getElementById('mixed-practice'));
-initMixedDivisionFigure(document.getElementById('mixed-division-figure'), mixed);
-initMixedSortedList(document.getElementById('mixed-list-figure'), mixed);
+initMixedRankTable(document.getElementById('mixed-rank-model'), mixed);
 </script>
 </body>
 </html>
