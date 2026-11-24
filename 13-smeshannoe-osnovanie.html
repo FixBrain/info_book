@@ -350,6 +350,40 @@ button:disabled{opacity:.55;cursor:default}
 .mdiv-record{grid-template-columns:repeat(3,minmax(0,1fr));max-width:24rem}
 .mdiv-record .mixed-cell strong{font-size:19px}
 .mdiv-transfer{position:fixed;z-index:15;pointer-events:none;display:block;padding:0 4px;border:1px solid #8db1f0;border-radius:4px;line-height:1.25;color:#194ba3;background:#edf3ff;font-weight:700}
+.mlist-controls label{display:grid;gap:3px;width:fit-content;font-size:14px;color:#36435c}
+.mlist-controls input{width:7rem}
+.mlist-actions{align-items:center}
+.mlist-actions [aria-disabled="true"]{opacity:.55;cursor:default}
+.mlist-groups{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;max-width:38rem}
+.mlist-group{min-width:0;padding:6px;border:1px solid #d6e0ef;border-radius:9px;background:#fff}
+.mlist-group h4{margin:0 0 6px;text-align:center;color:#233a62;font-size:15px;line-height:1.25}
+.mlist-group h4 small{display:block;margin-top:2px;color:var(--muted);font-weight:400}
+ol.mlist-rows{display:grid;gap:4px;padding:0;margin:0;list-style:none}
+.mlist-row{min-width:0;margin:0}
+.mlist-cells{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:4px;transition:grid-template-columns .25s ease,gap .25s ease}
+.mlist-groups:not([data-mlist-phase="0"]) .mlist-cells{grid-template-columns:minmax(0,2fr) minmax(0,0fr);gap:0}
+.mlist-groups:not([data-mlist-phase="0"]) .mlist-kept{grid-column:1}
+.mlist-groups[data-mlist-phase="3"] .mlist-group{grid-column:var(--mlist-column)}
+.mlist-cell{min-width:0;padding:3px 1px;border:1px solid #d6e0ef;border-radius:6px;background:#fff;text-align:center;line-height:1.25;transition:background-color .22s,border-color .22s,color .22s}
+.mlist-cell strong{display:block;font-variant-numeric:tabular-nums;white-space:nowrap}
+.mlist-cell small{display:block;font-size:12px;color:var(--muted)}
+.mlist-groups:not([data-mlist-phase="0"]) .mlist-kept{border-color:#6597ed;background:#eaf1ff;color:#133c85}
+.mlist-groups:not([data-mlist-phase="0"]) .mlist-target{border-color:#356cbf;background:#dceaff;box-shadow:0 0 0 1px #356cbf}
+.mlist-groups[data-mlist-phase="3"] .mlist-kept{border-color:#a98125;background:#fff0bd;color:#533500;box-shadow:0 0 0 1px #a98125}
+.mlist-remainders{grid-template-columns:repeat(3,minmax(0,1fr));max-width:23rem}
+.mlist-remainders .mixed-cell strong{font-size:19px}
+.mlist-readout p{margin:.55rem 0 0}
+@media(max-width:540px){
+  .mlist-actions{gap:5px;font-size:14px}
+  .mlist-actions button{padding-inline:9px}
+  .mlist-groups{gap:4px}
+  .mlist-group{padding:3px}
+  .mlist-group h4{font-size:13px}
+  .mlist-cells{gap:2px}
+  .mlist-cell strong{font-size:clamp(10px,3.6vw,14px)}
+  .mlist-cell small{font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){.mlist-cell,.mlist-cells{transition:none}}
 </style>
 </head>
 <body>
@@ -510,6 +544,13 @@ button:disabled{opacity:.55;cursor:default}
     </figure>
     <p data-mdiv-fallback>Последнее частное 0, поэтому трёх разрядов хватило. Остатки получены справа налево. Читаем их слева направо по позициям и получаем <strong>(2, 0, 4)</strong>.</p>
   </section>
+
+  <h3 id="mixed-list-title">Как список сворачивается при делении</h3>
+  <p>Поменяем местами основания 2 и 5. Для оснований (3, 5, 2) правая цифра меняется от 0 до 1, поэтому в каждой строке две записи. Пять строк с одной и той же старшей цифрой образуют блок из десяти записей. Всего блоков три.</p>
+  <figure class="mixed-teaching-figure" id="mixed-list-figure" aria-labelledby="mixed-list-title">
+    <figcaption>От пар записей к строкам и блокам</figcaption>
+    <p data-mlist-fallback>Делим 17 на 2 и получаем 17 = 8 · 2 + 1. После отсечения младшей цифры остаются 15 строк, из которых 8 идут перед нужной. Сохраняем остаток 1. Затем 8 = 1 · 5 + 3. Пять строк в каждом блоке сворачиваются в одну, всего остаются три блока. Перед нужным блоком один полный блок, а средняя цифра равна 3. Последнее деление 1 = 0 · 3 + 1 даёт старшую цифру 1. Получаем <strong>(1, 3, 1)</strong>.</p>
+  </figure>
 
   <h2>Те же три позиции с буквами</h2>
   <p>Возьмём <a href="#mixed-digits">те же три позиции с основаниями 3, 2 и 5</a> и поставим в соответствие каждой цифре букву из алфавита её позиции.</p>
@@ -1497,11 +1538,185 @@ function initMixedDivisionFigure(figure, mixed) {
   update();
 }
 
+function initMixedSortedList(figure, mixed) {
+  if (!figure) return;
+  const bases = [3, 5, 2];
+  const total = mixed.limit(bases);
+  const [groupCount, rowCount, columnCount] = bases;
+  const entriesPerBlock = rowCount * columnCount;
+  const tuple = (digits, separator = ', ') => `(${digits.join(separator)})`;
+  const records = [];
+  const groupNodes = [];
+  const rowNodes = [];
+  let completed = 0;
+  let encoded;
+  let emphasis;
+
+  const view = document.createElement('div');
+  view.innerHTML = `
+    <div class="mlist-controls">
+      <label>Десятичное число от 0 до ${total - 1}
+        <input type="text" inputmode="numeric" autocomplete="off" value="17" data-mlist-number aria-describedby="mixed-list-error">
+      </label>
+      <div class="model-actions mlist-actions" data-mlist-actions>
+        <button type="button" data-mlist-back aria-label="Предыдущий шаг списка">Назад</button>
+        <span data-mlist-progress></span>
+        <button type="button" data-mlist-next aria-label="Следующий шаг списка">Далее</button>
+      </div>
+      <p class="error" id="mixed-list-error" data-mlist-error role="status"></p>
+    </div>
+    <div class="mlist-groups" data-mlist-groups></div>
+    <div class="mlist-readout" role="status" aria-atomic="true">
+      <p class="formula" data-mlist-equation hidden></p>
+      <p data-mlist-status></p>
+      <div data-mlist-record class="mixed-cells mlist-remainders" role="group" aria-label="Сохранённые остатки слева направо">
+        ${['Старший', 'Средний', 'Младший'].map((place) => `<div class="mixed-cell"><span>${place} разряд</span><strong data-mlist-digit>—</strong></div>`).join('')}
+      </div>
+      <p class="formula" data-mlist-result hidden></p>
+    </div>`;
+  figure.appendChild(view);
+  figure.querySelector('[data-mlist-fallback]').hidden = true;
+
+  const find = (selector) => view.querySelector(selector);
+  const field = find('[data-mlist-number]');
+  const groups = find('[data-mlist-groups]');
+  const back = find('[data-mlist-back]');
+  const next = find('[data-mlist-next]');
+  const actions = find('[data-mlist-actions]');
+  const progress = find('[data-mlist-progress]');
+  const error = find('[data-mlist-error]');
+  const status = find('[data-mlist-status]');
+  const equation = find('[data-mlist-equation]');
+  const result = find('[data-mlist-result]');
+  const remainders = Array.from(view.querySelectorAll('[data-mlist-digit]'));
+
+  for (let oldest = 0; oldest < groupCount; oldest++) {
+    const group = document.createElement('section');
+    group.className = 'mlist-group';
+    group.dataset.mlistGroup = oldest;
+    group.style.setProperty('--mlist-column', oldest + 1);
+    groupNodes.push(group);
+    group.setAttribute('aria-labelledby', `mixed-list-group-${oldest}`);
+    const from = oldest * entriesPerBlock;
+    group.innerHTML = `<h4 id="mixed-list-group-${oldest}">Слева ${oldest}<small>${from}–${from + entriesPerBlock - 1}</small></h4>`;
+    const rows = document.createElement('ol');
+    rows.className = 'mlist-rows';
+    rows.setAttribute('role', 'list');
+    rows.setAttribute('aria-label', 'Записи блока по порядку');
+    rows.start = 0;
+    for (let middle = 0; middle < rowCount; middle++) {
+      const row = document.createElement('li');
+      row.className = 'mlist-row';
+      row.dataset.mlistRow = middle;
+      rowNodes.push({row, middle});
+      const cells = document.createElement('div');
+      cells.className = 'mlist-cells';
+      for (let last = 0; last < columnCount; last++) {
+        const digits = [oldest, middle, last];
+        const index = from + middle * columnCount + last;
+        const cell = document.createElement('div');
+        cell.dataset.mlistCell = index;
+        cell.className = 'mlist-cell';
+        cell.innerHTML = `<strong>${tuple(digits, ',')}</strong><small>${index}</small>`;
+        cells.appendChild(cell);
+        records.push({cell, digits, index, notation: cell.firstElementChild, label: cell.lastElementChild});
+      }
+      row.appendChild(cells);
+      rows.appendChild(row);
+    }
+    group.appendChild(rows);
+    groups.appendChild(group);
+  }
+
+  function explain(step) {
+    const {value, quotient, remainder} = step;
+    if (completed === 1) {
+      return `От каждой пары оставили префикс из двух цифр. Из 30 записей получилось 15 строк по две исходные записи. Частное ${quotient} показывает, сколько полных строк идёт перед строкой числа ${value}. Остаток ${remainder} сохраняем для младшего разряда.`;
+    }
+    if (completed === 2) {
+      return `Пять строк сворачиваются в один блок из десяти исходных записей. Остались три префикса из одной цифры. Частное ${quotient} показывает число полных блоков перед нужным. Остаток ${remainder} сохраняем для среднего разряда.`;
+    }
+    return `Остаток ${remainder} выбирает блок и даёт старшую цифру. Соединяем её с двумя сохранёнными остатками по порядку разрядов.`;
+  }
+
+  function render() {
+    const steps = encoded ? encoded.steps.slice(0, completed) : [];
+    const step = steps[steps.length - 1];
+    const finished = completed === bases.length;
+    const value = encoded?.steps[0].value;
+    const digits = encoded?.digits;
+    groups.dataset.mlistPhase = completed;
+    groupNodes.forEach((group, position) => { group.hidden = finished && position !== digits[0]; });
+    rowNodes.forEach(({row, middle}) => { row.hidden = completed >= 2 && middle !== (finished ? digits[1] : 0); });
+    for (const {cell, digits: shown, index, notation, label} of records) {
+      const [oldest, middle, last] = shown;
+      const retained = completed === 0 || (finished ? index === value : last === 0 && (completed === 1 || middle === 0));
+      cell.hidden = !retained;
+      cell.classList.toggle('mlist-kept', retained);
+      const targeted = retained && Boolean(step) && (completed === 1 ? index / columnCount === step.quotient : completed === 2 ? oldest === step.quotient : finished);
+      cell.classList.toggle('mlist-target', targeted);
+      if (targeted) cell.setAttribute('aria-current', 'true');
+      else cell.removeAttribute('aria-current');
+      if (!retained) continue;
+      notation.textContent = tuple(completed === 1 ? shown.slice(0, 2) : completed === 2 ? [oldest] : shown, ',');
+      label.textContent = completed === 1 ? `Строка ${index / columnCount}` : completed === 2 ? `Блок ${oldest}` : index;
+    }
+    for (const [position, cell] of remainders.entries()) {
+      const found = steps.find(({i}) => i === position);
+      cell.textContent = found ? found.remainder : '—';
+      cell.parentElement.classList.toggle('active', step?.i === position);
+    }
+    actions.hidden = !encoded;
+    status.hidden = !encoded;
+    progress.textContent = `Шаг ${completed} из ${bases.length}`;
+    back.setAttribute('aria-disabled', String(completed === 0));
+    next.setAttribute('aria-disabled', String(finished));
+    equation.hidden = !step;
+    equation.textContent = step ? `${step.value} = ${step.quotient} · ${step.base} + ${step.remainder}` : '';
+    if (!encoded) status.textContent = '';
+    else if (step) status.textContent = explain(step);
+    else status.textContent = `В списке ${total} записей. Сначала делим ${value} на 2, чтобы узнать, сколько полных пар перед ним.`;
+    result.hidden = !finished;
+    result.textContent = finished ? `${value} → ${tuple(digits)}` : '';
+  }
+
+  function update() {
+    if (emphasis) emphasis.cancel();
+    completed = 0;
+    const text = field.value.trim();
+    const value = Number(text);
+    const valid = /^\d+$/.test(text) && Number.isSafeInteger(value) && value < total;
+    field.setAttribute('aria-invalid', String(!valid));
+    error.textContent = valid ? '' : `Введите целое десятичное число от 0 до ${total - 1}.`;
+    encoded = valid ? mixed.encode(value, bases) : null;
+    render();
+  }
+  function move(offset) {
+    const destination = completed + offset;
+    if (!encoded || destination < 0 || destination > bases.length) return;
+    if (emphasis) emphasis.cancel();
+    completed = destination;
+    render();
+    if (offset < 0 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const target = groups.querySelector('.mlist-target');
+    if (target && typeof target.animate === 'function') {
+      emphasis = target.animate([{transform: 'translateY(3px)', opacity: .73}, {transform: 'translateY(0)', opacity: 1}],
+        {duration: 240, easing: 'ease-out'});
+      emphasis.id = 'mixed-list-target';
+    }
+  }
+  field.addEventListener('input', update);
+  back.addEventListener('click', () => move(-1));
+  next.addEventListener('click', () => move(1));
+  update();
+}
+
 initMixedClock(document.getElementById('mixed-clock-model'));
 initMixedWordModel(document.getElementById('mixed-word-model'), mixed);
 initMixedPixelModel(document.getElementById('mixed-pixel-model'), mixed);
 initMixedPractice(document.getElementById('mixed-practice'));
 initMixedDivisionFigure(document.getElementById('mixed-division-figure'), mixed);
+initMixedSortedList(document.getElementById('mixed-list-figure'), mixed);
 </script>
 </body>
 </html>
