@@ -348,12 +348,15 @@ button:disabled{opacity:.55;cursor:default}
 .mrank-actions [aria-disabled="true"]{opacity:.55;cursor:default}
 .mrank-readout p{margin:.45em 0}
 .mrank-scroll{max-height:19rem;overflow:auto;overscroll-behavior:contain;border:1px solid #d6e0ef;border-radius:8px;background:#fff}
-.mrank-table{width:100%;max-width:100%;border-collapse:separate;border-spacing:0;background:#fff;table-layout:fixed}
+.mrank-table{--mrank-heading-height:2.75rem;width:100%;max-width:100%;border-collapse:separate;border-spacing:0;background:#fff;table-layout:fixed}
 .mrank-table caption{text-align:left;padding:4px 8px;background:#fff;color:#263d67;font-size:14px}
 .mrank-table thead th{position:sticky;top:0;z-index:1;line-height:1.25;background:#edf3ff;box-shadow:0 1px 0 #d6e0ef}
 .mrank-table :is(th,td){border:0;border-bottom:1px solid #d6e0ef;border-right:1px solid #d6e0ef;padding:3px 2px;text-align:center;vertical-align:middle;font-variant-numeric:tabular-nums}
 .mrank-table thead th:last-child,.mrank-table tr>td:last-child{border-right:0}
-.mrank-table thead th small{display:block;font-size:12px;font-weight:400;color:#36435c}
+.mrank-table th[data-mrank-divisor]{box-sizing:border-box;height:var(--mrank-heading-height)}
+.mrank-table th[data-mrank-active-divisor]{background:#dceafe;color:#163d82}
+.mrank-table thead small{display:none;font-size:12px;font-weight:600}
+.mrank-table th[data-mrank-active-divisor] small{display:block}
 .mrank-table tbody{transform-origin:center top}
 .mrank-table tbody tr{height:1.75rem}
 .mrank-table tbody td{background:transparent;font-weight:650}
@@ -368,7 +371,7 @@ button:disabled{opacity:.55;cursor:default}
 .mrank-table .mrank-index-cell{font-weight:400}
 .mrank-table [data-mrank-target]>.mrank-index-cell{font-weight:700}
 .mrank-table .mrank-index-cell:only-child{text-align:center}
-.mrank-group-content{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:0 .35rem;position:sticky;top:2.75rem;bottom:.25rem}
+.mrank-group-content{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:0 .35rem;position:sticky;top:var(--mrank-heading-height);bottom:.25rem}
 .mrank-group-badge{border:1px solid #c1d2ec;border-radius:999px;padding-inline:.25rem;background:#eef3fa;color:#3b5379;font-size:12px;font-weight:650;line-height:1.4;white-space:nowrap}
 .mrank-table [data-mrank-full-group] .mrank-group-badge{border-color:#98bde9;background:#dceafe;color:#163d82}
 .mrank-table [data-mrank-selected-group] .mrank-group-badge{border-color:#b7872e;background:#fff0bd;color:#533500;font-weight:700}
@@ -380,7 +383,7 @@ button:disabled{opacity:.55;cursor:default}
   .mrank-bases input{width:3.55rem}
   .mrank-bases label{font-size:11px}
   .mrank-table{font-size:13px}
-  .mrank-table thead th small{font-size:11px}
+  .mrank-table thead small{font-size:11px}
   .mrank-group-content{column-gap:2px}
   .mrank-group-badge{padding-inline:2px;font-size:11px}
   .mrank-scroll{max-height:15.5rem}
@@ -1447,9 +1450,12 @@ function initMixedRankTable(root, mixed) {
     const weights = bases.map((_, position) => bases.slice(position + 1).reduce((a, b) => a * b, 1));
     const records = bases.reduce((a, b) => a * b, 1);
     const groupPosition = bases.length - 2;
-    const label = bases.length ? `Основания слева направо (${bases.join(', ')})` : 'После последнего сворачивания';
-    table.innerHTML = `<caption>${label}</caption><thead><tr><th scope="col" class="mrank-index-heading" aria-label="Десятичный индекс"></th>${bases.map((base, i) =>
-      `<th scope="col">Поз. ${i + 1}<small>Осн. ${base}</small></th>`).join('')}</tr></thead><tbody></tbody>`;
+    const label = bases.length ? 'Основания разрядов' : 'После последнего сворачивания';
+    const headings = bases.map((base, position) => {
+      if (position === bases.length - 1) return `<th scope="col" data-mrank-divisor><small>Делим на</small>${base}</th>`;
+      return `<th scope="col" aria-label="Позиция ${position + 1}, основание ${base}">${base}</th>`;
+    });
+    table.innerHTML = `<caption>${label}</caption><thead><tr><th scope="col" class="mrank-index-heading" aria-label="Десятичный индекс"></th>${headings.join('')}</tr></thead><tbody></tbody>`;
     const body = table.tBodies[0];
     const fragment = document.createDocumentFragment();
     groupCells = [];
@@ -1545,6 +1551,12 @@ function initMixedRankTable(root, mixed) {
     const radix = activeBases[activeBases.length - 1] || 0;
     const finished = cursor === totalSteps;
     rebuild(activeBases);
+    const divisorHeading = table.tHead.querySelector('[data-mrank-divisor]');
+    if (divisorHeading) {
+      divisorHeading.toggleAttribute('data-mrank-active-divisor', cursor > 0);
+      const heading = cursor > 0 ? `Делим на ${radix}` : `Позиция ${activeBases.length}, основание ${radix}`;
+      divisorHeading.setAttribute('aria-label', heading);
+    }
     markRows(active, detail, radix);
     if (cursor === 0) scroller.scrollTop = 0;
     else keepTargetInView(active);
