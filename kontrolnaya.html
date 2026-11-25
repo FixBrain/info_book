@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Итоговая контрольная работа — Числа и системы счисления</title>
+<link rel="stylesheet" href="assessment.css">
+<script src="kontrolnaya.js" defer></script>
+<script src="assessment.js" defer></script>
+</head>
+<body>
+<header class="top">
+  <details class="chapter-menu">
+    <summary>
+      <span class="chapter-menu-title">Главы учебника</span>
+      <span class="chapter-menu-current">Контрольная</span>
+    </summary>
+    <nav aria-label="Навигация по учебнику">
+      <a href="index.html">Оглавление</a>
+      <a href="proverka-1.html">Проверочная 1</a>
+      <a href="proverka-2.html">Проверочная 2</a>
+      <a href="proverka-3.html">Самостоятельная по третьему блоку</a>
+      <a href="11-itogi.html">Памятка</a>
+    </nav>
+  </details>
+</header>
+<main>
+  <h1>Итоговая контрольная работа</h1>
+  <p class="lead">8 заданий по всем трём блокам учебника. Максимум 20 баллов.</p>
+  <p class="assessment-intro">Решайте на черновике и переносите ответы в поля. В последних заданиях нужно соединить несколько приёмов. После сдачи к каждому заданию появится разбор. Числа вводите без индекса основания.</p>
+  <p class="progress"><strong id="assessment-attempt" tabindex="-1"></strong><span id="assessment-best"></span></p>
+  <noscript>Для генерации заданий и проверки ответов включите JavaScript в браузере.</noscript>
+  <form id="assessment-form" novalidate>
+    <div id="assessment-tasks"></div>
+    <p class="answered" id="assessment-answered"></p>
+    <div class="controls">
+      <button type="submit" class="primary" id="assessment-submit" disabled>Проверить работу</button>
+      <button type="button" id="assessment-retry" hidden>Новая попытка</button>
+      <button type="button" id="assessment-download" disabled>Скачать результат</button>
+    </div>
+    <div class="result" id="assessment-score" role="status" tabindex="-1"></div>
+    <p class="storage" id="assessment-storage" role="status" hidden>Браузер ограничил сохранение. Результат можно скачать до закрытия страницы.</p>
+  </form>
+</main>
+<footer aria-label="Переходы по учебнику">
+      <a href="proverka-3.html">← Самостоятельная по третьему блоку</a>
+      <a href="index.html">Оглавление</a>
+</footer>
+</body>
+</html>

@@ -1,0 +1,66 @@
+:root{--accent:#2563eb;--bg:#f7f8fa;--card:#fff;--line:#e3e7ee;--ink:#1f2430;--muted:#535d6f}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
+[hidden]{display:none!important}
+a{color:#164aad}
+header.top{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+main,nav,footer{max-width:880px;margin:0 auto;padding-left:16px;padding-right:16px}
+nav{display:flex;flex-wrap:wrap;gap:8px 18px;padding-top:12px;padding-bottom:12px;font-size:15px}
+main{padding-top:24px;padding-bottom:32px}
+h1{margin:0 0 8px;font-size:clamp(25px,5vw,34px);line-height:1.2}
+.lead{color:var(--muted);margin:0 0 16px;font-size:17px}
+.progress{display:flex;flex-wrap:wrap;gap:4px 20px;margin:16px 0;color:var(--muted)}
+.progress strong{color:var(--ink)}
+.question{margin:0 0 14px;padding:18px 20px;border:1px solid var(--line);border-radius:14px;background:var(--card);min-width:0}
+.question h2{font-size:19px;margin:0 0 7px;color:#172441;line-height:1.35}
+.question p{margin:7px 0}
+.math-context{margin:10px 0 12px;font-weight:650;font-size:18px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.math-context p{margin:4px 0}
+.part{min-width:0;border:0;padding:0;margin:11px 0 4px}
+.part legend{max-width:100%;padding:0;margin-bottom:4px;font-weight:600;overflow-wrap:anywhere}
+.entry{font:inherit;color:inherit;border:1px solid #aab7cc;border-radius:8px;padding:7px 10px;width:min(100%,28rem);min-height:40px;background:#fff}
+.entry:disabled{color:#354258;background:#f4f6fa;opacity:1}
+.choices{display:flex;align-items:flex-start;gap:6px 10px;flex-wrap:wrap}
+.choice{min-width:0;display:flex;align-items:baseline;gap:8px;padding:5px 10px;border:1px solid #dce2ed;border-radius:8px;background:#f7f9fe;cursor:pointer}
+.choice input{accent-color:var(--accent);margin:0;flex:none}
+.choice span{overflow-wrap:anywhere}
+fieldset:disabled .choice{cursor:default}
+.feedback{font-size:14px;overflow-wrap:anywhere}
+.correct{color:#236637}
+.incorrect{color:#8b4430}
+.task-score{font-weight:650}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 10px}
+button{font:inherit;font-weight:650;color:#164aad;background:#eaf0ff;border:1px solid #d5e1ff;border-radius:8px;padding:8px 14px;min-height:42px;cursor:pointer}
+button.primary{background:var(--accent);border-color:var(--accent);color:white}
+button:disabled{opacity:.53;cursor:default}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.result:empty{display:none}
+.result{background:#eef4ff;border:1px solid #d5e1ff;padding:12px 15px;border-radius:10px;margin:12px 0}
+.storage{color:#8b4430;margin:.6em 0}
+footer{border-top:1px solid var(--line);padding-top:12px;padding-bottom:30px}
+@media(max-width:540px){.question{padding:14px}.math-context{font-size:17px}nav{gap:5px 12px}}
+
+html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height) + 1rem)}
+.chapter-menu>summary{
+  display:flex;align-items:center;justify-content:space-between;gap:.75rem;
+  min-height:var(--chapter-bar-height);max-width:1048px;margin:0 auto;padding:.35rem 1rem;
+  cursor:pointer;list-style:none;color:var(--accent);font-size:.95rem;font-weight:650
+}
+.chapter-menu>summary:focus-visible{outline:3px solid var(--accent);outline-offset:-3px}
+.chapter-menu>summary::-webkit-details-marker{display:none}
+.chapter-menu-title{display:flex;align-items:center;gap:.6rem}
+.chapter-menu-title::before{
+  content:"";width:.45rem;height:.45rem;border-right:2px solid;border-bottom:2px solid;transform:rotate(-45deg)
+}
+.chapter-menu[open] .chapter-menu-title::before{transform:rotate(45deg)}
+.chapter-menu-current{white-space:nowrap;color:var(--muted);font-size:.875rem;font-weight:500}
+.chapter-menu nav{max-height:60vh;max-height:60svh;overflow-y:auto;overscroll-behavior:contain}
+.assessment-intro{margin:0 0 16px}
+.question-header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:0 12px}
+.question-header h2{margin-bottom:3px}
+.question-points,.answered{color:var(--muted);font-size:14px}
+.review{padding:10px 13px;margin:12px 0 0;background:#f0f5ff;border:1px solid #d5e1ff;border-radius:9px;overflow-wrap:anywhere}
+.review h3{margin:0 0 4px;font-size:16px}
+.review p:last-child{margin-bottom:0}
+footer{display:flex;flex-wrap:wrap;gap:6px 18px}
+@media(max-width:360px){.chapter-menu>summary{gap:.4rem}.chapter-menu-current{white-space:normal;text-align:right}}
