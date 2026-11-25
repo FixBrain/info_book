@@ -201,16 +201,17 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
 .chapter-menu nav{max-height:60vh;max-height:60svh;overflow-y:auto;overscroll-behavior:contain}
 @media screen{
   main{
-    --picture-height-limit:min(30rem,max(1px,calc(100vh - var(--chapter-bar-height) - 5rem)))
+    --picture-width-limit:40rem;
+    --picture-height-limit:min(36rem,max(1px,calc(100vh - var(--chapter-bar-height) - 4rem)))
   }
   @supports (height:100svh){
     main{
-      --picture-height-limit:min(30rem,max(1px,calc(100svh - var(--chapter-bar-height) - 5rem)))
+      --picture-height-limit:min(36rem,max(1px,calc(100svh - var(--chapter-bar-height) - 4rem)))
     }
   }
   /* The aspect ratio reserves the space for each picture before it loads. */
   main img.chapter-picture{
-    display:block;width:min(100%,calc(var(--picture-height-limit) * var(--picture-ratio)));
+    display:block;width:min(100%,var(--picture-width-limit),calc(var(--picture-height-limit) * var(--picture-ratio)));
     max-width:100%;height:auto;max-height:var(--picture-height-limit);margin-inline:auto;object-fit:contain
   }
 }
