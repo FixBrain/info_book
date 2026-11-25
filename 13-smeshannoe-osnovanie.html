@@ -362,18 +362,16 @@ button:disabled{opacity:.55;cursor:default}
 .mrank-table [data-mrank-complete]{background:#e8f1ff;color:#163d82}
 .mrank-table [data-mrank-target]{background:#eef4ff;color:#183b77}
 .mrank-table [data-mrank-remainder]{background:#fff0bd;color:#533500}
-.mrank-table thead :is(.mrank-index-heading,.mrank-group-heading){width:2.25rem}
-.mrank-table :is(.mrank-index-heading,.mrank-index-cell,.mrank-group-heading,[data-mrank-group-number]){border:0;background:#fff;box-shadow:none}
+.mrank-table thead .mrank-index-heading{width:2.25rem}
+.mrank-table :is(.mrank-index-heading,.mrank-index-cell){border:0;background:#fff;box-shadow:none}
 .mrank-table .mrank-index-cell{text-align:right;padding-inline:0 .4rem}
 .mrank-table .mrank-index-cell{font-weight:400}
 .mrank-table [data-mrank-target]>.mrank-index-cell{font-weight:700}
 .mrank-table .mrank-index-cell:only-child{text-align:center}
-.mrank-table [data-mrank-group-number]{color:#3b5379;padding-inline:4px;vertical-align:middle}
-.mrank-table [data-mrank-group-number] span{display:block;position:sticky;top:2.75rem;bottom:.25rem;margin-inline:auto;max-width:1.75rem;border:1px solid #c1d2ec;border-radius:999px;background:#eef3fa;font-size:13px;font-weight:650;line-height:1.45}
-.mrank-table [data-mrank-full-group]{color:#163d82}
-.mrank-table [data-mrank-full-group] span{border-color:#98bde9;background:#dceafe}
-.mrank-table [data-mrank-selected-group]{color:#533500}
-.mrank-table [data-mrank-selected-group] span{border-color:#b7872e;background:#fff0bd;font-weight:700}
+.mrank-group-content{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:0 .35rem;position:sticky;top:2.75rem;bottom:.25rem}
+.mrank-group-badge{border:1px solid #c1d2ec;border-radius:999px;padding-inline:.25rem;background:#eef3fa;color:#3b5379;font-size:12px;font-weight:650;line-height:1.4;white-space:nowrap}
+.mrank-table [data-mrank-full-group] .mrank-group-badge{border-color:#98bde9;background:#dceafe;color:#163d82}
+.mrank-table [data-mrank-selected-group] .mrank-group-badge{border-color:#b7872e;background:#fff0bd;color:#533500;font-weight:700}
 .mrank-digits{grid-template-columns:repeat(var(--mrank-positions,3),minmax(0,1fr));max-width:28rem}
 .mrank-digits .mixed-cell strong{font-size:20px}
 .mrank-result p{margin:.4em 0}
@@ -383,6 +381,8 @@ button:disabled{opacity:.55;cursor:default}
   .mrank-bases label{font-size:11px}
   .mrank-table{font-size:13px}
   .mrank-table thead th small{font-size:11px}
+  .mrank-group-content{column-gap:3px}
+  .mrank-group-badge{padding-inline:2px;font-size:11px}
   .mrank-scroll{max-height:15.5rem}
   .mrank-actions{gap:4px;font-size:14px}
   .mrank-actions button{padding-inline:8px}
@@ -553,8 +553,8 @@ button:disabled{opacity:.55;cursor:default}
   </section>
 
   <h3 id="mixed-list-title">От номера строки к цифрам</h3>
-  <p>Вернёмся к основаниям (3, 2, 5). В таблице 30 допустимых записей, а слева — их десятичные номера от 0 до 29. В каждой пятёрке строк правая цифра проходит значения от 0 до 4. Средняя цифра сохраняет значение пять строк, а левая — десять. В этих двух столбцах одинаковые соседние ячейки объединены. Справа стоят номера групп, тоже с нуля. После сворачивания они становятся номерами строк.</p>
-  <p>На каждом шаге делим текущий номер на основание правого разряда. Частное <i>K</i> отсчитывает полные группы строк перед выбранной. Остаток <i>R</i> указывает ячейку в следующей группе, считая с нуля. Записываем <i>R</i> как цифру. Затем сворачиваем каждую группу в одну строку, убираем правый столбец и продолжаем с номером <i>K</i>.</p>
+  <p>Вернёмся к основаниям (3, 2, 5). В таблице 30 допустимых записей, а слева — их десятичные номера от 0 до 29. В каждой пятёрке строк правая цифра проходит значения от 0 до 4. Средняя цифра сохраняет значение пять строк, а левая — десять. В этих двух столбцах одинаковые соседние ячейки объединены. Метка «№» рядом с цифрой предпоследнего разряда показывает номер группы, считая с нуля. При сворачивании каждая такая ячейка занимает одну строку, а номер группы становится её индексом слева.</p>
+  <p>На каждом шаге делим текущий номер на основание правого разряда. Частное <i>K</i> отсчитывает полные группы строк перед выбранной. Остаток <i>R</i> указывает ячейку в следующей группе, считая с нуля. Записываем <i>R</i> как цифру. Затем сворачиваем каждую группу в одну строку, убираем столбец младшего разряда и продолжаем с номером <i>K</i>.</p>
   <section class="interactive" id="mixed-rank-model" aria-labelledby="mixed-list-title">
     <noscript><p>Для числа 17 делим последовательно на 5, 2 и 3. Сначала 17 = 3 · 5 + 2. В 30 исходных строках выделяем три полные пятёрки и третью ячейку следующей пятёрки. После сворачивания остаётся 6 строк и номер 3. Затем 3 = 1 · 2 + 1. Сворачиваем по две строки, остаётся 3 строки и номер 1. Наконец 1 = 0 · 3 + 1. Из остатков получаем (1, 1, 2).</p></noscript>
   </section>
@@ -1446,11 +1446,10 @@ function initMixedRankTable(root, mixed) {
     tableKey = key;
     const weights = bases.map((_, position) => bases.slice(position + 1).reduce((a, b) => a * b, 1));
     const records = bases.reduce((a, b) => a * b, 1);
-    const radix = bases[bases.length - 1];
+    const groupPosition = bases.length - 2;
     const label = bases.length ? `Основания слева направо (${bases.join(', ')})` : 'После последнего сворачивания';
-    const groupHeading = radix ? '<th scope="col" class="mrank-group-heading" aria-label="Номер группы"></th>' : '';
     table.innerHTML = `<caption>${label}</caption><thead><tr><th scope="col" class="mrank-index-heading" aria-label="Десятичный индекс"></th>${bases.map((base, i) =>
-      `<th scope="col">Поз. ${i + 1}<small>Осн. ${base}</small></th>`).join('')}${groupHeading}</tr></thead><tbody></tbody>`;
+      `<th scope="col">Поз. ${i + 1}<small>Осн. ${base}</small></th>`).join('')}</tr></thead><tbody></tbody>`;
     const body = table.tBodies[0];
     const fragment = document.createDocumentFragment();
     groupCells = [];
@@ -1469,21 +1468,18 @@ function initMixedRankTable(root, mixed) {
         const digit = document.createElement('td');
         digit.rowSpan = weight;
         digit.dataset.mrankPlace = position;
-        digit.textContent = digits[position];
+        const value = digits[position];
+        if (position === groupPosition) {
+          const groupNumber = index / weight;
+          digit.dataset.mrankGroupNumber = groupNumber;
+          digit.setAttribute('aria-label', `Цифра ${value}. Группа ${groupNumber}`);
+          digit.innerHTML = `<div class="mrank-group-content"><span>${value}</span><span class="mrank-group-badge">№ ${groupNumber}</span></div>`;
+          groupCells.push(digit);
+        } else {
+          digit.textContent = value;
+        }
         row.appendChild(digit);
       });
-      if (radix && index % radix === 0) {
-        const groupNumber = index / radix;
-        const groupCell = document.createElement('td');
-        const groupLabel = document.createElement('span');
-        groupCell.rowSpan = radix;
-        groupCell.dataset.mrankGroupNumber = groupNumber;
-        groupCell.setAttribute('aria-label', `Группа ${groupNumber}`);
-        groupLabel.textContent = groupNumber;
-        groupCell.appendChild(groupLabel);
-        row.appendChild(groupCell);
-        groupCells.push(groupCell);
-      }
       fragment.appendChild(row);
       return row;
     });
@@ -1560,7 +1556,8 @@ function initMixedRankTable(root, mixed) {
     equation.textContent = detail ? `${detail.value} = ${detail.quotient} · ${detail.base} + ${detail.remainder}` : '';
     if (detail) {
       const prior = detail.quotient * detail.base;
-      status.textContent = `Частное K = ${detail.quotient} показывает число полных групп перед выбранной записью. В каждой группе ${rowCount(detail.base)}. Синим выделены строки этих групп (${prior}). Остаток R = ${detail.remainder} указывает номер от нуля внутри следующей группы. Там выделена строка с индексом ${detail.value}. Сохраняем цифру ${detail.remainder} в позиции ${detail.i + 1}.`;
+      const highlight = prior ? ` Синим выделены строки этих групп (${prior}).` : '';
+      status.textContent = `Частное K = ${detail.quotient} показывает число полных групп перед выбранной записью. В каждой группе ${rowCount(detail.base)}.${highlight} Остаток R = ${detail.remainder} указывает номер от нуля внутри следующей группы. Там выделена строка с индексом ${detail.value}. Сохраняем цифру ${detail.remainder} в позиции ${detail.i + 1}.`;
     } else if (finished) {
       status.textContent = 'Последнее частное равно 0. Запись собрана. Читаем сохранённые цифры слева направо.';
     } else if (previous) {
