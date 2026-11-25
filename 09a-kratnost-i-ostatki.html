@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>9А. Кратность и остатки</title>
+<style>
+:root{--accent:#2563eb;--bg:#f7f8fa;--card:#fff;--line:#e3e7ee;--ink:#1f2430;--muted:#5b6472}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+header.top{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+nav.menu{max-width:900px;margin:0 auto;display:flex;flex-wrap:wrap;gap:4px;padding:10px 16px}
+nav.menu a{text-decoration:none;color:var(--muted);padding:6px 10px;border-radius:8px;font-size:14px}
+nav.menu a:hover{background:#eef2ff;color:var(--accent)}
+nav.menu a[aria-current]{background:var(--accent);color:#fff}
+main{max-width:900px;margin:0 auto;padding:24px 16px 40px}
+h1{font-size:28px;margin:.2em 0 .4em}
+h2{font-size:21px;margin:1.6em 0 .5em;border-left:4px solid var(--accent);padding-left:10px}
+h3{font-size:17px;margin:0 0 .4em}
+p{margin:.7em 0}
+.lead{font-size:18px;color:var(--muted)}
+b.term{color:var(--accent)}
+.example,.interactive,.selfcheck,.note{border-radius:12px;padding:16px 18px;margin:18px 0}
+.example{background:#f0f6ff;border:1px solid #d6e4ff}
+.interactive{background:#fffdf3;border:1px solid #f0e4b8}
+.selfcheck{background:#f3fbf4;border:1px solid #cdeccf}
+.note{background:#fff8ec;border:1px solid #f3e2bd}
+.tag{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 9px;border-radius:20px;margin-bottom:4px;color:#fff}
+.example .tag{background:#2563eb}
+.interactive .tag{background:#795800}
+.selfcheck .tag{background:#217a36}
+.controls{display:flex;align-items:end;gap:10px;flex-wrap:wrap;margin:12px 0}
+.controls label{display:grid;gap:4px;font-weight:600}
+input,select{font:inherit;padding:6px 10px;border:1px solid #b8c2d1;border-radius:8px;color:var(--ink);background:var(--card);max-width:100%}
+input{width:110px}
+button{font:inherit;padding:7px 14px;border:0;border-radius:9px;background:var(--accent);color:#fff;cursor:pointer}
+button:hover{background:#1d4fd0}
+button.ghost{background:#eef2ff;color:#1647a8}
+button.ghost:hover{background:#dfe7ff}
+button:disabled{opacity:.55;cursor:default}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+
+.feedback{margin:8px 0;color:#a92620}
+.pager{display:flex;flex-wrap:wrap;justify-content:space-between;margin-top:36px;gap:10px}
+.pager a{text-decoration:none;color:#1647a8;background:#eef2ff;padding:10px 16px;border-radius:9px;font-size:15px}
+@media(max-width:540px){header.top{position:static}.example,.interactive,.selfcheck,.note{padding:13px}.controls label{max-width:100%}}
+.formula{margin:12px 0;text-align:center;font-size:20px;line-height:1.65;overflow-wrap:anywhere}
+@media(max-width:540px){.formula{font-size:17px}}
+.residue-parts{display:flex;flex-wrap:wrap;justify-content:center;align-items:stretch;gap:8px;margin:12px 0;padding:0;list-style:none}
+.residue-parts li{display:grid;justify-items:center;gap:2px;padding:8px 12px;border:1px solid #bcd0ff;border-radius:9px;background:#e8f0ff;text-align:center}
+.residue-parts li:last-child{border-color:#e9bb5f;background:#fff3ce}
+.residue-parts strong{font-size:21px;line-height:1.35}
+.residue-parts small{color:var(--muted)}
+
+#p8-parity {
+  --p8-line: #e3e7ee;
+  --p8-ink: #1f2430;
+  --p8-muted: #5b6472;
+  --p8-odd-line: #b47c13;
+  --p8-odd-paper: #fff3ce;
+  --p8-odd-text: #644400;
+  min-inline-size: 0;
+}
+
+.p8-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px 14px;
+  align-items: flex-end;
+  border: 1px solid var(--p8-line);
+  border-radius: 16px;
+  padding: 10px 13px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(20, 30, 60, .06);
+}
+
+.p8-field {
+  display: grid;
+  gap: 3px;
+  color: var(--p8-muted);
+  font-size: 14px;
+}
+
+.p8-field select { min-inline-size: 4em; }
+.p8-field input {
+  width: 132px;
+  max-width: 100%;
+  font-family: Consolas, Menlo, monospace;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+.p8-field input[aria-invalid="true"] { border-color: #a92620; }
+.p8-error { color: #a92620; overflow-wrap: anywhere; }
+.p8-notation { color: var(--p8-muted); font-size: 15px; }
+
+.p8-expression {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 10px;
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 14px;
+}
+
+.p8-term {
+  flex: 1 1 142px;
+  max-inline-size: 240px;
+  min-inline-size: 0;
+  display: grid;
+  grid-template-rows: auto minmax(2.5em, 1fr) auto;
+  align-items: center;
+  gap: 4px;
+  border: 1.5px solid var(--p8-line);
+  border-radius: 13px;
+  padding: 7px 8px;
+  background: #fff;
+  color: var(--p8-ink);
+  text-align: center;
+  animation: p8-reveal .24s ease-out;
+}
+
+.p8-term:is(.p8-odd,.p8-nonzero) {
+  border-color: var(--p8-odd-line);
+  background: var(--p8-odd-paper);
+}
+
+.p8-rank { color: var(--p8-muted); font-size: 13px; }
+.p8-operation {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  gap: .1em .3em;
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+.p8-operation strong { overflow-wrap: anywhere; }
+.p8-marker { min-block-size: 1.5em; font-size: 13px; color: var(--p8-muted); overflow-wrap: anywhere; }
+.p8-term:is(.p8-odd,.p8-nonzero) .p8-marker { color: var(--p8-odd-text); font-weight: 750; }
+
+.p8-reveal { margin-top: 12px; }
+
+.p8-result p {
+  margin: 9px 0 0;
+  padding: 7px 11px;
+  border: 1px solid #99b7f8;
+  border-radius: 11px;
+  background: #eef4ff;
+  overflow-wrap: anywhere;
+}
+
+@keyframes p8-reveal {
+  from { opacity: .45; }
+  to { opacity: 1; }
+}
+
+@media (max-width: 540px) {
+  .p8-panel { padding: 8px 10px; }
+  .p8-expression { gap: 8px; }
+  .p8-term { flex-basis: 118px; padding: 6px; }
+  .p8-operation { font-size: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .p8-term { animation: none; }
+}
+#ctr8 {
+  --ctr8-accent: var(--accent, #32644a);
+  --ctr8-line: color-mix(in srgb, var(--ctr8-accent) 25%, transparent);
+  --ctr8-tint: color-mix(in srgb, var(--ctr8-accent) 9%, transparent);
+  --ctr8-strong-tint: color-mix(in srgb, var(--ctr8-accent) 19%, transparent);
+  box-sizing: border-box;
+  display: grid;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+#ctr8 > h3,
+#ctr8 .ctr8-reading-note,
+#ctr8 .ctr8-trace p,
+#ctr8 .ctr8-facts,
+#ctr8 .ctr8-facts dd {
+  margin: 0;
+}
+
+#ctr8 .ctr8-settings,
+#ctr8 .ctr8-facts {
+  display: grid;
+  gap: 0.5rem 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: min(100%, 34rem);
+}
+
+#ctr8 .ctr8-field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 650;
+  min-width: 0;
+}
+
+#ctr8 .ctr8-field select,
+#ctr8 .ctr8-button {
+  box-sizing: border-box;
+  padding: 0.45rem 0.65rem;
+  min-height: 2.75rem;
+  border: 1px solid var(--ctr8-line);
+  border-radius: 0.65rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+}
+
+#ctr8 .ctr8-field select {
+  min-width: 3.6rem;
+  background: var(--surface, Canvas);
+  color: var(--ink, CanvasText);
+}
+
+#ctr8 .ctr8-button {
+  cursor: pointer;
+}
+
+#ctr8 .ctr8-button:hover {
+  background: var(--ctr8-strong-tint);
+}
+
+#ctr8 .ctr8-button-primary {
+  background: var(--ctr8-accent);
+  color: var(--on-accent, #fff);
+  border-color: var(--ctr8-accent);
+}
+
+#ctr8 .ctr8-button-primary:hover {
+  background: color-mix(in srgb, var(--ctr8-accent) 88%, #000);
+}
+
+#ctr8 .ctr8-button:focus-visible,
+#ctr8 .ctr8-field select:focus-visible {
+  outline: 2px solid var(--ctr8-accent);
+  outline-offset: 3px;
+}
+
+#ctr8 .ctr8-facts > div {
+  min-width: 0;
+  padding: 0.5rem 0.7rem;
+  border-radius: 0.6rem;
+  background: var(--ctr8-tint);
+}
+
+#ctr8 .ctr8-facts dt {
+  font-size: 0.86rem;
+}
+
+#ctr8 .ctr8-facts dd {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+#ctr8 .ctr8-mechanism,
+#ctr8 .ctr8-reading {
+  min-width: 0;
+  display: grid;
+  gap: 0.6rem;
+  justify-items: start;
+}
+
+#ctr8 .ctr8-reading {
+  width: 100%;
+}
+
+#ctr8 .ctr8-reading-main {
+  display: flex;
+  align-items: end;
+  gap: 0.35rem;
+  min-width: 0;
+  max-width: 100%;
+}
+
+#ctr8 .ctr8-digits,
+#ctr8 .ctr8-trace-digits {
+  display: grid;
+  grid-template-columns: repeat(var(--ctr8-k), minmax(0, 1fr));
+  gap: clamp(2px, 0.85vw, 7px);
+  min-width: 0;
+}
+
+#ctr8 .ctr8-cell,
+#ctr8 .ctr8-trace-cell {
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: clamp(1rem, 6.8vw, 2.8rem);
+  height: clamp(1.9rem, 11vw, 3.2rem);
+  min-width: 0;
+  border: 1px solid var(--ctr8-line);
+  border-radius: clamp(0.2rem, 1.5vw, 0.55rem);
+  background: var(--ctr8-tint);
+  font: 700 clamp(0.95rem, 3.8vw, 1.65rem)/1 ui-monospace, Menlo, Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+#ctr8 .ctr8-radix {
+  align-self: end;
+  position: static;
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+#ctr8 .ctr8-reading-note,
+#ctr8 .ctr8-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.55rem;
+}
+
+#ctr8 .ctr8-reading-note {
+  font-size: 0.9rem;
+}
+
+#ctr8 [data-ctr8-parity] {
+  border-radius: 0.4rem;
+  padding: 0.13rem 0.4rem;
+  background: var(--ctr8-strong-tint);
+  font-weight: 650;
+}
+
+#ctr8 .ctr8-trace {
+  box-sizing: border-box;
+  min-width: 0;
+  display: grid;
+  gap: 0.4rem;
+  padding: 0.65rem 0.75rem;
+  border-left: 3px solid var(--ctr8-accent);
+  border-radius: 0.35rem;
+  background: var(--ctr8-tint);
+  overflow-wrap: anywhere;
+}
+
+#ctr8 .ctr8-equation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.1rem 0.32rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+#ctr8 .ctr8-trace-digits {
+  width: max-content;
+  max-width: 100%;
+}
+
+#ctr8 .ctr8-trace-cell {
+  width: clamp(0.95rem, 6.3vw, 2rem);
+  height: clamp(1.4rem, 8vw, 2.1rem);
+  font-size: clamp(0.85rem, 3.4vw, 1.15rem);
+}
+
+#ctr8 .ctr8-drop {
+  opacity: 0.52;
+  text-decoration: line-through;
+  animation: ctr8-drop 560ms ease both;
+}
+
+#ctr8 .ctr8-keep {
+  background: var(--ctr8-strong-tint);
+  border-color: var(--ctr8-accent);
+  animation: ctr8-keep 650ms 100ms ease both;
+}
+
+#ctr8 .ctr8-cell-wrapped {
+  animation: ctr8-arrive 610ms ease both;
+}
+
+#ctr8 .ctr8-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  white-space: nowrap;
+  clip-path: inset(50%);
+  border: 0;
+}
+
+@keyframes ctr8-drop {
+  0% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0.52; transform: translateX(-2px); }
+}
+
+@keyframes ctr8-keep {
+  0% { filter: saturate(0.2); transform: translateY(-3px); }
+  60% { filter: saturate(1.3); }
+  100% { filter: saturate(1); transform: translateY(0); }
+}
+
+@keyframes ctr8-arrive {
+  0%, 30% { opacity: 0.4; transform: translateY(-3px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 420px) {
+  #ctr8 .ctr8-field {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    justify-items: start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #ctr8 .ctr8-drop,
+  #ctr8 .ctr8-keep,
+  #ctr8 .ctr8-cell-wrapped {
+    animation: none;
+  }
+}
+.weight-remainders{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));padding:0;margin:14px 0;gap:8px;list-style:none}
+.weight-remainders li{display:grid;gap:3px;justify-items:center;text-align:center;padding:9px;border:1px solid #e9d7bf;border-radius:10px;color:#4e3422;background:#fff8ec}
+.weight-remainders span,.weight-remainders small,.source-note{color:var(--muted);font-size:.9rem}
+main summary{cursor:pointer;font-weight:650}
+.selfcheck details+details{margin-top:10px;padding-top:10px;border-top:1px solid #cdeccf}
+main :is(h2,details,section,div)[id]{scroll-margin-top:14rem}
+@media(max-width:900px){header.top{position:static}main :is(h2,details,section,div)[id]{scroll-margin-top:1rem}}
+@media(max-width:525px){.weight-remainders{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="top">
+  <nav class="menu" aria-label="Главы учебника">
+    <a href="index.html">Оглавление</a>
+    <a href="01-chto-takoe-chislo.html">1. Что такое число</a>
+    <a href="02-razryady.html">2. Термины</a>
+    <a href="03-sravnenie.html">3. Сравнение чисел</a>
+    <a href="03-osnovaniya.html">4. Разные основания</a>
+    <a href="04-razvernutaya-zapis.html">5. Перевод в десятичную систему счисления</a>
+    <a href="05-perevod-iz-desyatichnoy.html">6. Из десятичной</a>
+    <a href="06a-perevod-mezhdu-sistemami.html">6А. Перевод между системами</a>
+    <a href="07-slozhenie-i-vychitanie.html">7. Сложение</a>
+    <a href="08-vychitanie.html">8. Вычитание</a>
+    <a href="08-svoystva-chisel.html">9. Разрядность и диапазоны</a>
+    <a href="09a-kratnost-i-ostatki.html" aria-current="page">9А. Кратность и остатки</a>
+    <a href="09-alternativnye-alfavity.html">10. Альтернативные алфавиты</a>
+    <a href="10-numeratsiya-slov.html">11. Сравнение и нумерация слов</a>
+    <a href="11-itogi.html">12. Итоги</a>
+    <a href="13-smeshannoe-osnovanie.html">13. Числа со смешанным основанием</a>
+    <a href="14-slova-nomera-sdvigi.html">14. Слова, номера и сдвиги</a>
+    <a href="15-smeshannoe-osnovanie-na-praktike.html">15. Часы и пиксели</a>
+  </nav>
+</header>
+<main>
+  <h1>9А. Кратность и остатки</h1>
+  <p class="lead">Как узнать, делится ли число на заданное число, если перед нами только его запись? Начнём с весов разрядов. Они помогают понять, какие цифры влияют на остаток и как их учитывать.</p>
+
+  <h2 id="multiples">Что показывает остаток</h2>
+  <p>Свяжем 23 палочки в пучки по пять. Получится 4 полных пучка и 3 отдельные палочки. Так читается равенство 23 = 4 · 5 + 3. Если разложить те же палочки по 4, остаток опять равен 3, а полных пучков будет 5.</p>
+  <p>В общем виде при делении целого числа <i>x</i> на положительное целое <i>m</i> получаем <i>x</i> = <i>q</i> · <i>m</i> + <i>r</i>, где 0 ≤ <i>r</i> &lt; <i>m</i>. Число <i>m</i> называют <b class="term">модулем</b>, когда нас интересуют остатки. Дальше будем брать <i>m</i> ≥ 2. Если <i>r</i> = 0, число <i>x</i> <b class="term">кратно</b> <i>m</i>. Число 0 тоже кратно любому положительному <i>m</i>.</p>
+
+  <h2 id="power-sums">Остатки в развёрнутой записи</h2>
+  <p>Запишем 431<sub>5</sub> как <a href="04-razvernutaya-zapis.html">сумму вкладов</a> 4 · 5<sup>2</sup> + 3 · 5 + 1. Цифры 4, 3 и 1 здесь служат коэффициентами при степенях основания. Такую конечную сумму в методичке называют степенным рядом.</p>
+
+  <div class="example">
+    <h3>Ищем остаток 431<sub>5</sub> при делении на 7</h3>
+    <p>Вес 25 даёт остаток 4. В каждом пучке из 25 палочек можно сразу отложить 3 полных пучка по 7. Из четырёх пучков по 25 в дальнейший счёт попадут только 4 · 4 палочки. Для двух младших весов ничего откладывать пока не нужно.</p>
+    <ul class="weight-remainders" aria-label="Как из весов получаются остатки">
+      <li><small>Вес 25</small><b>25 = 3 · 7 + 4</b><span>Остаётся 4 от каждого пучка</span></li>
+      <li><small>Вес 5</small><b>5 = 0 · 7 + 5</b><span>Остаётся 5 от каждого пучка</span></li>
+      <li><small>Вес 1</small><b>1 = 0 · 7 + 1</b><span>Остаётся 1 от каждой единицы</span></li>
+    </ul>
+    <p class="formula">4 · 4 + 3 · 5 + 1 · 1 = 32 = 4 · 7 + <b>4</b></p>
+    <p>Теперь собираем семёрки и из оставшихся палочек. Остаток равен 4, поэтому 431<sub>5</sub> не кратно 7.</p>
+  </div>
+
+  <p>Так можно работать с любой развёрнутой записью. Возьмём остаток <i>r</i><sub><i>i</i></sub> от каждого веса <i>N</i><sup><i>i</i></sup> при делении на <i>m</i>. Умножим его на цифру этого разряда и сложим результаты. У полученной суммы и исходного числа один и тот же остаток.</p>
+  <p class="formula"><i>x</i> ≡ <i>a</i><sub><i>k</i></sub> · <i>r</i><sub><i>k</i></sub> + … + <i>a</i><sub>1</sub> · <i>r</i><sub>1</sub> + <i>a</i><sub>0</sub> · <i>r</i><sub>0</sub> (mod <i>m</i>)</p>
+  <p>Знак ≡ с пометкой (mod <i>m</i>) означает, что обе части дают одинаковый остаток при делении на <i>m</i>. Каждый вес имеет вид <i>N</i><sup><i>i</i></sup> = <i>q</i><sub><i>i</i></sub> · <i>m</i> + <i>r</i><sub><i>i</i></sub>. Если заменить вес на <i>r</i><sub><i>i</i></sub>, из вклада исчезнет только кратное <i>m</i> слагаемое. Поэтому можно заменить остатками и веса, и целые вклады. В конце снова берём остаток от суммы, как мы сделали с числом 32.</p>
+  <details class="note">
+    <summary>Как считать остатки больших степеней</summary>
+    <p>Начинаем с веса 1. Чтобы получить остаток следующего веса, умножаем текущий остаток на основание <i>N</i> и снова делим с остатком. Для степеней 5 по модулю 7 справа налево получается 1, 5, 4, 6, 2, 3, 1. Появилась та же единица, поэтому дальше последовательность повторится. Полные значения степеней вычислять не пришлось.</p>
+  </details>
+
+  <h2 id="residues">Когда правило можно упростить</h2>
+  <section class="example" aria-labelledby="base-divisors">
+    <h3 id="base-divisors">Делители основания <i>N</i></h3>
+    <p>Если <i>m</i> делит основание <i>N</i>, то веса <i>N</i>, <i>N</i><sup>2</sup> и все следующие делятся на <i>m</i>. У единиц вес 1, поэтому <b>достаточно найти остаток младшей цифры</b>.</p>
+    <p>Например, 3 делит основание 9. У числа 263<sub>9</sub> последняя цифра 3, поэтому всё число кратно 3. У 265<sub>9</sub> остаток при делении на 3 равен остатку от 5, то есть 2.</p>
+  </section>
+
+  <section class="example" aria-labelledby="base-power-divisors">
+    <h3 id="base-power-divisors">Делители степени основания <i>N</i><sup><i>k</i></sup></h3>
+    <p>Если <i>m</i> делит <i>N</i><sup><i>k</i></sup>, все веса со степенью <i>k</i> и выше дают ноль. Достаточно взять <i>k</i> младших цифр и найти остаток их значения по модулю <i>m</i>. Ищем наименьшую целую степень основания, которая делится на <i>m</i>.</p>
+    <p><b>Пример. Делимость на 27 в основании 9.</b> Число 27 равно 9<sup>3/2</sup>. Веса разрядов — целые степени 9. Из них первый вес, кратный 27, равен 9<sup>2</sup> = 81. Поэтому достаточно двух последних цифр.</p>
+    <ul class="weight-remainders" aria-label="Какие окончания кратны 27">
+      <li><small>Окончание</small><b>00<sub>9</sub></b><span>0 · 9 + 0 = 0</span></li>
+      <li><small>Окончание</small><b>30<sub>9</sub></b><span>3 · 9 + 0 = 27</span></li>
+      <li><small>Окончание</small><b>60<sub>9</sub></b><span>6 · 9 + 0 = 54</span></li>
+    </ul>
+    <p>Значение двух цифр лежит от 0 до 80. На этом отрезке только 0, 27 и 54 кратны 27. Значит, 530<sub>9</sub> делится на 27, а 510<sub>9</sub> даёт остаток 9. Обе записи заканчиваются нулём, поэтому проверка одной цифры здесь недостаточна.</p>
+    <p>Когда <i>m</i> равно самому <i>N</i><sup><i>k</i></sup>, значение последних <i>k</i> цифр уже является остатком. Оно меньше <i>N</i><sup><i>k</i></sup>, потому что помещается в <i>k</i> позициях. Поэтому <b>число кратно <i>N</i><sup><i>k</i></sup>, если все <i>k</i> младших разрядов нулевые</b>. Если запись короче, представим недостающие разряды нулями слева.</p>
+    <p>У 4321400<sub>6</sub> две последние цифры равны нулю, поэтому число кратно 6<sup>2</sup>. На третьем месте справа стоит 4, поэтому число не кратно 6<sup>3</sup>.</p>
+  </section>
+
+  <div class="example" id="residue-two-moduli">
+    <h3>Одна запись, два модуля</h3>
+    <p>Вернёмся к 431<sub>5</sub>. Разделим запись на старшую часть и две младшие цифры.</p>
+    <ul class="residue-parts" aria-label="Вклады старшей и младшей частей числа">
+      <li><strong>4</strong><small>Старшая часть</small><b>4 · 25 = 100</b></li>
+      <li><strong>31<sub>5</sub></strong><small>Две младшие цифры</small><b>3 · 5 + 1 = 16</b></li>
+    </ul>
+    <p><b>По модулю 25.</b> Старший вклад 100 делится на 25. Остаток даёт запись 31<sub>5</sub>, её значение равно 16.</p>
+    <p><b>По модулю 7.</b> Старший вклад 100 даёт остаток 2. Младшая часть 16 тоже даёт остаток 2. Учитываем оба вклада и получаем 4, как в предыдущем примере.</p>
+  </div>
+
+  <section class="example" aria-labelledby="base-minus-one">
+    <h3 id="base-minus-one">Делимость на <i>N</i> − 1 и его делители</h3>
+    <p>Если <i>m</i> делит <i>N</i> − 1, то <i>N</i> даёт остаток 1 по модулю <i>m</i>. Поэтому и каждая степень <i>N</i> даёт остаток 1. Заменяем все веса единицами и получаем <b>сумму значений цифр</b>. По её остатку судим о кратности исходного числа.</p>
+    <p>В основании 5 число 5 − 1 равно 4. Для 431<sub>5</sub> сумма цифр равна 4 + 3 + 1 = 8, значит, число кратно 4. В десятичной системе 10 − 1 = 9, поэтому тот же признак действует для 9 и для его делителя 3.</p>
+  </section>
+  <div class="example" id="base-plus-one">
+    <h3>Делимость на <i>N</i> + 1 и его делители</h3>
+    <p>Если <i>m</i> делит <i>N</i> + 1, то <i>N</i> и −1 дают одинаковый остаток. Поэтому чётные степени основания можно заменить на 1, а нечётные на −1. Идём справа налево. Младшую цифру берём с плюсом, следующую с минусом и так далее.</p>
+    <p>По модулю 6 основание 5 можно заменить на −1, потому что 5 − (−1) = 6. Для 431<sub>5</sub> получаем 1 − 3 + 4 = 2. Это остаток от деления на 6. Если знакопеременная сумма выходит из диапазона остатков, снова берём остаток. Например, −1 даёт по модулю 6 остаток 5.</p>
+    <p>В десятичной системе по этой же схеме проверяют делимость на 11.</p>
+  </div>
+
+  <details class="note" id="combined-divisibility">
+    <summary>Составной делитель. Соединяем два признака</summary>
+    <p>Для делимости на 24 в основании 9 проверим 3 и 8. Эти числа взаимно просты, то есть их единственный общий делитель — 1. Поэтому кратность обоим числам даёт кратность их произведению 24.</p>
+    <p>У 763<sub>9</sub> последняя цифра 3, значит, число кратно 3. Сумма цифр 7 + 6 + 3 = 16 кратна 8, значит, всё число кратно и 24.</p>
+  </details>
+
+  <details class="note" id="block-divisibility">
+    <summary>Ещё один приём. Делимость по блокам цифр</summary>
+    <p>Возьмём группы по <i>k</i> цифр, начиная справа. Тогда веса блоков — 1, <i>N</i><sup><i>k</i></sup>, (<i>N</i><sup><i>k</i></sup>)<sup>2</sup> и так далее. Можем применить к ним те же правила.</p>
+    <ul>
+      <li><b>Делитель <i>N</i><sup><i>k</i></sup> − 1.</b> Каждый вес блока даёт остаток 1. Например, 37 делит 999 = 1000 − 1. В десятичном числе 123&#8239;025 складываем блоки 123 и 025. Сумма 148 кратна 37, значит, исходное число тоже кратно 37.</li>
+      <li><b>Делитель <i>N</i><sup><i>k</i></sup> + 1.</b> Веса блоков можно по очереди заменять на 1 и −1. Например, 7, 11 и 13 делят 1001 = 1000 + 1. Для числа 123&#8239;200 считаем 200 − 123 = 77. Оно кратно 7 и 11, а по модулю 13 даёт остаток 12. Те же результаты получаем для 123&#8239;200.</li>
+    </ul>
+  </details>
+
+  <details class="note" id="parity">
+    <summary>Чётность как пример кратности</summary>
+    <p>Чётность определяется остатком по модулю 2. При чётном основании все веса, кроме веса единиц, делятся на 2. Смотрим на последнюю цифру. При нечётном основании все веса дают остаток 1, поэтому достаточно суммы цифр.</p>
+    <p>В сумме вкладов чётные вклады дают 0, а нечётные — 1. Два нечётных вклада дают вместе число, кратное 2. Выберите делитель 2 в интерактиве ниже, чтобы увидеть эти вклады.</p>
+  </details>
+
+  <section class="interactive" id="p8-parity" aria-labelledby="p8-heading">
+    <h3 id="p8-heading">Остатки по разрядам</h3>
+    <p>Выберите основание, число и делитель. Модель разложит число по разрядам и выделит вклады с ненулевым остатком. При делителе 2 выделятся нечётные вклады.</p>
+
+    <div class="p8-panel">
+      <label class="p8-field" for="p8-base">Основание
+        <select id="p8-base"><option value="5" selected>5</option></select>
+      </label>
+      <label class="p8-field" for="p8-record">Неотрицательное целое число
+        <input id="p8-record" type="text" value="431" autocomplete="off" spellcheck="false" autocapitalize="characters" aria-describedby="p8-error">
+      </label>
+      <label class="p8-field" for="p8-modulus">Делитель в десятичной системе
+        <input id="p8-modulus" type="text" value="7" inputmode="numeric" autocomplete="off" aria-describedby="p8-error">
+      </label>
+    </div>
+    <p class="p8-error" id="p8-error" role="alert" hidden></p>
+
+    <button class="p8-reveal" id="p8-reveal" type="button" aria-expanded="false" aria-controls="p8-model" disabled>Разобрать остаток</button>
+    <div id="p8-model" hidden>
+      <p class="p8-notation">В каждом слагаемом значение цифры умножается на вес разряда. Значения цифр и вкладов даны в десятичной системе.</p>
+      <ol class="p8-expression" id="p8-expression" aria-label="Развёрнутая запись по разрядам"></ol>
+    </div>
+    <div class="p8-result" id="p8-result" role="status" aria-atomic="true"></div>
+  </section>
+
+  <h2 id="count-around">Счёт по кругу</h2>
+  <p>В <a href="08-svoystva-chisel.html#length-and-range">трёх двоичных разрядах</a> помещаются числа от 0 до 7. Если прибавить 1 к 111<sub>2</sub>, получится 1000<sub>2</sub>. Три младшие позиции показывают <b>000<sub>2</sub></b>, то есть остаток от деления на 8.</p>
+  <p>Если сделать шаг назад из нуля, получим 111<sub>2</sub>. Это остаток от деления −1 на 8. Это видно из равенства −1 = (−1) · 8 + 7. Остаток выбираем от 0 до 7, даже когда само число отрицательное.</p>
+
+  <section class="interactive" id="ctr8" aria-labelledby="ctr8-title">
+    <h3 id="ctr8-title">Счётчик с фиксированной разрядностью</h3>
+    <div class="ctr8-settings">
+      <label class="ctr8-field">
+        <span>Основание <var>N</var></span>
+        <select data-ctr8-select="base"><option value="2">2</option></select>
+      </label>
+      <label class="ctr8-field">
+        <span>Разрядов <var>k</var></span>
+        <select data-ctr8-select="width"><option value="3">3</option></select>
+      </label>
+    </div>
+    <dl class="ctr8-facts">
+      <div>
+        <dt>Модуль <var>N</var><sup><var>k</var></sup></dt>
+        <dd data-ctr8-modulus>2³ = 8</dd>
+      </div>
+      <div>
+        <dt>Диапазон значений</dt>
+        <dd data-ctr8-range>От 0 до 7</dd>
+      </div>
+    </dl>
+    <div class="ctr8-mechanism">
+      <div class="ctr8-reading">
+        <div class="ctr8-reading-main">
+          <div class="ctr8-digits" data-ctr8-digits aria-hidden="true" style="--ctr8-k:3">
+            <span class="ctr8-cell">0</span><span class="ctr8-cell">0</span><span class="ctr8-cell">0</span>
+          </div>
+          <sub class="ctr8-radix" data-ctr8-radix aria-hidden="true">2</sub>
+        </div>
+        <p class="ctr8-reading-note"><span data-ctr8-decimal>0 в десятичной системе</span> <span data-ctr8-parity>Чётное</span></p>
+      </div>
+      <div class="ctr8-actions">
+        <button class="ctr8-button" type="button" data-ctr8-action="minus" aria-label="Вычесть единицу">−1</button>
+        <button class="ctr8-button ctr8-button-primary" type="button" data-ctr8-action="plus" aria-label="Прибавить единицу">+1</button>
+        <button class="ctr8-button" type="button" data-ctr8-action="max">К максимуму</button>
+      </div>
+    </div>
+    <div class="ctr8-trace" data-ctr8-trace>
+      <p>Перейди к максимуму, затем прибавь единицу. Вычти единицу из нуля, чтобы увидеть обратный переход.</p>
+    </div>
+    <p class="ctr8-visually-hidden" data-ctr8-announcement aria-live="polite" aria-atomic="true">Запись 000 в основании 2. Значение 0, чётное.</p>
+  </section>
+
+  <h2 id="residue-classes">Действия с остатками</h2>
+  <p>Числа 5, 13 и 21 дают один остаток 5 по модулю 8 и входят в один <b class="term">класс вычетов</b>. Можно взять любое из них как представителя класса. Прибавим 3 к двум представителям и сравним результат.</p>
+  <div class="example">
+    <p class="formula">5 + 3 = 8, &nbsp; 13 + 3 = 16</p>
+    <p>Вторая сумма на 8 больше первой, поэтому обе дают остаток 0. Можно было сразу заменить 13 его остатком 5.</p>
+  </div>
+  <p>То же работает для вычитания и умножения. Если к одному из чисел прибавить несколько полных групп по <i>m</i>, сумма или разность изменится на целое число таких групп. При умножении меняется тоже целое число групп. Например, <i>m</i> дополнительных палочек, взятых <i>b</i> раз, дают <i>b</i> полных групп по <i>m</i>.</p>
+  <p>Классы вычетов вместе со сложением, вычитанием и умножением образуют <b class="term">кольцо остатков</b>. Эти свойства объясняют, почему в степенной сумме можно брать остатки отдельных весов, вкладов или промежуточных сумм.</p>
+
+  <div class="example">
+    <h3>Разность больших степеней</h3>
+    <p>Проверим, кратно ли 2<sup>20</sup> − 2<sup>9</sup> + 1 числу 3. По модулю 3 основание 2 можно заменить на −1. Чётная степень даёт 1, нечётная — −1. Получаем 1 − (−1) + 1 = 3, что кратно 3. Этот приём работает и для выражений, где некоторые степени вычитаются.</p>
+  </div>
+
+  <section class="selfcheck" aria-labelledby="residue-check-title">
+    <h2 id="residue-check-title">Самопроверка</h2>
+    <details>
+      <summary>Кратно ли 3020<sub>4</sub> числу 16? Чему равен остаток при делении на 8?</summary>
+      <p>Вес 16 и все старшие веса делятся и на 16, и на 8. Младшие цифры 20<sub>4</sub> дают 8. По модулю 16 это остаток 8, по модулю 8 остаток равен 0. Число кратно 8. Остаток 8 показывает, что кратности 16 нет.</p>
+    </details>
+    <details>
+      <summary>Найдите остатки 257<sub>9</sub> при делении на 3, 8 и 27.</summary>
+      <p>Число 3 делит 9, поэтому от младшей цифры 7 получаем остаток 1. Число 8 равно 9 − 1, поэтому берём сумму 2 + 5 + 7 = 14 и получаем остаток 6. Число 27 делит 9<sup>2</sup>. Младшие цифры 57<sub>9</sub> дают 5 · 9 + 7 = 52, значит, остаток равен 25.</p>
+    </details>
+    <details>
+      <summary>Проверьте, кратно ли 352<sub>7</sub> числам 6 и 8.</summary>
+      <p>По модулю 6 основание 7 заменяем на 1. Получаем 3 + 5 + 2 = 10, остаток 4. По модулю 8 основание 7 заменяем на −1. Получаем 2 − 5 + 3 = 0. Число кратно 8.</p>
+    </details>
+    <details>
+      <summary>Найдите остаток от деления 8<sup>4024</sup> − 4<sup>1605</sup> + 2<sup>1024</sup> − 126 на 3.</summary>
+      <p>Запишем степени по основанию 2. Получаем 2<sup>12072</sup> − 2<sup>3210</sup> + 2<sup>1024</sup> − 126. Все три показателя чётны, поэтому по модулю 3 каждая степень даёт 1. Число 126 кратно 3. Остаток равен 1 − 1 + 1 − 0 = <b>1</b>.</p>
+    </details>
+  </section>
+  <p class="source-note">В основе главы — раздел «Четность числа» из методички Евгения Джобса «Системы счисления» (с. 18–19) и разделы о степенных рядах и кратности основанию из методички «Системы счисления. Свойства чисел и арифметика» (с. 11, 13–14).</p>
+  <p class="source-note">Признаки делимости в произвольном основании и их расширения на блоки цифр разобраны в § 7.2 книги Самера Сеража <a href="https://www.math.aau.at/OeMO/Downloads/datei/1207/download" lang="en">Rigorous Elementary</a>. Выводы через остатки для десятичной системы можно сверить с <a href="https://nrich.maths.org/articles/divisibility-tests">разбором NRICH</a>.</p>
+  <nav class="pager" aria-label="Соседние главы">
+    <a href="08-svoystva-chisel.html">← 9. Разрядность и диапазоны</a>
+    <a href="proverka-2.html">Проверочная работа 2 →</a>
+    <a href="09-alternativnye-alfavity.html">10. Альтернативные алфавиты →</a>
+  </nav>
+</main>
+<script>
+(() => {
+  'use strict';
+
+  const digits = '0123456789ABCDEFGHIJ';
+  const decimal = new Intl.NumberFormat('ru-RU');
+  const byId = (id) => document.getElementById(id);
+  const baseInput = byId('p8-base');
+  const recordInput = byId('p8-record');
+  const modulusInput = byId('p8-modulus');
+  const model = byId('p8-model');
+  const error = byId('p8-error');
+  const expression = byId('p8-expression');
+  const revealButton = byId('p8-reveal');
+  const result = byId('p8-result');
+
+  baseInput.replaceChildren(...Array.from({ length: 19 }, (_, index) => {
+    const base = index + 2;
+    return new Option(String(base), String(base), base === 5, base === 5);
+  }));
+
+  function readInput() {
+    const base = Number(baseInput.value);
+    const record = recordInput.value.trim().toUpperCase();
+    const rawModulus = modulusInput.value.trim();
+    if (!record || record.length > 8) {
+      return { error: 'Введите запись целого числа длиной от одной до восьми цифр.', field: recordInput };
+    }
+
+    const unsupported = Array.from(record).find((symbol) => digits.indexOf(symbol) < 0 || digits.indexOf(symbol) >= base);
+    if (unsupported !== undefined) {
+      return { error: `Символ «${unsupported}» не является допустимой цифрой в основании ${base}. Используйте цифры от 0 до ${digits[base - 1]}.`, field: recordInput };
+    }
+    if (!/^\d+$/.test(rawModulus) || BigInt(rawModulus) < 2n) {
+      return { error: 'Введите делитель десятичными цифрами. Он должен быть целым числом от 2.', field: modulusInput };
+    }
+
+    return { base, record, modulus: BigInt(rawModulus) };
+  }
+
+  function revealContributions() {
+    const { base, record, modulus, error: problem } = readInput();
+    if (problem) return;
+
+    let total = 0n;
+    let sumOfRemainders = 0n;
+    let oddCount = 0;
+    const parityMode = modulus === 2n;
+    expression.innerHTML = Array.from(record, (symbol, index) => {
+      const place = record.length - index - 1;
+      const digit = digits.indexOf(symbol);
+      const weight = BigInt(base) ** BigInt(place);
+      const contribution = BigInt(digit) * weight;
+      const remainder = contribution % modulus;
+      total += contribution;
+      sumOfRemainders += remainder;
+      if (parityMode && remainder !== 0n) oddCount += 1;
+
+      const highlight = remainder === 0n ? '' : parityMode ? ' p8-odd' : ' p8-nonzero';
+      const marker = parityMode ? (remainder === 0n ? 'Чётный вклад' : 'Нечётный вклад') : `Остаток веса ${decimal.format(weight % modulus)} · цифра ${digit} → остаток ${decimal.format(remainder)}`;
+      return `
+        <li class="p8-term${highlight}" data-place="${place}">
+          <span class="p8-rank">Разряд ${place}${digit >= 10 ? ` · ${symbol} = ${digit}` : ''}</span>
+          <div class="p8-operation">${index > 0 ? '<span aria-hidden="true">+</span>' : ''}<span>${digit} · ${base}<sup>${place}</sup> =</span> <strong>${decimal.format(contribution)}</strong></div>
+          <span class="p8-marker">${marker}</span>
+        </li>`;
+    }).join('');
+
+    const remainder = sumOfRemainders % modulus;
+    const number = `<b>${record}<sub>${base}</sub> = ${decimal.format(total)}<sub>10</sub></b>`;
+    if (parityMode) {
+      const parity = remainder === 0n ? 'чётное' : 'нечётное';
+      result.innerHTML = `<p>Нечётных вкладов ${oddCount}, поэтому ${number} — <b>${parity} число</b>. Остаток от деления на 2 равен <b>${remainder}</b>.</p>`;
+    } else {
+      const verdict = remainder === 0n ? 'кратно' : 'не кратно';
+      result.innerHTML = `<p>Сумма остатков вкладов равна ${decimal.format(sumOfRemainders)}. При делении этой суммы на ${decimal.format(modulus)} остаток равен <b>${decimal.format(remainder)}</b>. Поэтому ${number} ${verdict} ${decimal.format(modulus)}.</p>`;
+    }
+    model.hidden = false;
+    revealButton.setAttribute('aria-expanded', 'true');
+  }
+
+  function refresh() {
+    const input = readInput();
+    error.textContent = input.error ?? '';
+    error.hidden = !input.error;
+    recordInput.setAttribute('aria-invalid', String(input.field === recordInput));
+    modulusInput.setAttribute('aria-invalid', String(input.field === modulusInput));
+    revealButton.disabled = Boolean(input.error);
+    revealButton.textContent = input.modulus === 2n ? 'Анализ чётности' : 'Разобрать остаток';
+    revealButton.setAttribute('aria-expanded', 'false');
+    model.hidden = true;
+    expression.replaceChildren();
+    result.replaceChildren();
+  }
+
+  revealButton.addEventListener('click', revealContributions);
+  baseInput.addEventListener('change', refresh);
+  recordInput.addEventListener('input', refresh);
+  modulusInput.addEventListener('input', refresh);
+  refresh();
+})();
+</script>
+<script>
+(function () {
+  function mountCounter() {
+    const root = document.getElementById('ctr8');
+    if (!root || root.dataset.ctr8Mounted) return;
+    root.dataset.ctr8Mounted = 'true';
+
+    const baseSelect = root.querySelector('[data-ctr8-select="base"]');
+    const widthSelect = root.querySelector('[data-ctr8-select="width"]');
+    const modulusReadout = root.querySelector('[data-ctr8-modulus]');
+    const rangeReadout = root.querySelector('[data-ctr8-range]');
+    const digits = root.querySelector('[data-ctr8-digits]');
+    const radixLabel = root.querySelector('[data-ctr8-radix]');
+    const decimal = root.querySelector('[data-ctr8-decimal]');
+    const parity = root.querySelector('[data-ctr8-parity]');
+    const trace = root.querySelector('[data-ctr8-trace]');
+    const announcement = root.querySelector('[data-ctr8-announcement]');
+    let base = 2;
+    let width = 3;
+    let value = 0n;
+
+    function fillSelect(select, low, high, selected) {
+      const options = document.createDocumentFragment();
+      for (let current = low; current <= high; current++) {
+        const option = document.createElement('option');
+        option.value = String(current);
+        option.textContent = String(current);
+        option.selected = current === selected;
+        options.append(option);
+      }
+      select.replaceChildren(options);
+    }
+
+    function modulus() {
+      return BigInt(base) ** BigInt(width);
+    }
+
+    function baseDigits(number) {
+      return number.toString(base).toUpperCase();
+    }
+
+    function fixedDigits(number) {
+      return baseDigits(number).padStart(width, '0');
+    }
+
+    function text(tag, value, className) {
+      const node = document.createElement(tag);
+      node.textContent = value;
+      if (className) node.className = className;
+      return node;
+    }
+
+    function notation(written, radix = base) {
+      const node = text('span', written);
+      node.append(text('sub', radix));
+      return node;
+    }
+
+    function equation(...parts) {
+      const line = text('p', '', 'ctr8-equation');
+      line.append(...parts);
+      return line;
+    }
+
+    function updateReadout({ wrapped = false, explanation = '' } = {}) {
+      const capacity = modulus();
+      const written = fixedDigits(value);
+      const even = value % 2n === 0n;
+      modulusReadout.replaceChildren(String(base), text('sup', width), ` = ${capacity}`);
+      rangeReadout.textContent = `От 0 до ${capacity - 1n}`;
+      digits.style.setProperty('--ctr8-k', width);
+      const cellClass = wrapped ? 'ctr8-cell ctr8-cell-wrapped' : 'ctr8-cell';
+      digits.replaceChildren(...[...written].map(digit => text('span', digit, cellClass)));
+      radixLabel.textContent = String(base);
+      decimal.textContent = `${value} в десятичной системе`;
+      parity.textContent = even ? 'Чётное' : 'Нечётное';
+      announcement.textContent = `${explanation ? explanation + ' ' : ''}Запись ${written} в основании ${base}. Значение ${value}, ${even ? 'чётное' : 'нечётное'}.`;
+    }
+
+    function retainedDigits(written, removed = 0) {
+      const row = text('div', '', 'ctr8-trace-digits');
+      row.style.setProperty('--ctr8-k', written.length);
+      row.setAttribute('aria-hidden', 'true');
+      row.append(...[...written].map((digit, index) => text('span', digit, `ctr8-trace-cell ${index < removed ? 'ctr8-drop' : 'ctr8-keep'}`)));
+      return row;
+    }
+
+    function step(delta) {
+      const previous = fixedDigits(value);
+      const limit = modulus();
+      const raw = value + delta;
+      const symbol = delta > 0n ? '+' : '−';
+      if (raw === limit) {
+        const full = baseDigits(raw);
+        value = 0n;
+        trace.replaceChildren(
+          equation(notation(previous), '+', notation('1'), '=', notation(full)),
+          retainedDigits(full, full.length - width),
+          text('p', 'Старшая цифра вышла за пределы счётчика. Сохраняем младшие цифры по числу ячеек.'),
+        );
+        updateReadout({ wrapped: true, explanation: `Полный результат ${full}. Старшая цифра отброшена.` });
+        return;
+      }
+
+      if (raw === -1n) {
+        value = raw + limit;
+        trace.replaceChildren(
+          equation(notation(previous), '−', notation('1'), '=', notation('−1', 10)),
+          equation(notation('−1', 10), '+', notation(String(limit), 10), '=', notation(String(value), 10), '=', notation(fixedDigits(value))),
+          retainedDigits(fixedDigits(value)),
+          text('p', 'Прибавляем модуль и записываем полученный остаток в ячейки счётчика.'),
+        );
+        updateReadout({ wrapped: true, explanation: `Минус один плюс модуль ${limit} даёт ${value}.` });
+        return;
+      }
+
+      value = raw;
+      trace.replaceChildren(equation(notation(previous), symbol, notation('1'), '=', notation(fixedDigits(value))));
+      updateReadout();
+    }
+
+    function changeSettings() {
+      base = Number(baseSelect.value);
+      width = Number(widthSelect.value);
+      const before = value;
+      const limit = modulus();
+      value %= limit;
+      if (before !== value) {
+        const explanation = `В новом диапазоне ${before} даёт остаток ${value} по модулю ${limit}.`;
+        trace.replaceChildren(text('p', explanation));
+        updateReadout({ explanation });
+      } else {
+        trace.replaceChildren(text('p', 'Прибавь или вычти единицу, чтобы проверить новый диапазон.'));
+        updateReadout();
+      }
+    }
+
+    fillSelect(baseSelect, 2, 20, base);
+    fillSelect(widthSelect, 1, 8, width);
+    baseSelect.addEventListener('change', changeSettings);
+    widthSelect.addEventListener('change', changeSettings);
+    root.querySelector('[data-ctr8-action="minus"]').addEventListener('click', () => step(-1n));
+    root.querySelector('[data-ctr8-action="plus"]').addEventListener('click', () => step(1n));
+    root.querySelector('[data-ctr8-action="max"]').addEventListener('click', () => {
+      value = modulus() - 1n;
+      trace.replaceChildren(text('p', 'Теперь прибавь единицу, чтобы увидеть переход через верхнюю границу.'));
+      updateReadout({ explanation: 'Выбрано максимальное значение.' });
+    });
+    updateReadout();
+  }
+
+  if (document.readyState === 'loading' && !document.getElementById('ctr8')) {
+    document.addEventListener('DOMContentLoaded', mountCounter, { once: true });
+  } else {
+    mountCounter();
+  }
+})();
+</script>
+</body>
+</html>

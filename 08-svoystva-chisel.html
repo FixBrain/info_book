@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>9. Свойства чисел и их записей</title>
+<title>9. Разрядность и диапазоны</title>
 <style>
 :root{--accent:#2563eb;--bg:#f7f8fa;--card:#fff;--line:#e3e7ee;--ink:#1f2430;--muted:#5b6472}
 *{box-sizing:border-box}
@@ -49,14 +49,7 @@ button:disabled{opacity:.55;cursor:default}
 .prop-range>div{display:grid;gap:3px;justify-items:center;text-align:center;padding:10px;border:1px solid var(--line);background:var(--card);border-radius:12px}
 .prop-range>div span{font-size:14px;color:var(--muted)}
 .prop-range>div b{font-size:22px;color:var(--accent)}
-.prop-odd{background:#ffe2a6;color:#57370b;border-radius:5px;padding:1px 4px}
 @media(max-width:540px){.prop-range{grid-template-columns:minmax(0,1fr)}.formula{font-size:17px}}
-.residue-parts{display:flex;flex-wrap:wrap;justify-content:center;align-items:stretch;gap:8px;margin:12px 0;padding:0;list-style:none}
-.residue-parts li{display:grid;justify-items:center;gap:2px;padding:8px 12px;border:1px solid #bcd0ff;border-radius:9px;background:#e8f0ff;text-align:center}
-.residue-parts li:last-child{border-color:#e9bb5f;background:#fff3ce}
-.residue-parts strong{font-size:21px;line-height:1.35}
-.residue-parts small{color:var(--muted)}
-.residue-mod li{margin:.55em 0}
 
 .int8-table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
 .int8-table th,.int8-table td{padding:8px 6px;text-align:left;vertical-align:top;border-bottom:1px solid #d6e4ff}
@@ -73,378 +66,6 @@ button:disabled{opacity:.55;cursor:default}
 .int8-values li{min-width:2.2em;max-width:100%;border:1px solid #bcd0ff;border-radius:8px;background:#eef4ff;padding:3px 8px;text-align:center}
 .int8-values li.int8-out{border-color:var(--line);background:var(--bg);color:var(--muted)}
 @media(max-width:540px){.int8-table{font-size:14px}.int8-table th,.int8-table td{padding:6px 4px}}
-
-#p8-parity {
-  --p8-line: #e3e7ee;
-  --p8-ink: #1f2430;
-  --p8-muted: #5b6472;
-  --p8-odd-line: #b47c13;
-  --p8-odd-paper: #fff3ce;
-  --p8-odd-text: #644400;
-  min-inline-size: 0;
-}
-
-.p8-panel {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 9px 14px;
-  align-items: flex-end;
-  border: 1px solid var(--p8-line);
-  border-radius: 16px;
-  padding: 10px 13px;
-  background: #fff;
-  box-shadow: 0 2px 8px rgba(20, 30, 60, .06);
-}
-
-.p8-field {
-  display: grid;
-  gap: 3px;
-  color: var(--p8-muted);
-  font-size: 14px;
-}
-
-.p8-field select { min-inline-size: 4em; }
-.p8-field input {
-  width: 132px;
-  max-width: 100%;
-  font-family: Consolas, Menlo, monospace;
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: .07em;
-  text-transform: uppercase;
-}
-.p8-field input[aria-invalid="true"] { border-color: #a92620; }
-.p8-error { color: #a92620; overflow-wrap: anywhere; }
-.p8-notation { color: var(--p8-muted); font-size: 15px; }
-
-.p8-expression {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: stretch;
-  gap: 10px;
-  list-style: none;
-  padding: 0;
-  margin: 12px 0 14px;
-}
-
-.p8-term {
-  flex: 1 1 142px;
-  max-inline-size: 240px;
-  min-inline-size: 0;
-  display: grid;
-  grid-template-rows: auto minmax(2.5em, 1fr) auto;
-  align-items: center;
-  gap: 4px;
-  border: 1.5px solid var(--p8-line);
-  border-radius: 13px;
-  padding: 7px 8px;
-  background: #fff;
-  color: var(--p8-ink);
-  text-align: center;
-  animation: p8-reveal .24s ease-out;
-}
-
-.p8-term.p8-odd {
-  border-color: var(--p8-odd-line);
-  background: var(--p8-odd-paper);
-}
-
-.p8-rank { color: var(--p8-muted); font-size: 13px; }
-.p8-operation {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: baseline;
-  gap: .1em .3em;
-  font-size: 18px;
-  font-variant-numeric: tabular-nums;
-}
-.p8-operation strong { overflow-wrap: anywhere; }
-.p8-marker { min-block-size: 1.5em; font-size: 13px; color: var(--p8-muted); }
-.p8-odd .p8-marker { color: var(--p8-odd-text); font-weight: 750; }
-
-.p8-reveal { margin-top: 12px; }
-
-.p8-result p {
-  margin: 9px 0 0;
-  padding: 7px 11px;
-  border: 1px solid #99b7f8;
-  border-radius: 11px;
-  background: #eef4ff;
-  overflow-wrap: anywhere;
-}
-
-@keyframes p8-reveal {
-  from { opacity: .45; }
-  to { opacity: 1; }
-}
-
-@media (max-width: 540px) {
-  .p8-panel { padding: 8px 10px; }
-  .p8-expression { gap: 8px; }
-  .p8-term { flex-basis: 118px; padding: 6px; }
-  .p8-operation { font-size: 16px; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .p8-term { animation: none; }
-}
-#ctr8 {
-  --ctr8-accent: var(--accent, #32644a);
-  --ctr8-line: color-mix(in srgb, var(--ctr8-accent) 25%, transparent);
-  --ctr8-tint: color-mix(in srgb, var(--ctr8-accent) 9%, transparent);
-  --ctr8-strong-tint: color-mix(in srgb, var(--ctr8-accent) 19%, transparent);
-  box-sizing: border-box;
-  display: grid;
-  gap: 0.85rem;
-  min-width: 0;
-}
-
-#ctr8 > h3,
-#ctr8 .ctr8-reading-note,
-#ctr8 .ctr8-trace p,
-#ctr8 .ctr8-facts,
-#ctr8 .ctr8-facts dd {
-  margin: 0;
-}
-
-#ctr8 .ctr8-settings,
-#ctr8 .ctr8-facts {
-  display: grid;
-  gap: 0.5rem 0.75rem;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  width: min(100%, 34rem);
-}
-
-#ctr8 .ctr8-field {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 0.45rem;
-  font-weight: 650;
-  min-width: 0;
-}
-
-#ctr8 .ctr8-field select,
-#ctr8 .ctr8-button {
-  box-sizing: border-box;
-  padding: 0.45rem 0.65rem;
-  min-height: 2.75rem;
-  border: 1px solid var(--ctr8-line);
-  border-radius: 0.65rem;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  font-weight: 700;
-}
-
-#ctr8 .ctr8-field select {
-  min-width: 3.6rem;
-  background: var(--surface, Canvas);
-  color: var(--ink, CanvasText);
-}
-
-#ctr8 .ctr8-button {
-  cursor: pointer;
-}
-
-#ctr8 .ctr8-button:hover {
-  background: var(--ctr8-strong-tint);
-}
-
-#ctr8 .ctr8-button-primary {
-  background: var(--ctr8-accent);
-  color: var(--on-accent, #fff);
-  border-color: var(--ctr8-accent);
-}
-
-#ctr8 .ctr8-button-primary:hover {
-  background: color-mix(in srgb, var(--ctr8-accent) 88%, #000);
-}
-
-#ctr8 .ctr8-button:focus-visible,
-#ctr8 .ctr8-field select:focus-visible {
-  outline: 2px solid var(--ctr8-accent);
-  outline-offset: 3px;
-}
-
-#ctr8 .ctr8-facts > div {
-  min-width: 0;
-  padding: 0.5rem 0.7rem;
-  border-radius: 0.6rem;
-  background: var(--ctr8-tint);
-}
-
-#ctr8 .ctr8-facts dt {
-  font-size: 0.86rem;
-}
-
-#ctr8 .ctr8-facts dd {
-  font-weight: 700;
-  overflow-wrap: anywhere;
-  font-variant-numeric: tabular-nums;
-}
-
-#ctr8 .ctr8-mechanism,
-#ctr8 .ctr8-reading {
-  min-width: 0;
-  display: grid;
-  gap: 0.6rem;
-  justify-items: start;
-}
-
-#ctr8 .ctr8-reading {
-  width: 100%;
-}
-
-#ctr8 .ctr8-reading-main {
-  display: flex;
-  align-items: end;
-  gap: 0.35rem;
-  min-width: 0;
-  max-width: 100%;
-}
-
-#ctr8 .ctr8-digits,
-#ctr8 .ctr8-trace-digits {
-  display: grid;
-  grid-template-columns: repeat(var(--ctr8-k), minmax(0, 1fr));
-  gap: clamp(2px, 0.85vw, 7px);
-  min-width: 0;
-}
-
-#ctr8 .ctr8-cell,
-#ctr8 .ctr8-trace-cell {
-  display: grid;
-  place-items: center;
-  box-sizing: border-box;
-  width: clamp(1rem, 6.8vw, 2.8rem);
-  height: clamp(1.9rem, 11vw, 3.2rem);
-  min-width: 0;
-  border: 1px solid var(--ctr8-line);
-  border-radius: clamp(0.2rem, 1.5vw, 0.55rem);
-  background: var(--ctr8-tint);
-  font: 700 clamp(0.95rem, 3.8vw, 1.65rem)/1 ui-monospace, Menlo, Consolas, monospace;
-  font-variant-numeric: tabular-nums;
-}
-
-#ctr8 .ctr8-radix {
-  align-self: end;
-  position: static;
-  font-size: 0.85rem;
-  line-height: 1;
-}
-
-#ctr8 .ctr8-reading-note,
-#ctr8 .ctr8-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.35rem 0.55rem;
-}
-
-#ctr8 .ctr8-reading-note {
-  font-size: 0.9rem;
-}
-
-#ctr8 [data-ctr8-parity] {
-  border-radius: 0.4rem;
-  padding: 0.13rem 0.4rem;
-  background: var(--ctr8-strong-tint);
-  font-weight: 650;
-}
-
-#ctr8 .ctr8-trace {
-  box-sizing: border-box;
-  min-width: 0;
-  display: grid;
-  gap: 0.4rem;
-  padding: 0.65rem 0.75rem;
-  border-left: 3px solid var(--ctr8-accent);
-  border-radius: 0.35rem;
-  background: var(--ctr8-tint);
-  overflow-wrap: anywhere;
-}
-
-#ctr8 .ctr8-equation {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.1rem 0.32rem;
-  font-variant-numeric: tabular-nums;
-  font-weight: 700;
-}
-
-#ctr8 .ctr8-trace-digits {
-  width: max-content;
-  max-width: 100%;
-}
-
-#ctr8 .ctr8-trace-cell {
-  width: clamp(0.95rem, 6.3vw, 2rem);
-  height: clamp(1.4rem, 8vw, 2.1rem);
-  font-size: clamp(0.85rem, 3.4vw, 1.15rem);
-}
-
-#ctr8 .ctr8-drop {
-  opacity: 0.52;
-  text-decoration: line-through;
-  animation: ctr8-drop 560ms ease both;
-}
-
-#ctr8 .ctr8-keep {
-  background: var(--ctr8-strong-tint);
-  border-color: var(--ctr8-accent);
-  animation: ctr8-keep 650ms 100ms ease both;
-}
-
-#ctr8 .ctr8-cell-wrapped {
-  animation: ctr8-arrive 610ms ease both;
-}
-
-#ctr8 .ctr8-visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  white-space: nowrap;
-  clip-path: inset(50%);
-  border: 0;
-}
-
-@keyframes ctr8-drop {
-  0% { opacity: 1; transform: translateX(0); }
-  100% { opacity: 0.52; transform: translateX(-2px); }
-}
-
-@keyframes ctr8-keep {
-  0% { filter: saturate(0.2); transform: translateY(-3px); }
-  60% { filter: saturate(1.3); }
-  100% { filter: saturate(1); transform: translateY(0); }
-}
-
-@keyframes ctr8-arrive {
-  0%, 30% { opacity: 0.4; transform: translateY(-3px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-
-@media (max-width: 420px) {
-  #ctr8 .ctr8-field {
-    grid-template-columns: minmax(0, 1fr);
-    align-content: start;
-    justify-items: start;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  #ctr8 .ctr8-drop,
-  #ctr8 .ctr8-keep,
-  #ctr8 .ctr8-cell-wrapped {
-    animation: none;
-  }
-}
 </style>
 </head>
 <body>
@@ -460,7 +81,8 @@ button:disabled{opacity:.55;cursor:default}
     <a href="06a-perevod-mezhdu-sistemami.html">6А. Перевод между системами</a>
     <a href="07-slozhenie-i-vychitanie.html">7. Сложение</a>
     <a href="08-vychitanie.html">8. Вычитание</a>
-    <a href="08-svoystva-chisel.html" aria-current="page">9. Свойства чисел</a>
+    <a href="08-svoystva-chisel.html" aria-current="page">9. Разрядность и диапазоны</a>
+    <a href="09a-kratnost-i-ostatki.html">9А. Кратность и остатки</a>
     <a href="09-alternativnye-alfavity.html">10. Альтернативные алфавиты</a>
     <a href="10-numeratsiya-slov.html">11. Сравнение и нумерация слов</a>
     <a href="11-itogi.html">12. Итоги</a>
@@ -470,8 +92,8 @@ button:disabled{opacity:.55;cursor:default}
   </nav>
 </header>
 <main>
-  <h1>9. Свойства чисел и их записей</h1>
-  <p class="lead">Сначала выясним, какие числа помещаются в заданное число разрядов и как считать целые в диапазоне. Затем разберём, как по записи числа определять его чётность и остаток от деления.</p>
+  <h1>9. Разрядность и диапазоны</h1>
+  <p class="lead">Какие числа можно записать на трёх двоичных позициях? Сколько из них имеют ровно три цифры в обычной записи? Чтобы ответить на эти вопросы, найдём крайние значения и научимся считать целые между ними.</p>
 
   <h2 id="length-and-range">Количество разрядов и диапазон</h2>
   <p>Возьмём положительное число с <i>k</i> цифрами в основании <i>N</i>. Старшая цифра стоит в разряде с весом <i>N</i><sup><i>k</i>−1</sup>. Поставим там 1, а в остальные разряды — нули. Получится самое маленькое число с такой длиной.</p>
@@ -491,7 +113,12 @@ button:disabled{opacity:.55;cursor:default}
   <h2 id="integer-range">Количество целых чисел в диапазоне от <i>a</i> до <i>b</i></h2>
   <p>Пусть <i>a</i> и <i>b</i> — целые числа, <i>a</i> ≤ <i>b</i>. Перечислим целые от −2 до 3 включительно. Получим ряд −2, −1, 0, 1, 2, 3. От первого числа до последнего делаем пять шагов по единице. Чтобы получить количество чисел, к числу шагов прибавляем 1 за начальное число.</p>
   <p class="formula"><i>b</i> − <i>a</i> + 1</p>
-  <p>По этому правилу можно пересчитать трёхразрядные двоичные числа из предыдущего примера. От 4 до 7 включительно их 7 − 4 + 1 = 4.</p>
+  <div class="example" id="numbers-by-length">
+    <h3>Сколько чисел имеют заданную длину?</h3>
+    <p>Вернёмся к трём двоичным позициям. У положительных чисел с обычной записью из трёх цифр границы 4 и 7. Обе включены, поэтому таких чисел 7 − 4 + 1 = <b>4</b>. Если разрешить ведущие нули, границы 0 и 7 и получается <b>8</b> чисел.</p>
+    <p>В основании <i>N</i> границы для положительных чисел с <i>k</i> цифрами равны <i>N</i><sup><i>k</i>−1</sup> и <i>N</i><sup><i>k</i></sup> − 1. Применим то же правило.</p>
+    <p class="formula">(<i>N</i><sup><i>k</i></sup> − 1) − <i>N</i><sup><i>k</i>−1</sup> + 1 = <b><i>N</i><sup><i>k</i></sup> − <i>N</i><sup><i>k</i>−1</sup></b></p>
+  </div>
   <p>Если <i>a</i> исключаем, начинаем с <i>a</i> + 1. Если <i>b</i> исключаем, заканчиваем на <i>b</i> − 1. После этого снова считаем от первой до последней границы включительно. Если первая получилась больше последней, подходящих целых нет.</p>
 
   <div class="example">
@@ -530,126 +157,22 @@ button:disabled{opacity:.55;cursor:default}
     </div>
   </section>
 
-  <h2 id="parity">Чётность числа</h2>
-  <p>Развернём запись в сумму вкладов цифр. Каждый чётный вклад даёт остаток 0 при делении на 2. Нечётный вклад даёт остаток 1. Два нечётных вклада вместе дают чётную сумму, поэтому <b>чётность числа определяется количеством нечётных вкладов</b>.</p>
-  <div class="example">
-    <h3>Чётное основание</h3>
-    <p>Вес единиц равен 1. Остальные веса <i>N</i>, <i>N</i><sup>2</sup> и дальше кратны 2, поэтому их вклады чётны. Достаточно посмотреть на последнюю цифру.</p>
-    <p class="formula">135<sub>6</sub> = 1 · 36 + 3 · 6 + <mark class="prop-odd">5 · 1</mark></p>
-    <p>Вклады 36 и 18 чётные, а вклад единиц 5 нечётный. Всё число нечётное.</p>
-  </div>
-  <div class="example">
-    <h3>Нечётное основание</h3>
-    <p>Все веса <i>N</i><sup><i>i</i></sup> нечётны. Вклад нечётен, если его цифра нечётна. Поэтому можно сложить цифры и проверить чётность их суммы.</p>
-    <p class="formula">12<sub>3</sub> = <mark class="prop-odd">1 · 3</mark> + 2 · 1 = 5<sub>10</sub></p>
-    <p>Первый вклад нечётный, второй чётный. Тот же результат даёт сумма цифр 1 + 2 = 3. При смене основания обе записи числа дают одну и ту же чётность.</p>
-  </div>
-
-  <section class="interactive" id="p8-parity" aria-labelledby="p8-heading">
-    <h3 id="p8-heading">Ищем нечётные вклады</h3>
-    <p>Выбери основание и введи число. По кнопке «Анализ чётности» появится развёрнутая запись, в которой выделены все нечётные вклады.</p>
-
-    <div class="p8-panel">
-      <label class="p8-field" for="p8-base">Основание
-        <select id="p8-base"><option value="3" selected>3</option></select>
-      </label>
-      <label class="p8-field" for="p8-record">Неотрицательное целое число
-        <input id="p8-record" type="text" value="121" autocomplete="off" spellcheck="false" autocapitalize="characters" aria-describedby="p8-error">
-      </label>
-    </div>
-    <p class="p8-error" id="p8-error" role="alert" hidden></p>
-
-    <button class="p8-reveal" id="p8-reveal" type="button" aria-expanded="false" aria-controls="p8-model" disabled>Анализ чётности</button>
-    <div id="p8-model" hidden>
-      <p class="p8-notation">В каждом слагаемом значение цифры умножается на вес разряда. Значения цифр и вкладов даны в десятичной системе.</p>
-      <ol class="p8-expression" id="p8-expression" aria-label="Развёрнутая запись по разрядам"></ol>
-    </div>
-    <div class="p8-result" id="p8-result" role="status" aria-atomic="true"></div>
+  <section class="selfcheck" aria-labelledby="range-check-title">
+    <h3 id="range-check-title">Проверь себя</h3>
+    <details>
+      <summary>Сколько положительных чисел имеют ровно две цифры в основании 5?</summary>
+      <p>Самое маленькое число 10<sub>5</sub> = 5, самое большое 44<sub>5</sub> = 24. Обе границы включены. Получаем 24 − 5 + 1 = <b>20</b>.</p>
+    </details>
+    <details>
+      <summary>Сколько целых чисел удовлетворяют условию −2 &lt; <i>x</i> ≤ 3?</summary>
+      <p>Первое подходящее число −1, последнее 3. Получаем 3 − (−1) + 1 = <b>5</b>.</p>
+    </details>
   </section>
 
-  <h2 id="residues">От последних цифр к кольцам остатков</h2>
-  <h3>Остаток от деления на <i>N</i><sup><i>k</i></sup></h3>
-  <p>Оставим <i>k</i> младших разрядов в позиционной записи неотрицательного целого числа <i>x</i>. Пусть они обозначают число <i>r</i>. Веса всех отброшенных разрядов кратны <i>N</i><sup><i>k</i></sup>, поэтому их вклады в сумме дают <i>qN</i><sup><i>k</i></sup> для целого <i>q</i>. Число <i>r</i> помещается в <i>k</i> позициях, значит</p>
-  <p class="formula"><i>x</i> = <i>qN</i><sup><i>k</i></sup> + <i>r</i>, &nbsp; 0 ≤ <i>r</i> &lt; <i>N</i><sup><i>k</i></sup>.</p>
-  <p>Значит, <b>последние <i>k</i> цифр дают остаток от деления на <i>N</i><sup><i>k</i></sup></b>. Если все они нули, число делится на <i>N</i><sup><i>k</i></sup>. Запись короче <i>k</i> цифр можно мысленно выровнять нулями слева.</p>
-  <div class="example" id="residue-two-moduli">
-    <h3>Одна запись, два модуля</h3>
-    <p>У 431<sub>5</sub> последняя цифра 1, поэтому остаток от деления на 5 равен 1. Для сравнения остатков по модулям 25 и 7 разложим число на старшую часть и две младшие цифры.</p>
-    <ul class="residue-parts" aria-label="Вклады старшей и младшей частей числа">
-      <li><strong>4</strong><small>Старшая часть</small><b>4 · 25 = 100</b></li>
-      <li><strong>31<sub>5</sub></strong><small>Две младшие цифры</small><b>3 · 5 + 1 = 16</b></li>
-    </ul>
-    <p class="formula">431<sub>5</sub> = 100 + 16 = 116<sub>10</sub></p>
-    <ul class="residue-mod">
-      <li><b>Модуль 25.</b> Старший вклад 100 делится на 25. После его удаления остаётся 16. Это остаток, потому что 0 ≤ 16 &lt; 25.</li>
-      <li><b>Модуль 7.</b> Старший вклад 100 даёт остаток 2, поэтому его нужно учесть. У всего числа остаток <b>4</b>, так как 116 = 16 · 7 + 4. Только две младшие цифры дали бы другой остаток <b>2</b>, так как 16 = 2 · 7 + 2.</li>
-    </ul>
-  </div>
-
-  <h3>Счёт при фиксированном числе разрядов</h3>
-  <p>Отведём три двоичные позиции. При сложении 111<sub>2</sub> + 001<sub>2</sub> получается 1000<sub>2</sub>. В трёх младших позициях остаётся <b>000<sub>2</sub></b>. Это остаток от деления на 2<sup>3</sup> = 8.</p>
-  <p>При счёте назад из 000<sub>2</sub> попадаем в 111<sub>2</sub>. Разность равна −1, а −1 = (−1) · 8 + 7, поэтому остаток — 7. В этом примере <b>2 — основание записи, 8 — модуль</b>.</p>
-
-  <section class="interactive" id="ctr8" aria-labelledby="ctr8-title">
-    <h3 id="ctr8-title">Счётчик с фиксированной разрядностью</h3>
-    <div class="ctr8-settings">
-      <label class="ctr8-field">
-        <span>Основание <var>N</var></span>
-        <select data-ctr8-select="base"><option value="2">2</option></select>
-      </label>
-      <label class="ctr8-field">
-        <span>Разрядов <var>k</var></span>
-        <select data-ctr8-select="width"><option value="3">3</option></select>
-      </label>
-    </div>
-    <dl class="ctr8-facts">
-      <div>
-        <dt>Модуль <var>N</var><sup><var>k</var></sup></dt>
-        <dd data-ctr8-modulus>2³ = 8</dd>
-      </div>
-      <div>
-        <dt>Диапазон значений</dt>
-        <dd data-ctr8-range>От 0 до 7</dd>
-      </div>
-    </dl>
-    <div class="ctr8-mechanism">
-      <div class="ctr8-reading">
-        <div class="ctr8-reading-main">
-          <div class="ctr8-digits" data-ctr8-digits aria-hidden="true" style="--ctr8-k:3">
-            <span class="ctr8-cell">0</span><span class="ctr8-cell">0</span><span class="ctr8-cell">0</span>
-          </div>
-          <sub class="ctr8-radix" data-ctr8-radix aria-hidden="true">2</sub>
-        </div>
-        <p class="ctr8-reading-note"><span data-ctr8-decimal>0 в десятичной системе</span> <span data-ctr8-parity>Чётное</span></p>
-      </div>
-      <div class="ctr8-actions">
-        <button class="ctr8-button" type="button" data-ctr8-action="minus" aria-label="Вычесть единицу">−1</button>
-        <button class="ctr8-button ctr8-button-primary" type="button" data-ctr8-action="plus" aria-label="Прибавить единицу">+1</button>
-        <button class="ctr8-button" type="button" data-ctr8-action="max">К максимуму</button>
-      </div>
-    </div>
-    <div class="ctr8-trace" data-ctr8-trace>
-      <p>Перейди к максимуму, затем прибавь единицу. Вычти единицу из нуля, чтобы увидеть обратный переход.</p>
-    </div>
-    <p class="ctr8-visually-hidden" data-ctr8-announcement aria-live="polite" aria-atomic="true">Запись 000 в основании 2. Значение 0, чётное.</p>
-  </section>
-
-  <h3>Действия с классами вычетов</h3>
-  <p>Зафиксируем модуль <i>m</i>. Числа с одинаковым остатком при делении на <i>m</i> образуют <b class="term">класс вычетов</b>. Например, по модулю 8 числа 5, 13 и 21 принадлежат одному классу. У всех остаток 5, а в двоичной записи у всех три последние цифры <b>101</b>.</p>
-  <p>Запись <i>a</i> ≡ <i>b</i> (mod <i>m</i>) означает, что <i>a</i> и <i>b</i> дают одинаковый остаток при делении на <i>m</i>.</p>
-  <p>В <b class="term">кольце остатков</b> классы можно складывать, вычитать и умножать. Чтобы выполнить действие, берём по одному представителю каждого класса, считаем и находим остаток. По модулю 8 получаем</p>
-  <p class="formula">7 + 3 ≡ 2, &nbsp; 2 − 5 ≡ 5, &nbsp; 5 · 3 ≡ 7 &nbsp; (mod 8).</p>
-  <div class="note">
-    <h3>Почему можно брать любые представители</h3>
-    <p>Заменим <i>a</i> на <i>a</i> + <i>um</i>, а <i>b</i> на <i>b</i> + <i>vm</i>. Сумма изменится на <i>m</i>(<i>u</i> + <i>v</i>), а разность — на <i>m</i>(<i>u</i> − <i>v</i>). Для произведения получаем</p>
-    <p class="formula">(<i>a</i> + <i>um</i>)(<i>b</i> + <i>vm</i>) − <i>ab</i> = <i>m</i>(<i>ub</i> + <i>va</i> + <i>uvm</i>).</p>
-    <p>Каждое изменение кратно <i>m</i>. Поэтому результат действия принадлежит одному и тому же классу при любом выборе представителей.</p>
-  </div>
-  <p>Кольцо остатков можно построить для любого модуля <i>m</i> ≥ 2. При <i>m</i> = <i>N</i><sup><i>k</i></sup> остаток сразу виден по записи числа — это его <i>k</i> младших разрядов.</p>
+  <p class="note">В главе 9А разберём <a id="residues" href="09a-kratnost-i-ostatki.html#residues">кратность и остатки</a>, включая <a id="parity" href="09a-kratnost-i-ostatki.html#parity">чётность</a> как частный случай. Там же находятся модели <a id="p8-parity" href="09a-kratnost-i-ostatki.html#p8-parity">анализа чётности</a> и <a id="ctr8" href="09a-kratnost-i-ostatki.html#ctr8">счётчика с фиксированной разрядностью</a>.</p>
   <nav class="pager" aria-label="Соседние главы">
-    <a href="08-vychitanie.html">← Назад: вычитание</a>
-    <a href="proverka-2.html">Проверочная работа 2</a>
-    <a href="09-alternativnye-alfavity.html">Дальше: альтернативные алфавиты →</a>
+    <a href="08-vychitanie.html">← 8. Вычитание</a>
+    <a href="09a-kratnost-i-ostatki.html">9А. Кратность и остатки →</a>
   </nav>
 </main>
 <script>
@@ -721,239 +244,6 @@ button:disabled{opacity:.55;cursor:default}
   includeLeft.addEventListener('change', update);
   includeRight.addEventListener('change', update);
   update();
-})();
-</script>
-<script>
-(() => {
-  'use strict';
-
-  const digits = '0123456789ABCDEFGHIJ';
-  const decimal = new Intl.NumberFormat('ru-RU');
-  const byId = (id) => document.getElementById(id);
-  const baseInput = byId('p8-base');
-  const recordInput = byId('p8-record');
-  const model = byId('p8-model');
-  const error = byId('p8-error');
-  const expression = byId('p8-expression');
-  const revealButton = byId('p8-reveal');
-  const result = byId('p8-result');
-
-  baseInput.replaceChildren(...Array.from({ length: 19 }, (_, index) => {
-    const base = index + 2;
-    return new Option(String(base), String(base), base === 3, base === 3);
-  }));
-
-  function readInput() {
-    const base = Number(baseInput.value);
-    const record = recordInput.value.trim().toUpperCase();
-    if (!record || record.length > 8) return { error: 'Введите запись целого числа длиной от одной до восьми цифр.' };
-
-    const unsupported = Array.from(record).find((symbol) => digits.indexOf(symbol) < 0 || digits.indexOf(symbol) >= base);
-    if (unsupported !== undefined) {
-      return { error: `Символ «${unsupported}» не является допустимой цифрой в основании ${base}. Используйте цифры от 0 до ${digits[base - 1]}.` };
-    }
-
-    return { base, record };
-  }
-
-  function revealContributions() {
-    const { base, record, error: problem } = readInput();
-    if (problem) return;
-
-    const terms = Array.from(record, (symbol, index) => {
-      const place = record.length - index - 1;
-      const digit = digits.indexOf(symbol);
-      const contribution = BigInt(digit) * BigInt(base) ** BigInt(place);
-      return { symbol, place, digit, contribution, odd: contribution % 2n === 1n };
-    });
-    expression.innerHTML = terms.map((term, index) => `
-      <li class="p8-term${term.odd ? ' p8-odd' : ''}" data-place="${term.place}">
-        <span class="p8-rank">Разряд ${term.place}${term.digit >= 10 ? ` · ${term.symbol} = ${term.digit}` : ''}</span>
-        <div class="p8-operation">${index > 0 ? '<span aria-hidden="true">+</span>' : ''}<span>${term.digit} · ${base}<sup>${term.place}</sup> =</span> <strong>${decimal.format(term.contribution)}</strong></div>
-        <span class="p8-marker">${term.odd ? 'Нечётный вклад' : 'Чётный вклад'}</span>
-      </li>`).join('');
-    const total = terms.reduce((sum, term) => sum + term.contribution, 0n);
-    const oddCount = terms.filter((term) => term.odd).length;
-    const parity = oddCount % 2 ? 'нечётное' : 'чётное';
-    model.hidden = false;
-    revealButton.setAttribute('aria-expanded', 'true');
-    result.innerHTML = `<p>Нечётных вкладов ${oddCount}, поэтому <b>${record}<sub>${base}</sub> = ${decimal.format(total)}<sub>10</sub></b> — <b>${parity} число</b>.</p>`;
-  }
-
-  function refresh() {
-    const problem = readInput().error;
-    error.textContent = problem ?? '';
-    error.hidden = !problem;
-    recordInput.setAttribute('aria-invalid', String(Boolean(problem)));
-    revealButton.disabled = Boolean(problem);
-    revealButton.setAttribute('aria-expanded', 'false');
-    model.hidden = true;
-    expression.replaceChildren();
-    result.replaceChildren();
-  }
-
-  revealButton.addEventListener('click', revealContributions);
-  baseInput.addEventListener('change', refresh);
-  recordInput.addEventListener('input', refresh);
-  refresh();
-})();
-</script>
-<script>
-(function () {
-  function mountCounter() {
-    const root = document.getElementById('ctr8');
-    if (!root || root.dataset.ctr8Mounted) return;
-    root.dataset.ctr8Mounted = 'true';
-
-    const baseSelect = root.querySelector('[data-ctr8-select="base"]');
-    const widthSelect = root.querySelector('[data-ctr8-select="width"]');
-    const modulusReadout = root.querySelector('[data-ctr8-modulus]');
-    const rangeReadout = root.querySelector('[data-ctr8-range]');
-    const digits = root.querySelector('[data-ctr8-digits]');
-    const radixLabel = root.querySelector('[data-ctr8-radix]');
-    const decimal = root.querySelector('[data-ctr8-decimal]');
-    const parity = root.querySelector('[data-ctr8-parity]');
-    const trace = root.querySelector('[data-ctr8-trace]');
-    const announcement = root.querySelector('[data-ctr8-announcement]');
-    let base = 2;
-    let width = 3;
-    let value = 0n;
-
-    function fillSelect(select, low, high, selected) {
-      const options = document.createDocumentFragment();
-      for (let current = low; current <= high; current++) {
-        const option = document.createElement('option');
-        option.value = String(current);
-        option.textContent = String(current);
-        option.selected = current === selected;
-        options.append(option);
-      }
-      select.replaceChildren(options);
-    }
-
-    function modulus() {
-      return BigInt(base) ** BigInt(width);
-    }
-
-    function baseDigits(number) {
-      return number.toString(base).toUpperCase();
-    }
-
-    function fixedDigits(number) {
-      return baseDigits(number).padStart(width, '0');
-    }
-
-    function text(tag, value, className) {
-      const node = document.createElement(tag);
-      node.textContent = value;
-      if (className) node.className = className;
-      return node;
-    }
-
-    function notation(written, radix = base) {
-      const node = text('span', written);
-      node.append(text('sub', radix));
-      return node;
-    }
-
-    function equation(...parts) {
-      const line = text('p', '', 'ctr8-equation');
-      line.append(...parts);
-      return line;
-    }
-
-    function updateReadout({ wrapped = false, explanation = '' } = {}) {
-      const capacity = modulus();
-      const written = fixedDigits(value);
-      const even = value % 2n === 0n;
-      modulusReadout.replaceChildren(String(base), text('sup', width), ` = ${capacity}`);
-      rangeReadout.textContent = `От 0 до ${capacity - 1n}`;
-      digits.style.setProperty('--ctr8-k', width);
-      const cellClass = wrapped ? 'ctr8-cell ctr8-cell-wrapped' : 'ctr8-cell';
-      digits.replaceChildren(...[...written].map(digit => text('span', digit, cellClass)));
-      radixLabel.textContent = String(base);
-      decimal.textContent = `${value} в десятичной системе`;
-      parity.textContent = even ? 'Чётное' : 'Нечётное';
-      announcement.textContent = `${explanation ? explanation + ' ' : ''}Запись ${written} в основании ${base}. Значение ${value}, ${even ? 'чётное' : 'нечётное'}.`;
-    }
-
-    function retainedDigits(written, removed = 0) {
-      const row = text('div', '', 'ctr8-trace-digits');
-      row.style.setProperty('--ctr8-k', written.length);
-      row.setAttribute('aria-hidden', 'true');
-      row.append(...[...written].map((digit, index) => text('span', digit, `ctr8-trace-cell ${index < removed ? 'ctr8-drop' : 'ctr8-keep'}`)));
-      return row;
-    }
-
-    function step(delta) {
-      const previous = fixedDigits(value);
-      const limit = modulus();
-      const raw = value + delta;
-      const symbol = delta > 0n ? '+' : '−';
-      if (raw === limit) {
-        const full = baseDigits(raw);
-        value = 0n;
-        trace.replaceChildren(
-          equation(notation(previous), '+', notation('1'), '=', notation(full)),
-          retainedDigits(full, full.length - width),
-          text('p', 'Старшая цифра вышла за пределы счётчика. Сохраняем младшие цифры по числу ячеек.'),
-        );
-        updateReadout({ wrapped: true, explanation: `Полный результат ${full}. Старшая цифра отброшена.` });
-        return;
-      }
-
-      if (raw === -1n) {
-        value = raw + limit;
-        trace.replaceChildren(
-          equation(notation(previous), '−', notation('1'), '=', notation('−1', 10)),
-          equation(notation('−1', 10), '+', notation(String(limit), 10), '=', notation(String(value), 10), '=', notation(fixedDigits(value))),
-          retainedDigits(fixedDigits(value)),
-          text('p', 'Прибавляем модуль и записываем полученный остаток в ячейки счётчика.'),
-        );
-        updateReadout({ wrapped: true, explanation: `Минус один плюс модуль ${limit} даёт ${value}.` });
-        return;
-      }
-
-      value = raw;
-      trace.replaceChildren(equation(notation(previous), symbol, notation('1'), '=', notation(fixedDigits(value))));
-      updateReadout();
-    }
-
-    function changeSettings() {
-      base = Number(baseSelect.value);
-      width = Number(widthSelect.value);
-      const before = value;
-      const limit = modulus();
-      value %= limit;
-      if (before !== value) {
-        const explanation = `В новом диапазоне ${before} даёт остаток ${value} по модулю ${limit}.`;
-        trace.replaceChildren(text('p', explanation));
-        updateReadout({ explanation });
-      } else {
-        trace.replaceChildren(text('p', 'Прибавь или вычти единицу, чтобы проверить новый диапазон.'));
-        updateReadout();
-      }
-    }
-
-    fillSelect(baseSelect, 2, 20, base);
-    fillSelect(widthSelect, 1, 8, width);
-    baseSelect.addEventListener('change', changeSettings);
-    widthSelect.addEventListener('change', changeSettings);
-    root.querySelector('[data-ctr8-action="minus"]').addEventListener('click', () => step(-1n));
-    root.querySelector('[data-ctr8-action="plus"]').addEventListener('click', () => step(1n));
-    root.querySelector('[data-ctr8-action="max"]').addEventListener('click', () => {
-      value = modulus() - 1n;
-      trace.replaceChildren(text('p', 'Теперь прибавь единицу, чтобы увидеть переход через верхнюю границу.'));
-      updateReadout({ explanation: 'Выбрано максимальное значение.' });
-    });
-    updateReadout();
-  }
-
-  if (document.readyState === 'loading' && !document.getElementById('ctr8')) {
-    document.addEventListener('DOMContentLoaded', mountCounter, { once: true });
-  } else {
-    mountCounter();
-  }
 })();
 </script>
 </body>
