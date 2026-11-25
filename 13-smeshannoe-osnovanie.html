@@ -94,6 +94,7 @@ main [id]{scroll-margin-top:16.5rem}
 .mxstep-stage{max-width:40rem}
 .mxstep-board,.mxstep-outputs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:10px 0}
 .mxstep-board-extended{grid-template-columns:repeat(4,minmax(0,1fr))}
+.mxstep-board-extended abbr{text-decoration:none}
 .mxstep-outputs{grid-template-columns:repeat(2,minmax(0,1fr))}
 .mxstep-place,.mxstep-outputs>div{min-width:0;display:grid;justify-items:center;align-content:start;gap:4px;padding:8px 4px;border:1px solid #d7e1ef;border-radius:10px;text-align:center;background:#fff;line-height:1.35}
 .mxstep-active{border-color:#be8537;background:#fff4dc}
@@ -708,7 +709,8 @@ function initMixedStickAddition(root, mixed, bases) {
               return picture(weights[i], attribute);
             }).join('');
           return `<div class="mxstep-place${isActive ? ' mxstep-active' : ''}" data-mxstep-place="${i}">
-            <b>${positions[i]}</b><span class="mxstep-base">Основание ${bases[i]}</span>
+            <b>${overflow && i === right ? '<abbr title="Единицы">Ед.</abbr>' : positions[i]}</b>
+            <span class="mxstep-base">${overflow ? '<abbr title="Основание">Осн.</abbr>' : 'Основание'} ${bases[i]}</span>
             <div class="mxstep-objects" aria-hidden="true">${art}</div>
             <span class="mxstep-digit" data-mxstep-digit aria-label="${pending ? 'Пучок готов к переносу' : counted(count, i)}">${digit}</span>
           </div>`;
