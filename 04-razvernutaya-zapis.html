@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>5. Развёрнутая запись и перевод в десятичную систему</title>
+<title>5. Перевод в десятичную систему счисления. Развернутая запись и схема Горнера</title>
 <style>
 :root{--accent:#2563eb;--bg:#f7f8fa;--card:#fff;--line:#e3e7ee;--ink:#1f2430;--muted:#5b6472}
 *{box-sizing:border-box}
@@ -38,6 +38,17 @@ button:disabled{background:#c5cbd6;cursor:default}
 button.ghost{background:#eef2ff;color:var(--accent)}
 button.ghost:disabled{background:#eef0f4;color:#a3aab8}
 .formula{text-align:center;font-size:17px;margin:12px 0;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;overflow-x:auto}
+.formula.math-display{
+  padding:clamp(12px,2vw,20px);
+  font-family:Cambria,"Latin Modern Roman","Times New Roman",serif;
+  font-size:clamp(1.4rem,3.8vw,2.5rem);
+  line-height:1.55;
+}
+.math-display .math-line{display:inline-block;white-space:nowrap}
+.math-display var{font-style:italic}
+.math-display sup,.math-display sub{font-size:.65em;line-height:0}
+.math-display .math-steps{display:grid;gap:.15em}
+.math-display .math-condition{font-size:.8em}
 .scroll{overflow-x:auto}
 table.t{border-collapse:collapse;margin:10px auto;background:#fff}
 table.t th,table.t td{border:1px solid var(--line);padding:6px 12px;text-align:center}
@@ -104,7 +115,7 @@ table.t.horner-steps th,table.t.horner-steps td{padding:5px 7px}
     <a href="02-razryady.html">2. Термины</a>
     <a href="03-sravnenie.html">3. Сравнение чисел</a>
     <a href="03-osnovaniya.html">4. Разные основания</a>
-    <a href="04-razvernutaya-zapis.html" aria-current="page">5. Развёрнутая запись</a>
+    <a href="04-razvernutaya-zapis.html" aria-current="page">5. Перевод в десятичную систему счисления</a>
     <a href="05-perevod-iz-desyatichnoy.html">6. Из десятичной</a>
     <a href="07-slozhenie-i-vychitanie.html">7. Сложение</a>
     <a href="08-vychitanie.html">8. Вычитание</a>
@@ -118,7 +129,7 @@ table.t.horner-steps th,table.t.horner-steps td{padding:5px 7px}
   </nav>
 </header>
 <main>
-  <h1>5. Развёрнутая запись и перевод в десятичную систему</h1>
+  <h1>5. Перевод в десятичную систему счисления. Развернутая запись и схема Горнера</h1>
   <p class="lead">Перед нами запись 263<sub>7</sub>: палочки связаны в пучки по семь. Сколько здесь палочек, если считать привычно, десятками? Перевести число в десятичную систему — значит найти это количество. Разберём два способа и увидим, почему они дают один ответ.</p>
 
   <p>В <a href="03-osnovaniya.html">главе 4</a> мы узнали, что основание N задаёт размер пучка и допустимые цифры от 0 до N − 1. Здесь основание уже известно. Разряды в данной записи нумеруем справа налево с нуля. Их веса идут в порядке 1, N, N², N³, …</p>
@@ -139,8 +150,11 @@ table.t.horner-steps th,table.t.horner-steps td{padding:5px 7px}
     <p><b>Пример с буквами.</b> F1B<sub>16</sub> = 15 · 256 + 1 · 16 + 11 · 1 = 3840 + 16 + 11 = 3867<sub>10</sub>. Каждая буква — одна цифра: F — это 15, B — это 11.</p>
   </div>
 
-  <p>В общем виде: если запись числа x в основании N состоит из цифр a<sub>k</sub> … a<sub>1</sub> a<sub>0</sub>, то</p>
-  <div class="formula">x = a<sub>k</sub>·N<sup>k</sup> + … + a<sub>2</sub>·N² + a<sub>1</sub>·N + a<sub>0</sub></div>
+  <p>Пусть запись числа <var>x</var> в основании <var>N</var> состоит из цифр <var>a</var><sub><var>k</var></sub> … <var>a</var><sub>1</sub> <var>a</var><sub>0</sub>. Сложим вклады разрядов, чтобы найти значение числа.</p>
+  <div class="formula math-display" role="math" aria-label="Икс равен а с индексом ка, умноженному на эн в степени ка, и так далее, плюс а с индексом два, умноженное на эн в квадрате, плюс а с индексом один, умноженное на эн, плюс а с индексом ноль.">
+    <span class="math-line"><var>x</var> = <var>a</var><sub><var>k</var></sub> · <var>N</var><sup><var>k</var></sup> + …</span>
+    <span class="math-line">+ <var>a</var><sub>2</sub> · <var>N</var><sup>2</sup> + <var>a</var><sub>1</sub> · <var>N</var> + <var>a</var><sub>0</sub></span>
+  </div>
   <p>Такую сумму называют <b class="term">развёрнутой записью</b> числа. Порядок действий: пронумеровать разряды справа налево с нуля, найти веса, умножить каждую цифру на её вес, сложить.</p>
 
   <div class="interactive">
@@ -154,7 +168,7 @@ table.t.horner-steps th,table.t.horner-steps td{padding:5px 7px}
     <div class="readout" id="aout"></div>
   </div>
 
-  <h2>Способ 2. Развязываем пучки</h2>
+  <h2>Способ 2. Постепенно развязываем пучки</h2>
   <p>В записи 263<sub>7</sub> цифры показывают 2 пучка по 49, 6 пучков по 7 и 3 отдельные палочки. Начнём с двух больших пучков. После каждого развязывания добавим то, что лежит в следующем разряде.</p>
   <figure class="horner-unpacking">
     <figcaption>Что мы считаем на каждом шаге</figcaption>
@@ -181,10 +195,13 @@ table.t.horner-steps th,table.t.horner-steps td{padding:5px 7px}
     </div>
   </figure>
   <p>На каждом шаге число палочек в одном пучке уменьшается в 7 раз, а число развязанных пучков становится в 7 раз больше. В конце все палочки лежат по одной.</p>
-  <div class="formula">263<sub>7</sub> = (2 · 7 + 6) · 7 + 3 = 143<sub>10</sub></div>
+  <div class="formula math-display" role="math" aria-label="Начинаем с 263 в основании 7. 2 умножить на 7, прибавить 6, результат умножить на 7 и прибавить 3. Получаем 143 в десятичной системе.">
+    <span class="math-line">263<sub>7</sub> =</span>
+    <span class="math-line">(2 · 7 + 6) · 7 + 3</span>
+    <span class="math-line">= 143<sub>10</sub></span>
+  </div>
   <p>Если раскрыть скобки, получится 2 · 7² + 6 · 7 + 3 — та же развёрнутая запись.</p>
-  <p><b>Правило.</b> Берём старшую цифру. Умножаем текущее значение на N и прибавляем следующую цифру. Повторяем, пока цифры не закончатся. Этот приём называют схемой Горнера.</p>
-  <p><b>Почему это работает для любой записи.</b> После первого шага у нас значение одной цифры. Когда к прочитанной части дописываем справа новую цифру, все прежние разряды сдвигаются на одну позицию влево и их веса умножаются на N. Новая цифра занимает позицию единиц, поэтому прибавляем её значение. Так после каждого шага получаем значение всех уже прочитанных цифр, а в конце — значение всего числа.</p>
+
   <div class="example">
     <span class="tag">Разобранный пример · ноль в середине</span>
     <p><b>Задача.</b> Перевести 4052<sub>7</sub> в десятичную систему.</p>
@@ -199,6 +216,20 @@ table.t.horner-steps th,table.t.horner-steps td{padding:5px 7px}
     <p><b>Как нельзя.</b> Пропустить ноль: (4 · 7 + 5) · 7 + 2 = 233. Это перевод другой записи, 452<sub>7</sub>.</p>
     <p><b>Проверка по весам.</b> 4 · 343 + 0 · 49 + 5 · 7 + 2 · 1 = 1372 + 0 + 35 + 2 = 1409.</p>
   </div>
+
+  <p>В общем виде обозначим через <var>H</var><sub><var>i</var></sub> число групп веса <var>N</var><sup><var>i</var></sup>, полученных из уже прочитанных цифр от <var>a</var><sub><var>k</var></sub> до <var>a</var><sub><var>i</var></sub>. Начинаем со старшей цифры и движемся к младшей.</p>
+  <div class="formula math-display" role="math" aria-label="Аш с индексом ка равно а с индексом ка. Аш с индексом и равно аш с индексом и плюс один, умноженному на эн, плюс а с индексом и. Индекс и идёт от ка минус один до нуля. Икс равен аш с индексом ноль.">
+    <div class="math-steps">
+      <div><var>H</var><sub><var>k</var></sub> = <var>a</var><sub><var>k</var></sub></div>
+      <div>
+        <span class="math-line"><var>H</var><sub><var>i</var></sub> = <var>H</var><sub><var>i</var>+1</sub> · <var>N</var> + <var>a</var><sub><var>i</var></sub>,</span>
+        <span class="math-line math-condition"><var>i</var> = <var>k</var> − 1, …, 0</span>
+      </div>
+      <div><var>x</var> = <var>H</var><sub>0</sub></div>
+    </div>
+  </div>
+  <p>Такой способ вычисления называют <b class="term">схемой Горнера</b>. На каждом шаге умножаем предыдущий результат на <var>N</var> и прибавляем следующую цифру. Запись называют рекурсивной, потому что каждый новый результат вычисляется из предыдущего.</p>
+  <p>При развязывании каждая группа старшего разряда даёт <var>N</var> групп соседнего младшего разряда. К ним добавляем <var>a</var><sub><var>i</var></sub> групп, которые уже были в этом разряде. Например, для 263<sub>7</sub> получаем <var>H</var><sub>2</sub> = 2, <var>H</var><sub>1</sub> = 20 и <var>H</var><sub>0</sub> = 143. При <var>i</var> = 0 считаем отдельные палочки, поэтому <var>H</var><sub>0</sub> равно значению числа.</p>
 
   <div class="interactive">
     <span class="tag">Интерактив · развязываем пучки</span>
@@ -266,7 +297,7 @@ table.t.horner-steps th,table.t.horner-steps td{padding:5px 7px}
   <ul>
     <li>Перевести в десятичную систему — значит сосчитать, сколько палочек во всех пучках.</li>
     <li>Развёрнутая запись: x = a<sub>k</sub>·N<sup>k</sup> + … + a<sub>1</sub>·N + a<sub>0</sub>. Каждая цифра умножается на вес своего разряда, вклады складываются.</li>
-    <li>Развязывание пучков: начинаем со старшей цифры, умножаем на N и прибавляем следующую цифру, и так до конца.</li>
+    <li>По схеме Горнера начинаем со старшей цифры. Умножаем текущий результат на N, прибавляем следующую цифру и повторяем до конца записи.</li>
     <li>Оба способа — одна и та же сумма, записанная по-разному, поэтому ответ совпадает.</li>
     <li>Ноль шаг не отменяет: вклад равен нулю, но разряд занят, а при развязывании умножение всё равно выполняется.</li>
   </ul>
