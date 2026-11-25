@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>14. Слова, номера и сдвиги</title>
+<style>
+:root{--accent:#2563eb;--bg:#f7f8fa;--card:#fff;--line:#e3e7ee;--ink:#1f2430;--muted:#525e71}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+header.top{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+nav.menu{max-width:900px;margin:0 auto;display:flex;flex-wrap:wrap;gap:4px;padding:10px 16px}
+nav.menu a{text-decoration:none;color:var(--muted);padding:6px 10px;border-radius:8px;font-size:14px}
+nav.menu a:hover{background:#eef2ff;color:var(--accent)}
+nav.menu a[aria-current]{background:var(--accent);color:#fff}
+main{max-width:900px;margin:0 auto;padding:24px 16px 40px}
+h1{font-size:clamp(25px,5vw,30px);line-height:1.25;margin:.2em 0 .4em}
+h2{font-size:21px;line-height:1.35;margin:1.65em 0 .55em;border-left:4px solid var(--accent);padding-left:10px}
+h3{font-size:17px;margin:0 0 .4em;line-height:1.4}
+p{margin:.55em 0}
+a{color:#1647a8}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+[hidden]{display:none!important}
+.lead{font-size:18px;color:var(--muted);margin:0 0 20px}
+.example,.interactive,.note,.selfcheck{border-radius:12px;padding:14px 18px;margin:16px 0}
+.example{background:#f0f6ff;border:1px solid #d6e4ff}
+.interactive{background:#fffaf0;border:1px solid #eadbb0}
+.note{background:#fff8e7;border:1px solid #ebdbb2}
+.selfcheck{background:#f3fbf4;border:1px solid #cdeccf}
+.selfcheck h2{margin:.2em 0 .5em;border-left-color:#2b8246}
+.selfcheck h3{margin:.7em 0 .2em}
+.example ol,ul,ol{padding-inline-start:24px;margin:.5em 0}
+li{margin:.3em 0}
+.word-sample{max-width:20em;padding:4px 16px 5px 42px;border:1px solid #d6e4ff;background:var(--card);border-radius:10px;font-variant-numeric:tabular-nums}
+.formula{font-size:17px;margin:.65em 0 .85em;font-weight:650;line-height:1.5;overflow-wrap:anywhere;color:#172644;font-variant-numeric:tabular-nums}
+.table-wrap{overflow-x:auto;max-width:100%;margin:12px 0}
+table{border-collapse:collapse;font-size:15px;max-width:100%;background:#fff}
+caption{text-align:left;font-weight:650;color:#324365;padding-bottom:.35em}
+th,td{border:1px solid #d6e0ef;padding:5px 8px;text-align:left;font-variant-numeric:tabular-nums}
+th{background:#edf3ff;font-weight:650}
+td.active,th.active{background:#dbe8ff;color:#183f91}
+.model-controls,.model-actions{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:end;margin:10px 0}
+.model-controls label{display:grid;gap:3px;min-width:0;max-width:100%;font-size:14px;color:#36435c}
+button,input,select{font:inherit;max-width:100%;min-height:40px}
+input,select{padding:6px 8px;border:1px solid #aebbd0;border-radius:8px;color:var(--ink);background:#fff}
+input{width:min(100%,14rem)}
+button{border:1px solid #cedcf9;border-radius:8px;background:#edf3ff;color:#194ba3;padding:6px 12px;cursor:pointer}
+button.primary{background:#235ad7;border-color:#235ad7;color:white}
+button:disabled{opacity:.55;cursor:default}
+.model-stage{margin:12px 0;overflow-wrap:anywhere}
+.model-status,.error{margin:.5em 0;overflow-wrap:anywhere}
+.model-status:empty,.error:empty{display:none}
+.error{color:#8b3529;font-weight:600}
+.mixed-cells{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;max-width:540px;margin:12px 0}
+.mixed-cell{padding:7px 3px;border:1px solid #d6e1f1;border-radius:10px;background:#fff;text-align:center;line-height:1.3;min-width:0}
+.mixed-cell span,.mixed-cell small{display:block;font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.mixed-cell strong{display:block;color:#1d448e;font:700 24px/1.2 -apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:4px 0;font-variant-numeric:tabular-nums}
+.mixed-cell.active{background:#e5eeff;border-color:#6597ed}
+.selfcheck details{margin-top:10px}
+.selfcheck summary{width:fit-content;color:#1647a8;cursor:pointer}
+.pager{display:flex;flex-wrap:wrap;justify-content:space-between;margin-top:28px;gap:10px}
+.pager a{text-decoration:none;background:#eef2ff;padding:10px 16px;border-radius:9px;font-size:15px}
+@media(max-width:540px){
+  header.top{position:static}
+  .example,.note,.interactive,.selfcheck{padding:12px}
+  .mixed-cells{gap:4px}
+  .mixed-cell span,.mixed-cell small{font-size:11px}
+  th,td{padding:4px 6px}
+}
+
+main [id]{scroll-margin-top:16.5rem}
+@media(min-width:700px){main [id]{scroll-margin-top:11.5rem}}
+@media(max-width:540px){main [id]{scroll-margin-top:14px}}
+.mixed-predict summary{width:fit-content;color:#1647a8;cursor:pointer}
+.mixed-word-model [hidden] { display: none !important; }
+.mixed-word-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  gap: .75rem;
+  align-items: end;
+}
+.mixed-word-controls label { display: grid; gap: .3rem; min-width: 0; font-weight: 600; }
+.mixed-word-controls input, .mixed-word-controls select {
+  box-sizing: border-box;
+  min-width: 0;
+  width: 100%;
+  min-height: 2.55rem;
+  padding: .35rem .55rem;
+  font: inherit;
+  font-weight: 400;
+}
+.mixed-word-controls [aria-invalid="true"] { border-color: #b42318; }
+.mixed-word-error { color: #a52318; }
+.mixed-word-error:empty { margin: 0; }
+.mixed-word-stage { min-width: 0; }
+.mixed-word-step-title { margin: .85rem 0 .45rem; }
+.mixed-word-note { margin: .65rem 0; }
+.mixed-word-formula { margin: .65rem 0; overflow-wrap: anywhere; }
+.mixed-word-cells {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: .25rem;
+  max-width: 26rem;
+}
+.mixed-word-cells .mixed-cell {
+  display: grid;
+  gap: .13rem;
+  align-content: start;
+  justify-items: center;
+  text-align: center;
+  min-width: 0;
+  padding: .32rem .12rem;
+  border: 1px solid #d8e1ef;
+  border-radius: .4rem;
+  background: #fff;
+  font-size: .75rem;
+  line-height: 1.3;
+}
+.mixed-word-cells .mixed-cell strong { font-size: 1.25rem; }
+.mixed-word-cells .active, .mixed-word-table .active { background: #eaf1ff; }
+.mixed-word-cells .active { border-color: var(--accent, #2563eb); }
+.mixed-word-table { max-width: 26rem; }
+.mixed-word-table table { width: 100%; table-layout: fixed; margin: 0; }
+.mixed-word-table th, .mixed-word-table td { padding: .3rem .2rem; text-align: center; }
+.mixed-word-table th:first-child { width: 43%; text-align: left; }
+.mixed-word-actions { display: flex; flex-wrap: wrap; gap: .45rem .6rem; align-items: center; }
+.mixed-word-actions button { min-height: 2.5rem; padding-inline: .65rem; }
+.mixed-word-actions [aria-disabled="true"] { opacity: .55; cursor: default; }
+.mixed-word-announcement {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.mixed-teaching-figure{margin:14px 0;padding:12px 15px;border:1px solid #d6e4ff;border-radius:12px;background:#f0f6ff}
+.mixed-teaching-figure figcaption{font-weight:650;color:#263d67;margin:0 0 .45em}
+.mixed-letter-mark{background:#fff5d7;border-color:#dcc68e}
+.mixed-teaching-table :is(td,th):not(:first-child){text-align:center}
+#mixed-letter-transition span{display:inline-block}
+</style>
+</head>
+<body>
+<header class="top">
+  <nav class="menu" aria-label="Главы учебника">
+    <a href="index.html">Оглавление</a>
+    <a href="01-chto-takoe-chislo.html">1. Что такое число</a>
+    <a href="02-razryady.html">2. Термины</a>
+    <a href="03-sravnenie.html">3. Сравнение чисел</a>
+    <a href="03-osnovaniya.html">4. Разные основания</a>
+    <a href="04-razvernutaya-zapis.html">5. Развёрнутая запись</a>
+    <a href="05-perevod-iz-desyatichnoy.html">6. Из десятичной</a>
+    <a href="07-slozhenie-i-vychitanie.html">7. Сложение</a>
+    <a href="08-vychitanie.html">8. Вычитание</a>
+    <a href="08-svoystva-chisel.html">9. Свойства чисел</a>
+    <a href="09-alternativnye-alfavity.html">10. Альтернативные алфавиты</a>
+    <a href="10-numeratsiya-slov.html">11. Сравнение и нумерация слов</a>
+    <a href="11-itogi.html">12. Итоги</a>
+    <a href="13-smeshannoe-osnovanie.html">13. Числа со смешанным основанием</a>
+    <a href="14-slova-nomera-sdvigi.html" aria-current="page">14. Слова, номера и сдвиги</a>
+    <a href="15-smeshannoe-osnovanie-na-praktike.html">15. Часы и пиксели</a>
+  </nav>
+</header>
+<main>
+  <h1>14. Слова, номера и сдвиги</h1>
+  <p class="lead">У каждой позиции слова может быть свой набор букв. Найдём место слова в списке, восстановим слово по номеру и разберём, как перейти на заданное число мест вперёд.</p>
+
+  <section class="note mixed-predict" aria-labelledby="mixed-word-recall">
+    <h2 id="mixed-word-recall">Перед началом</h2>
+    <p>У первого слова индекс 0 и порядковый номер 1. У любого другого слова индекс тоже равен числу слов перед ним. Чтобы получить номер, прибавляем к индексу единицу. <a href="10-numeratsiya-slov.html">Глава 11. Сравнение и нумерация слов</a></p>
+  </section>
+
+  <h2 id="mixed-letter-positions">Те же три позиции с буквами</h2>
+  <p>Возьмём <a href="13-smeshannoe-osnovanie.html#mixed-digits">те же три позиции с основаниями 3, 2 и 5</a> и поставим в соответствие каждой цифре букву из алфавита её позиции.</p>
+  <figure class="mixed-teaching-figure">
+    <figcaption>Алфавиты с различными основаниями</figcaption>
+    <div class="table-wrap">
+      <table class="mixed-teaching-table" id="mixed-letter-map">
+        <thead><tr><th scope="col">Цифра</th><th scope="col">Слева</th><th scope="col">Середина</th><th scope="col">Справа</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">0</th><td>Е</td><td class="mixed-letter-mark">Л</td><td>Е</td></tr>
+          <tr><th scope="row">1</th><td class="mixed-letter-mark">Л</td><td>Н</td><td class="mixed-letter-mark">Л</td></tr>
+          <tr><th scope="row">2</th><td>Н</td><td>—</td><td>Н</td></tr>
+          <tr><th scope="row">3</th><td>—</td><td>—</td><td>О</td></tr>
+          <tr><th scope="row">4</th><td>—</td><td>—</td><td>С</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Значение буквы зависит от позиции. У буквы Л значение 1 слева и справа, 0 в середине.</p>
+    <p class="formula" id="mixed-letter-transition">ЛНС → НЛЕ &nbsp; <span>(1, 1, 4) → (2, 0, 0)</span></p>
+  </figure>
+  <p>В слове ЛНС справа стоит последняя буква С. При переходе к следующему слову справа пишем Е и переносим единицу в среднюю позицию. Там тоже стояла последняя буква Н, поэтому пишем Л и переносим единицу в левую позицию. Слева Л меняется на Н. Получаем НЛЕ — именно так в числовом примере значение 19 перешло в 20.</p>
+
+  <h2 id="mixed-word-order">Номера слов с разными правилами для позиций</h2>
+  <p>Применим тот же способ к четырём позициям. Составляем слова из букв И, Н, С, Т, А, В, К. На первом месте может стоять только согласная, на последнем — только гласная. Буквы можно повторять. Здесь словом считаем любую допустимую последовательность из четырёх букв. Порядок букв в каждом списке задаёт их значения от нуля.</p>
+  <div class="table-wrap">
+    <table>
+      <caption>Буквы, количество вариантов и веса позиций</caption>
+      <thead><tr><th scope="col">Позиция слева</th><th scope="col">Буквы по возрастанию значения</th><th scope="col">Вариантов</th><th scope="col">Вес</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Первая</th><td>В, К, Н, С, Т</td><td>5</td><td>98</td></tr>
+        <tr><th scope="row">Вторая</th><td>А, В, И, К, Н, С, Т</td><td>7</td><td>14</td></tr>
+        <tr><th scope="row">Третья</th><td>А, В, И, К, Н, С, Т</td><td>7</td><td>2</td></tr>
+        <tr><th scope="row">Четвёртая</th><td>А, И</td><td>2</td><td>1</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Всего 5 · 7 · 7 · 2 = 490 слов. Располагаем их по первой различающейся букве, пользуясь порядком для её позиции. Если зафиксировать первую букву, справа остаётся 7 · 7 · 2 = 98 вариантов. Поэтому вес первой позиции равен 98. Так же получаются остальные веса.</p>
+  <p>Начало списка показывает, как перебираются позиции. Быстрее всего меняется последняя буква. Когда её варианты закончились, меняется предпоследняя.</p>
+  <ol class="word-sample" aria-label="Первые пять слов списка">
+    <li>ВААА</li>
+    <li>ВААИ</li>
+    <li>ВАВА</li>
+    <li>ВАВИ</li>
+    <li>ВАИА</li>
+  </ol>
+  <p>Для каждой меньшей буквы в первой различающейся позиции можно подставить любую допустимую последовательность справа. Таких последовательностей ровно столько, каков вес позиции. Складываем числа слов из этих непересекающихся групп.</p>
+  <p>Значение записи равно <strong>индексу с нуля</strong>, то есть количеству слов перед ней. При нумерации с единицы к индексу прибавляем 1. Буква может иметь разные значения в разных местах. Например, И во второй позиции имеет значение 2, а в четвёртой имеет значение 1.</p>
+
+  <section class="example">
+    <h3 id="mixed-word-nika">Задача 1. На каком месте стоит НИКА</h3>
+    <p>Ищем каждую букву в списке её позиции. Н стоит на месте с индексом 2, И имеет индекс 2, К имеет индекс 3, А имеет индекс 0. Получаем (2, 2, 3, 0).</p>
+    <div class="formula">2 · 98 + 2 · 14 + 3 · 2 + 0 · 1 = 230</div>
+    <p>При чтении по Горнеру получится ((2 · 7 + 2) · 7 + 3) · 2 + 0 = 230. Перед НИКА стоят 230 слов, поэтому его <strong>номер 231</strong>.</p>
+  </section>
+
+  <section class="example">
+    <h3>Задача 2. Какое слово стоит на месте 108</h3>
+    <p>Вычитаем 1 из номера и получаем индекс 107. Делим на основания справа налево в порядке 2, 7, 7, 5.</p>
+    <div class="table-wrap">
+      <table>
+        <caption>Разряды индекса 107</caption>
+        <thead><tr><th scope="col">Позиция слева</th><th scope="col">Деление с остатком</th><th scope="col">Цифра</th><th scope="col">Буква</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Четвёртая</th><td>107 = 53 · 2 + 1</td><td>1</td><td>И</td></tr>
+          <tr><th scope="row">Третья</th><td>53 = 7 · 7 + 4</td><td>4</td><td>Н</td></tr>
+          <tr><th scope="row">Вторая</th><td>7 = 1 · 7 + 0</td><td>0</td><td>А</td></tr>
+          <tr><th scope="row">Первая</th><td>1 = 0 · 5 + 1</td><td>1</td><td>К</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Читаем цифры от старшей к младшей. Запись (1, 0, 4, 1) даёт слово <strong>КАНИ</strong>. Проверка по весам даёт 1 · 98 + 0 · 14 + 4 · 2 + 1 = 107, номер 108.</p>
+  </section>
+
+  <h2 id="mixed-word-addition">Сложение с разными основаниями</h2>
+  <p>Выровняем записи по позициям и пойдём справа налево. В каждой позиции складываем две цифры и входящий перенос. Делим сумму на основание <strong>текущего</strong> разряда. Под чертой пишем остаток, частное переносим влево.</p>
+
+  <section class="example">
+    <h3 id="mixed-word-shift">Задача 3. Какое слово стоит на 100 позиций дальше НИКА</h3>
+    <p>Сначала запишем сам шаг 100 в разрядах нашего списка. Последовательные деления дают 100 = 50 · 2 + 0, 50 = 7 · 7 + 1, 7 = 1 · 7 + 0, 1 = 0 · 5 + 1. В обратном порядке остатки образуют (1, 0, 1, 0).</p>
+    <p>Складываем (2, 2, 3, 0) и (1, 0, 1, 0) непосредственно по разрядам. Начинаем с правого столбца.</p>
+    <div class="table-wrap">
+      <table>
+        <caption>Сложение столбиком в основаниях 5, 7, 7, 2</caption>
+        <thead><tr><th scope="col">Позиция слева</th><th scope="col">Первая</th><th scope="col">Вторая</th><th scope="col">Третья</th><th scope="col">Четвёртая</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Основание разряда</th><td>5</td><td>7</td><td>7</td><td>2</td></tr>
+          <tr><th scope="row">Цифры НИКА</th><td>2</td><td>2</td><td>3</td><td>0</td></tr>
+          <tr><th scope="row">Прибавляем</th><td>1</td><td>0</td><td>1</td><td>0</td></tr>
+          <tr><th scope="row">Цифры суммы</th><td><b>3</b></td><td><b>2</b></td><td><b>4</b></td><td><b>0</b></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Справа налево суммы равны 0, 4, 2 и 3. Каждая меньше основания своего разряда, поэтому переносов не возникает. Получаем (3, 2, 4, 0), а по спискам позиций — <strong>СИНА</strong>.</p>
+    <p>Теперь вычислим индекс результата по Горнеру и найдём его номер.</p>
+    <div class="formula">((3 · 7 + 2) · 7 + 4) · 2 + 0 = 330</div>
+    <p>Индекс равен 330, поэтому СИНА стоит на <strong>месте 331</strong>.</p>
+  </section>
+
+  <section class="note">
+    <h3>Почему перенос сохраняет сумму</h3>
+    <p>Пусть в разряде веса <i>w</i><sub>i</sub> собрано <i>s</i> групп. Разделим <i>s</i> на <i>b</i><sub>i</sub> и получим частное <i>q</i> и остаток <i>r</i>. Каждые <i>b</i><sub>i</sub> групп составляют одну группу слева, поэтому в соседний разряд переходят <i>q</i> групп, а здесь остаются <i>r</i>.</p>
+    <div class="formula"><i>s</i> · <i>w</i><sub>i</sub> = (<i>q</i> · <i>b</i><sub>i</sub> + <i>r</i>) · <i>w</i><sub>i</sub> = <i>q</i> · <i>w</i><sub>i + 1</sub> + <i>r</i> · <i>w</i><sub>i</sub></div>
+    <p>При сложении двух допустимых записей перенос равен 0 или 1. Справа входящий перенос равен нулю, а в каждом следующем разряде две цифры и входящая единица дают не больше 2<i>b</i><sub>i</sub> − 1.</p>
+  </section>
+
+  <section class="example">
+    <h3 id="mixed-word-carry">Перенос через несколько позиций</h3>
+    <p>Прибавим 1 к (2, 6, 6, 1). В правом разряде 1 + 1 = 2, поэтому пишем 0 и переносим 1. В каждом из двух средних разрядов получаем 6 + 1 = 7. Оба раза пишем 0 и снова переносим 1. Слева 2 + 1 = 3 и перенос заканчивается.</p>
+    <div class="formula">(2, 6, 6, 1) + (0, 0, 0, 1) = (3, 0, 0, 0)</div>
+    <p>Крайняя допустимая запись (4, 6, 6, 1) имеет индекс 489 и соответствует последнему слову с номером 490. Если прибавить 1, перенос пройдёт и через первый разряд. Получится индекс 490, для которого потребовалась бы ещё одна позиция. В четырёхбуквенном списке такого слова нет.</p>
+  </section>
+
+  <section id="mixed-word-model" aria-labelledby="mixed-word-title">
+    <h3 id="mixed-word-title">Слово, номер и сдвиг</h3>
+    <p>Выберите «Сдвиг вперёд». Введите НТТИ и сдвиг 1. Предскажите, в каких позициях произойдёт перенос, затем проверьте по шагам.</p>
+  </section>
+
+  <section class="selfcheck" aria-labelledby="mixed-word-practice">
+    <h2 id="mixed-word-practice">Самопроверка</h2>
+    <p>Какое слово стоит на месте 99 в списке из задач главы?</p>
+    <details>
+      <summary>Проверить решение</summary>
+      <p>Индекс равен 98. Первые 98 слов начинаются с В, значит, следующее слово первое среди слов на К. У остальных позиций берём первые допустимые буквы. Получается <strong>КААА</strong>.</p>
+    </details>
+  </section>
+
+  <nav class="pager" aria-label="Соседние главы">
+    <a href="13-smeshannoe-osnovanie.html">← 13. Числа со смешанным основанием</a>
+    <a href="index.html">Оглавление</a>
+    <a href="15-smeshannoe-osnovanie-na-praktike.html">15. Часы и пиксели →</a>
+  </nav>
+</main>
+<script>
+const mixed = (() => {
+  function limit(bases) {
+    if (!Array.isArray(bases) || !bases.length || Array.from(bases).some((base) => !Number.isSafeInteger(base) || base < 2)) {
+      throw new RangeError('Основания должны быть целыми числами не меньше двух.');
+    }
+    const size = bases.reduce((product, base) => product * base, 1);
+    if (!Number.isSafeInteger(size)) throw new RangeError('Слишком большой диапазон.');
+    return size;
+  }
+
+  function checkDigits(digits, bases) {
+    if (!Array.isArray(digits) || digits.length !== bases.length ||
+        bases.some((base, i) => !Number.isSafeInteger(digits[i]) || digits[i] < 0 || digits[i] >= base)) {
+      throw new RangeError('В каждом разряде нужна цифра от нуля до основания минус один.');
+    }
+  }
+
+  function encode(number, bases) {
+    const size = limit(bases);
+    if (!Number.isSafeInteger(number) || number < 0 || number >= size) {
+      throw new RangeError(`Число должно быть от 0 до ${size - 1}.`);
+    }
+    const digits = Array(bases.length);
+    const steps = [];
+    let value = number;
+    for (let i = bases.length - 1; i >= 0; i -= 1) {
+      const base = bases[i];
+      const remainder = value % base;
+      const quotient = (value - remainder) / base;
+      digits[i] = remainder;
+      steps.push({ i, base, value, quotient, remainder });
+      value = quotient;
+    }
+    return { digits, steps };
+  }
+
+  function decode(digits, bases) {
+    limit(bases);
+    checkDigits(digits, bases);
+    let value = 0;
+    const steps = bases.map((base, i) => {
+      const before = value;
+      const digit = digits[i];
+      value = before * base + digit;
+      return { i, base, before, digit, value };
+    });
+    return { value, steps };
+  }
+
+  function hornerExpressions(digits, bases) {
+    const expressions = [String(digits[0])];
+    for (let i = 1; i < digits.length; i++) {
+      const previous = expressions[i - 1];
+      const prefix = i === 1 ? previous : `(${previous})`;
+      expressions.push(`${prefix} · ${bases[i]} + ${digits[i]}`);
+    }
+    return expressions;
+  }
+
+  function add(left, right, bases) {
+    limit(bases);
+    checkDigits(left, bases);
+    checkDigits(right, bases);
+    const digits = Array(bases.length);
+    const steps = [];
+    let carry = 0;
+    for (let i = bases.length - 1; i >= 0; i -= 1) {
+      const base = bases[i];
+      const incoming = carry;
+      const sum = left[i] + right[i] + incoming;
+      if (!Number.isSafeInteger(sum)) throw new RangeError('Слишком большая сумма цифр.');
+      const digit = sum % base;
+      carry = (sum - digit) / base;
+      digits[i] = digit;
+      steps.push({ i, base, left: left[i], right: right[i], incoming, sum, digit, carry });
+    }
+    return { digits, carry, steps };
+  }
+
+  return { limit, encode, decode, hornerExpressions, add };
+})();
+
+function initMixedWordModel(root, mixed) {
+  const alphabets = ['ВКНСТ', 'АВИКНСТ', 'АВИКНСТ', 'АИ'];
+  const bases = alphabets.map((letters) => letters.length);
+  const total = bases.reduce((product, base) => product * base, 1);
+  const blank = () => bases.map(() => null);
+  const split = (digits) => digits.map((digit, index) => alphabets[index][digit]);
+  const state = {steps: [], step: 0};
+
+  const model = document.createElement('div');
+  model.className = 'mixed-word-model';
+  model.innerHTML = `
+    <div class="model-controls mixed-word-controls">
+      <label>Действие
+        <select data-mixed-mode>
+          <option value="word">Слово → номер</option>
+          <option value="number">Номер → слово</option>
+          <option value="shift">Сдвиг вперёд</option>
+        </select>
+      </label>
+      <label>Слово из четырёх русских букв
+        <input type="text" data-mixed-input="word" value="НИКА" autocomplete="off" autocapitalize="characters" spellcheck="false">
+      </label>
+      <label hidden>Номер от 1 до ${total}
+        <input type="text" data-mixed-input="number" value="108" inputmode="numeric" autocomplete="off">
+      </label>
+      <label hidden>Сдвиг на число мест от 0 до ${total - 1}
+        <input type="text" data-mixed-input="shift" value="100" inputmode="numeric" autocomplete="off">
+      </label>
+    </div>
+    <p class="error mixed-word-error" data-mixed-error role="status" aria-atomic="true"></p>
+    <div class="model-stage mixed-word-stage" data-mixed-stage></div>
+    <p class="mixed-word-announcement" data-mixed-announcement role="status" aria-atomic="true"></p>
+    <div class="model-actions mixed-word-actions" data-mixed-actions>
+      <button type="button" data-mixed-back aria-label="Предыдущий шаг">Назад</button>
+      <span data-mixed-progress></span>
+      <button type="button" data-mixed-next aria-label="Следующий шаг">Далее</button>
+    </div>`;
+  root.classList.add('interactive');
+  root.appendChild(model);
+  const find = (selector) => model.querySelector(selector);
+  const mode = find('[data-mixed-mode]');
+  const fields = {
+    word: find('[data-mixed-input="word"]'),
+    number: find('[data-mixed-input="number"]'),
+    shift: find('[data-mixed-input="shift"]'),
+  };
+  const stage = find('[data-mixed-stage]');
+  const error = find('[data-mixed-error]');
+  const announcement = find('[data-mixed-announcement]');
+  let suffix = 1;
+  while (document.getElementById(`mixed-word-error-${suffix}`)) suffix++;
+  error.id = `mixed-word-error-${suffix}`;
+  const actions = find('[data-mixed-actions]');
+  const back = find('[data-mixed-back]');
+  const next = find('[data-mixed-next]');
+  const progress = find('[data-mixed-progress]');
+
+  function cells(digits, active = -1, showLetters = false) {
+    return `<div class="mixed-cells mixed-word-cells">${bases.map((base, index) => {
+      const digit = digits[index];
+      const activeClass = index === active ? ' active' : '';
+      const value = digit === null ? '—' : digit;
+      const shown = showLetters && digit !== null
+        ? `<strong>${alphabets[index][digit]}</strong><span>цифра ${digit}</span>`
+        : `<strong>${value}</strong>`;
+      return `<div class="mixed-cell${activeClass}"><span>Позиция ${index + 1}</span><span>Осн. ${base}</span>${shown}</div>`;
+    }).join('')}</div>`;
+  }
+
+  function addTable(left, right, carries, result, active) {
+    const row = (name, values) => `<tr><th scope="row">${name}</th>${values.map((value, index) =>
+      `<td${index === active ? ' class="active"' : ''}>${value === null ? '—' : value}</td>`).join('')}</tr>`;
+    const headers = bases.map((_, index) => `<th scope="col"${index === active ? ' class="active"' : ''}>${index + 1}</th>`).join('');
+    return `<div class="table-wrap mixed-word-table"><table>
+      <thead><tr><th scope="col">Позиция</th>${headers}</tr></thead>
+      <tbody>${row('Основание', bases)}${row('Входящий перенос', carries)}${row('Слово', left)}${row('Сдвиг', right)}${row('Сумма', result)}</tbody>
+    </table></div>`;
+  }
+
+  function frame(title, note, visual = '', formula = '', result = false) {
+    return {title, note, visual, formula, result};
+  }
+
+  function readWord() {
+    const letters = Array.from(fields.word.value.trim().toUpperCase());
+    if (letters.length !== bases.length) return {message: 'Введите слово из четырёх русских букв.'};
+    const digits = letters.map((letter, index) => alphabets[index].indexOf(letter));
+    const invalid = digits.indexOf(-1);
+    if (invalid !== -1) {
+      return {message: `В позиции ${invalid + 1} допустимы буквы ${Array.from(alphabets[invalid]).join(', ')}.`};
+    }
+    return {letters: letters.join(''), digits};
+  }
+
+  function readInteger(field, minimum, maximum) {
+    const text = field.value.trim();
+    if (!/^\d+$/.test(text)) return null;
+    const value = Number(text);
+    return Number.isSafeInteger(value) && value >= minimum && value <= maximum ? value : null;
+  }
+
+  function decoding(digits, decoded) {
+    return mixed.hornerExpressions(digits, bases).map((expression, i) => {
+      const last = i === digits.length - 1;
+      const instruction = i === 0
+        ? 'Начинаем со значения первой цифры.'
+        : 'Умножаем всё выражение на основание текущей позиции и прибавляем её цифру.';
+      const note = last ? `${instruction} Теперь вычисляем выражение целиком и получаем индекс слова.` : instruction;
+      const formula = last ? `${expression} = ${decoded.value}` : expression;
+      return frame(`Схема Горнера. Позиция ${i + 1}`, note, cells(digits, i, true), formula);
+    });
+  }
+
+  function encoding(encoded, title, showLetters) {
+    const found = blank();
+    return encoded.steps.map(({i, base, value, quotient, remainder}) => {
+      found[i] = remainder;
+      return frame(
+        `${title}. Позиция ${i + 1}`,
+        i === 0
+          ? 'Остаток даёт первую цифру. Нулевое частное означает, что значение целиком поместилось в четыре позиции.'
+          : 'В эту позицию записываем остаток. С частным переходим к позиции слева.',
+        cells(found, i, showLetters),
+        `${value} : ${base} = ${quotient}, остаток ${remainder}`,
+      );
+    });
+  }
+
+  function wordSteps(word) {
+    const decoded = mixed.decode(word.digits, bases);
+    return [
+      frame('Заменяем буквы цифрами', 'Каждая буква получает номер от нуля в алфавите своей позиции.', cells(word.digits, -1, true)),
+      ...decoding(word.digits, decoded),
+      frame('Находим порядковый номер', `Слово <b>${word.letters}</b> имеет номер <b>${decoded.value + 1}</b>. Нумерация слов начинается с единицы.`,
+        cells(word.digits, -1, true), `${decoded.value} + 1 = ${decoded.value + 1}`, true),
+    ];
+  }
+
+  function numberSteps(number) {
+    const index = number - 1;
+    const encoded = mixed.encode(index, bases);
+    return [
+      frame('Переходим от номера к индексу', 'Индекс отсчитываем от нуля. Затем делим его на основания позиций справа налево.',
+        cells(blank()), `${number} − 1 = ${index}`),
+      ...encoding(encoded, 'Делим на основание', true),
+      frame('Восстанавливаем слово', `Читаем буквы слева направо. Номеру <b>${number}</b> соответствует слово <b>${split(encoded.digits).join('')}</b>.`,
+        cells(encoded.digits, -1, true), '', true),
+    ];
+  }
+
+  function shiftSteps(word, distance, encoded, addition) {
+    const resultDigits = blank();
+    const carries = blank();
+    const shiftedWord = split(addition.digits).join('');
+    const columns = addition.steps.map(({i, base, left, right, incoming, sum, digit, carry}) => {
+      resultDigits[i] = digit;
+      carries[i] = incoming;
+      if (i > 0) carries[i - 1] = carry;
+      const carryNote = carry ? `Переносим ${carry} в позицию ${i} слева.` : 'Переноса влево нет.';
+      return frame(
+        `Складываем столбиком. Позиция ${i + 1}`,
+        `К двум цифрам прибавляем входящий перенос ${incoming}. Остаток ${digit} записываем в сумму. ${carryNote}`,
+        addTable(word.digits, encoded.digits, carries, resultDigits, i),
+        `${left} + ${right} + ${incoming} = ${sum}; &nbsp; ${sum} = ${carry} · ${base} + ${digit}`,
+      );
+    });
+    const decoded = mixed.decode(addition.digits, bases);
+    return [
+      frame('Готовим сдвиг', `Слово <b>${word.letters}</b> уже записано цифрами. Число мест сдвига <b>${distance}</b> переведём в ту же систему с основаниями по позициям.`,
+        cells(word.digits, -1, true)),
+      ...encoding(encoded, 'Кодируем сдвиг', false),
+      ...columns,
+      frame('Читаем полученные буквы', `Цифры суммы дают слово <b>${shiftedWord}</b>. Теперь найдём его порядковый номер.`,
+        cells(addition.digits, -1, true)),
+      ...decoding(addition.digits, decoded),
+      frame('Переходим к порядковому номеру', `После сдвига получаем слово <b>${shiftedWord}</b>, его номер <b>${decoded.value + 1}</b>.`,
+        cells(addition.digits, -1, true), `${decoded.value} + 1 = ${decoded.value + 1}`, true),
+    ];
+  }
+
+  function render() {
+    const current = state.steps[state.step];
+    stage.hidden = !current;
+    actions.hidden = !current;
+    if (!current) {
+      stage.replaceChildren();
+      announcement.textContent = '';
+      return;
+    }
+    stage.innerHTML = `<p class="mixed-word-step-title"><strong>${current.title}</strong></p>
+      ${current.visual}
+      ${current.formula ? `<p class="formula mixed-word-formula">${current.formula}</p>` : ''}
+      <p class="mixed-word-note"${current.result ? ' data-mixed-result' : ''}>${current.note}</p>`;
+    back.setAttribute('aria-disabled', String(state.step === 0));
+    next.setAttribute('aria-disabled', String(state.step === state.steps.length - 1));
+    progress.textContent = `Шаг ${state.step + 1} из ${state.steps.length}`;
+    announcement.textContent = Array.from(stage.querySelectorAll('p'), (line) => line.textContent).join(' ');
+  }
+
+  function invalid(field, message) {
+    field.setAttribute('aria-invalid', 'true');
+    field.setAttribute('aria-describedby', error.id);
+    error.textContent = message;
+    render();
+  }
+
+  function update() {
+    const operation = mode.value;
+    fields.word.parentElement.hidden = operation === 'number';
+    fields.number.parentElement.hidden = operation !== 'number';
+    fields.shift.parentElement.hidden = operation !== 'shift';
+    for (const field of Object.values(fields)) {
+      field.removeAttribute('aria-invalid');
+      field.removeAttribute('aria-describedby');
+    }
+    error.textContent = '';
+    state.steps = [];
+    state.step = 0;
+
+    if (operation === 'number') {
+      const number = readInteger(fields.number, 1, total);
+      if (number === null) return invalid(fields.number, `Введите целый десятичный номер от 1 до ${total}.`);
+      state.steps = numberSteps(number);
+    } else {
+      const word = readWord();
+      if (word.message) return invalid(fields.word, word.message);
+      if (operation === 'word') {
+        state.steps = wordSteps(word);
+      } else {
+        const distance = readInteger(fields.shift, 0, total - 1);
+        if (distance === null) return invalid(fields.shift, `Введите целое десятичное число от 0 до ${total - 1}.`);
+        const encoded = mixed.encode(distance, bases);
+        const added = mixed.add(word.digits, encoded.digits, bases);
+        if (added.carry) {
+          const available = total - 1 - mixed.decode(word.digits, bases).value;
+          return invalid(fields.shift, `Сдвиг выходит за конец списка. Для этого слова введите сдвиг от 0 до ${available}.`);
+        }
+        state.steps = shiftSteps(word, distance, encoded, added);
+      }
+    }
+    render();
+  }
+
+  function move(offset) {
+    const destination = state.step + offset;
+    if (destination < 0 || destination >= state.steps.length) return;
+    state.step = destination;
+    render();
+  }
+
+  mode.addEventListener('change', update);
+  for (const field of Object.values(fields)) field.addEventListener('input', update);
+  back.addEventListener('click', () => move(-1));
+  next.addEventListener('click', () => move(1));
+  update();
+}
+
+initMixedWordModel(document.getElementById('mixed-word-model'), mixed);
+</script>
+</body>
+</html>
