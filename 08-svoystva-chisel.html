@@ -65,6 +65,7 @@ button:disabled{opacity:.55;cursor:default}
 .int8-values:empty{display:none}
 .int8-values li{min-width:2.2em;max-width:100%;border:1px solid #bcd0ff;border-radius:8px;background:#eef4ff;padding:3px 8px;text-align:center}
 .int8-values li.int8-out{border-color:var(--line);background:var(--bg);color:var(--muted)}
+#interval-in-base-four .int8-values li{box-sizing:border-box;min-width:2.5em}
 @media(max-width:540px){.int8-table{font-size:14px}.int8-table th,.int8-table td{padding:6px 4px}}
 
 html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height) + 1rem)}
@@ -160,9 +161,19 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
     <p>В последней строке берём большее из 0 и <i>b</i> − <i>a</i> − 1, чтобы пустой диапазон давал 0. Например, строго между 4 и 5 целых чисел нет. При <i>a</i> = <i>b</i> получаем одно число, только если обе границы включены.</p>
   </div>
 
+  <div class="example" id="interval-in-base-four">
+    <h3>Промежуток в основании 4</h3>
+    <p>Положительные числа ровно с тремя четверичными цифрами идут от 100<sub>4</sub> до 333<sub>4</sub>. Посчитаем целые числа в начале этого диапазона, для которых <b>100<sub>4</sub> ≤ <i>x</i> &lt; 110<sub>4</sub></b>.</p>
+    <p>Переведём границы по весам. Здесь 100<sub>4</sub> = 4<sup>2</sup> = 16, а 110<sub>4</sub> = 4<sup>2</sup> + 4 = 20. Значит, 16 ≤ <i>x</i> &lt; 20.</p>
+    <ul class="int8-values" aria-label="Целые от 16 до 19 входят в промежуток, число 20 исключено">
+      <li>16</li><li>17</li><li>18</li><li>19</li><li class="int8-out" aria-label="20 исключено"><s>20</s></li>
+    </ul>
+    <p>Левая граница 16 включена. Правая граница 20 исключена, поэтому последнее подходящее число — 19. Всего <b>19 − 16 + 1 = 4</b> числа.</p>
+  </div>
+
   <section class="interactive" id="int8-model" aria-labelledby="int8-title">
     <h3 id="int8-title">Проверь границы</h3>
-    <p>Введи две целые границы. Сними отметку, чтобы исключить соответствующую границу.</p>
+    <p>Введи две целые границы в десятичной системе. Сними отметку, чтобы исключить соответствующую границу. Для проверки четверичного примера введи 16 и 20 и исключи правую границу.</p>
     <div class="controls">
       <label for="int8-a"><span>Левая граница <i>a</i></span><input id="int8-a" type="text" value="-2" autocomplete="off" spellcheck="false" aria-describedby="int8-error"></label>
       <label for="int8-b"><span>Правая граница <i>b</i></span><input id="int8-b" type="text" value="3" autocomplete="off" spellcheck="false" aria-describedby="int8-error"></label>
@@ -189,9 +200,13 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
       <summary>Сколько целых чисел удовлетворяют условию −2 &lt; <i>x</i> ≤ 3?</summary>
       <p>Первое подходящее число −1, последнее 3. Получаем 3 − (−1) + 1 = <b>5</b>.</p>
     </details>
+    <details>
+      <summary>Сколько целых чисел удовлетворяют условию 22<sub>5</sub> &lt; <i>x</i> ≤ 32<sub>5</sub>?</summary>
+      <p>В десятичной системе 22<sub>5</sub> = 12, а 32<sub>5</sub> = 17. Число 12 исключено, а 17 входит в промежуток. Считаем от 13 до 17 включительно и получаем 17 − 13 + 1 = <b>5</b>.</p>
+    </details>
   </section>
 
-  <p class="note">В главе 9А разберём <a id="residues" href="09a-kratnost-i-ostatki.html#residues">кратность и остатки</a>, включая <a id="parity" href="09a-kratnost-i-ostatki.html#parity">чётность</a> как частный случай. Там же находятся модели <a id="p8-parity" href="09a-kratnost-i-ostatki.html#p8-parity">анализа чётности</a> и <a id="ctr8" href="09a-kratnost-i-ostatki.html#ctr8">счётчика с фиксированной разрядностью</a>.</p>
+  <p class="note">В трёх двоичных позициях помещаются числа от 0 до 7. Что покажет <a id="ctr8" href="09a-kratnost-i-ostatki.html#ctr8">такой счётчик</a>, если сделать шаг вперёд из 7 или шаг назад из 0? В главе 9А свяжем эти переходы с <a id="residues" href="09a-kratnost-i-ostatki.html#residues">остатками от деления</a> и покажем, как по записи числа <a id="parity" href="09a-kratnost-i-ostatki.html#parity">проверять чётность</a> и <a id="p8-parity" href="09a-kratnost-i-ostatki.html#p8-parity">находить остатки для других делителей</a>.</p>
   <nav class="pager" aria-label="Соседние главы">
     <a href="08-vychitanie.html">← 8. Вычитание</a>
     <a href="09a-kratnost-i-ostatki.html">9А. Кратность и остатки →</a>

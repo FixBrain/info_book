@@ -328,8 +328,6 @@ li+li{margin-top:.35em}
 .sum-answer summary{color:var(--accent);font-weight:700;cursor:pointer}
 .sum-answer .sum-scroll{margin-top:8px}
 .sum-grid .borrow-hit{background:#ffe8b0;color:#57370b;font-weight:750}
-.borrow-trace td{padding:5px 9px}
-
 .fraction-example{padding-inline:clamp(10px,2.3vw,18px)}
 .fraction-example h3{margin-block-start:0}
 .fraction-table{
@@ -572,7 +570,7 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
 
   <section class="interactive column-model" id="column-subtract" aria-labelledby="column-subtract-heading">
     <h3 id="column-subtract-heading">Вычитание на цветных палочках</h3>
-    <p>Начните с примера 100<sub>4</sub> − 2<sub>4</sub>. «Следующий шаг» показывает вычитание в очередном столбце вместе с нужными разменами. «Вычесть целиком» проигрывает весь пример.</p>
+    <p>Начните с примера 100<sub>4</sub> − 2<sub>4</sub>. По кнопке «Следующий шаг» модель делает один размен или вычитает в одном столбце. «Вычесть целиком» проигрывает весь пример.</p>
     <p>Выберите основание от 2 до 20 и введите два целых неотрицательных числа, до восьми цифр в каждом. Уменьшаемое должно быть больше вычитаемого или равно ему.</p>
 
     <div class="ca-panel">
@@ -624,22 +622,22 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
       </section>
     </div>
   <!-- ns-ch07-integer-illustrations:end -->
-  <div class="example">
+  <div class="example notebook-example" id="integer-borrowing-column">
     <h4>Пример 1000<sub>4</sub> − 123<sub>4</sub></h4>
-    <p>Для единиц берём заём из разряда групп по 64. После разменов в разрядах групп по 16 и по 4 остаётся по три палочки, а в единицах — четыре. Теперь вычисляем цифру разности в каждом столбце справа налево.</p>
-    <div class="sum-scroll" tabindex="0" role="region" aria-label="Разбор длинного займа в основании 4">
-      <table class="sum-grid borrow-trace">
-        <caption>Вычисления в основании 4 после размена</caption>
-        <thead><tr><th scope="col">Разряд</th><th scope="col">Доступно</th><th scope="col">Вычитаем</th><th scope="col">Проверка сложением</th><th scope="col">Цифра</th></tr></thead>
-        <tbody>
-          <tr><th scope="row">Единицы</th><td>10</td><td>3</td><td>3 + 1 = 10</td><td>1</td></tr>
-          <tr><th scope="row">Группы по 4</th><td>3</td><td>2</td><td>2 + 1 = 3</td><td>1</td></tr>
-          <tr><th scope="row">Группы по 16</th><td>3</td><td>1</td><td>1 + 2 = 3</td><td>2</td></tr>
-          <tr><th scope="row">Группы по 64</th><td>0</td><td>0</td><td>0 + 0 = 0</td><td>0</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p>Читаем цифры ответа от старшего разряда к младшему. Опускаем ведущий ноль и получаем <b>211<sub>4</sub></b>.</p>
+    <p>Занимаем из разряда веса 64. После разменов в разрядах веса 16 и 4 остаётся по три группы, а в единицах — четыре палочки. В тетради зачёркиваем исходные цифры и пишем над ними новые количества.</p>
+    <table class="fraction-table fraction-column">
+      <caption>Длинный заём в записи столбиком</caption>
+      <thead>
+        <tr><th scope="col">Вес разряда</th><th scope="col">64</th><th scope="col">16</th><th scope="col">4</th><th scope="col">1</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">После размена</th><td class="borrow-mark">0</td><td class="borrow-mark">3</td><td class="borrow-mark">3</td><td class="borrow-mark">4</td></tr>
+        <tr><th scope="row">Уменьшаемое</th><td><del class="borrow-old">1</del></td><td><del class="borrow-old">0</del></td><td><del class="borrow-old">0</del></td><td><del class="borrow-old">0</del></td></tr>
+        <tr><th scope="row">− Вычитаемое</th><td></td><td>1</td><td>2</td><td>3</td></tr>
+        <tr class="fraction-answer"><th scope="row">Разность</th><td></td><td>2</td><td>1</td><td>1</td></tr>
+      </tbody>
+    </table>
+    <p>Над единицами пишем 4 как пометку о количестве палочек. В таблице сложения это количество записано как 10<sub>4</sub>. В строке 3 оно стоит под цифрой 1, поэтому в единицах ответа пишем 1. Дальше вычитаем 2 из 3 и 1 из 3. Разряд веса 64 пуст, ответ — <b>211<sub>4</sub></b>.</p>
   </div>
   <div class="example notebook-example">
     <h4>Когда нужен ещё один заём</h4>
@@ -703,14 +701,15 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
         <tr><th scope="row">Разменяли четверть</th><td>0</td><td>3</td><td class="fraction-changed">3</td><td class="fraction-changed">5</td></tr>
       </tbody>
     </table>
-    <p>Перед вычитанием есть 0 четвёрок, 3 единицы, 3 четверти и 5 шестнадцатых. В таблице указаны количества групп на каждом шаге. Из пяти шестнадцатых вычитаем две, остаётся три. В остальных разрядах вычитаем нули.</p>
+    <p>Переносим количества из последней строки таблицы в тетрадь. Над зачёркнутыми цифрами появляются 0, 3, 3 и 5. Пометка 5 обозначает пять шестнадцатых после размена. Убираем две, остаётся три. В остальных разрядах вычитаем нули.</p>
     <table class="fraction-table fraction-column">
       <caption>Запись вычитания столбиком в основании 4</caption>
       <thead>
         <tr><th scope="col">Вес разряда</th><th scope="col">4</th><th scope="col">1</th><th class="fraction-comma" scope="col"><span class="fraction-sr">Запятая</span></th><th scope="col">1/4</th><th scope="col">1/16</th></tr>
       </thead>
       <tbody>
-        <tr><th scope="row">Уменьшаемое</th><td>1</td><td>0</td><td>,</td><td>0</td><td>1</td></tr>
+        <tr><th scope="row">После размена</th><td class="borrow-mark">0</td><td class="borrow-mark">3</td><td></td><td class="borrow-mark">3</td><td class="borrow-mark">5</td></tr>
+        <tr><th scope="row">Уменьшаемое</th><td><del class="borrow-old">1</del></td><td><del class="borrow-old">0</del></td><td>,</td><td><del class="borrow-old">0</del></td><td><del class="borrow-old">1</del></td></tr>
         <tr><th scope="row">− Вычитаемое</th><td></td><td>0</td><td>,</td><td>0</td><td>2</td></tr>
         <tr class="fraction-answer"><th scope="row">Разность</th><td></td><td>3</td><td>,</td><td>3</td><td>3</td></tr>
       </tbody>
@@ -870,8 +869,8 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
     fields.forEach((field) => { field.disabled = busy; });
     start.setAttribute('aria-disabled', String(busy || !example));
     previous.setAttribute('aria-disabled', String(busy || !completed));
-    next.setAttribute('aria-disabled', String(busy || !example || completed === example.steps.length));
-    counter.textContent = example ? `Разобрано разрядов: ${completed} из ${example.steps.length}` : '';
+    next.setAttribute('aria-disabled', String(busy || !example || completed === example.actions.length));
+    counter.textContent = example ? `Шаг ${completed} из ${example.actions.length}` : '';
   }
 
   function prepare(commit = false) {
@@ -898,7 +897,9 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
         firstField.value = first.record;
         secondField.value = second.record;
       }
-      example = { base, first: first.record, second: second.record, steps: makePlan(first.record, second.record, base) };
+      const steps = makePlan(first.record, second.record, base);
+      const actions = steps.flatMap((step) => [...step.loans.map((loan) => ({ loan })), { step }]);
+      example = { base, first: first.record, second: second.record, steps, actions };
       scroller.hidden = false;
       status.hidden = false;
       status.textContent = initialMessage;
@@ -1010,16 +1011,9 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
     receiverNote.textContent = '';
   }
 
-  async function showStep(step) {
+  async function subtractColumn(step) {
     const col = columnAt(step.place);
     col.classList.add('ca-active');
-    showColumns(col);
-    if (step.loans.length) {
-      status.textContent = 'Палочек в этом столбце не хватает. Ищем ближайший непустой разряд слева.';
-      await wait(470);
-      for (const loan of step.loans) await borrow(loan);
-    }
-
     showColumns(col);
     const area = col.querySelector('.ca-work .ca-sticks');
     const source = [...col.querySelectorAll('.ca-first .ca-stick')];
@@ -1044,7 +1038,12 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
     col.classList.remove('ca-active');
   }
 
-  function showCompletedStep(step) {
+  function describeAction({ loan, step }) {
+    if (loan) {
+      const receiver = loan.to ? `в разряде ${loan.to}` : 'в единицах';
+      status.textContent = `Разменяли одну палочку из разряда ${loan.from}. Теперь ${receiver} ${pluralSticks(loan.toCount)}.`;
+      return;
+    }
     const place = step.place ? `Разряд ${step.place}` : 'Единицы';
     const before = step.loans.length ? 'После размена сверху' : 'Сверху';
     status.textContent = `${place}. ${before} ${pluralSticks(step.before)}. Убираем ${pluralSticks(step.take)} и пишем ${alphabet[step.digit]} под чертой.`;
@@ -1055,19 +1054,25 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
     completed -= 1;
     result.hidden = true;
     drawBoard();
-    for (const step of example.steps.slice(0, completed)) {
-      for (const loan of step.loans) {
+    for (const { loan, step } of example.actions.slice(0, completed)) {
+      if (loan) {
         renderMinuend(columnAt(loan.from), loan.fromCount);
         renderMinuend(columnAt(loan.to), loan.toCount);
+      } else {
+        const col = columnAt(step.place);
+        col.querySelector('.ca-work .ca-sticks').innerHTML = sticks(step.digit, step.place);
+        writeDigit(col, step.digit, false);
       }
-      const col = columnAt(step.place);
-      col.querySelector('.ca-work .ca-sticks').innerHTML = sticks(step.digit, step.place);
-      writeDigit(col, step.digit, false);
     }
     if (completed) {
-      const step = example.steps[completed - 1];
-      showColumns(columnAt(step.place));
-      showCompletedStep(step);
+      const action = example.actions[completed - 1];
+      const { loan, step } = action;
+      if (loan) {
+        showColumns(columnAt(loan.from), columnAt(loan.to));
+      } else {
+        showColumns(columnAt(step.place));
+      }
+      describeAction(action);
     } else {
       status.textContent = initialMessage;
     }
@@ -1075,7 +1080,7 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
   }
 
   async function runSubtraction(all = false) {
-    if (busy || !example || (!all && completed === example.steps.length)) return;
+    if (busy || !example || (!all && completed === example.actions.length)) return;
     if (all) {
       completed = 0;
       result.hidden = true;
@@ -1084,15 +1089,19 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
     busy = true;
     updateControls();
     try {
-      const end = all ? example.steps.length : completed + 1;
+      const end = all ? example.actions.length : completed + 1;
       while (completed < end) {
-        const step = example.steps[completed];
-        await showStep(step);
+        const action = example.actions[completed];
+        if (action.loan) {
+          await borrow(action.loan);
+        } else {
+          await subtractColumn(action.step);
+        }
         completed += 1;
-        showCompletedStep(step);
+        describeAction(action);
         updateControls();
       }
-      if (completed === example.steps.length) {
+      if (completed === example.actions.length) {
         const raw = example.steps.map((step) => alphabet[step.digit]).reverse().join('');
         const answer = raw.replace(/^0+(?=.)/, '');
         for (let place = raw.length - 1; place >= answer.length; place -= 1) {

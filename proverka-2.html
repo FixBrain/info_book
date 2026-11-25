@@ -358,12 +358,19 @@ function makeAssessmentTasks(random, extended = true, parityGrid = extended) {
     const increment = pick(0, 1);
     const zeros = '0'.repeat(width);
     const maximum = digits[base - 1].repeat(width);
-    tasks.push({
+    const task = {
       title: 'Счётчик с фиксированной разрядностью',
       prompt: `Число позиций счётчика в основании ${base} равно ${width}. Что он покажет после указанного изменения? Запишите ровно столько цифр, сколько позиций в счётчике, включая ведущие нули.`,
       context: `Начальное состояние <b>${increment ? maximum : zeros}</b><sub>${base}</sub>, изменение <b>${increment ? '+1' : '−1'}</b>`,
       parts: [response('Показание счётчика', increment ? zeros : maximum, 'literal')],
-    });
+    };
+    if (parityGrid) {
+      const modulus = base ** width;
+      task.solution = increment
+        ? `После прибавления 1 получается запись ${'1' + zeros}. Старшая единица выходит за пределы счётчика. В ячейках остаётся ${zeros}.`
+        : `При вычитании 1 из нуля получаем −1. Счётчик хранит остаток при делении на ${modulus}. Прибавляем ${modulus} к −1 и получаем остаток ${modulus - 1}. В ячейках это ${maximum}.`;
+    }
+    tasks.push(task);
   }
 
   if (!extended) return tasks;
@@ -616,6 +623,14 @@ function assessmentRandom(seed) {
     return part.answer ?? asText(part, part.expected);
   }
 
+  function paritySummary(task, result) {
+    return task.rubric.map(({ parts }) => {
+      const label = task.parts[parts[0]].baseParity === 0 ? 'В чётных основаниях' : 'В нечётных основаниях';
+      const correctCount = parts.filter(index => result.correct[index]).length;
+      return `${label} верно ${correctCount} из ${parts.length}.`;
+    }).join(' ');
+  }
+
   function element(tag, className, text) {
     const node = document.createElement(tag);
     if (className) node.className = className;
@@ -688,6 +703,7 @@ function assessmentRandom(seed) {
     }
     if (progress.completedAt) {
       section.append(element('p', 'task-score', `За задание — ${result.points} из ${result.max}.`));
+      if (task.layout === 'parity') section.append(element('p', 'parity-summary', paritySummary(task, result)));
       if (task.solution) section.append(element('p', 'task-explanation', `Разбор. ${task.solution}`));
     }
     return section;
@@ -780,13 +796,15 @@ function assessmentRandom(seed) {
     const lines = [assessment.title, `Попытка ${progress.attempt} от ${date}`, `Результат — ${points} из ${scale.max}. ${status}`,
       `Лучший результат — ${progress.best} из ${scale.max}.`];
     tasks.forEach((task, index) => {
-      const { answers, max, points: taskPoints } = results[index];
+      const result = results[index];
+      const { answers, max, points: taskPoints } = result;
       lines.push('', `${index + 1}. ${task.title} — ${taskPoints} из ${max}.`, task.prompt);
       if (task.context) lines.push(plainContext(task.context));
       task.parts.forEach((part, partIndex) => {
         lines.push(`  ${part.label}`, `  Ваш ответ — ${asText(part, answers[partIndex])}.`,
           `  Верный ответ — ${expectedAnswer(part)}.`);
       });
+      if (task.layout === 'parity') lines.push(`  ${paritySummary(task, result)}`);
       if (task.solution) lines.push(`  Разбор. ${task.solution}`);
     });
     return lines.join('\r\n') + '\r\n';
