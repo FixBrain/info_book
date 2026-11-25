@@ -32,6 +32,15 @@ h1{margin:0 0 8px;font-size:clamp(25px,5vw,34px);line-height:1.2}
 .choice input{accent-color:var(--accent);margin:0;flex:none}
 .choice span{overflow-wrap:anywhere}
 fieldset:disabled .choice{cursor:default}
+.parity-table{width:min(100%,30rem);margin:12px auto 0;table-layout:fixed;border-collapse:separate;border-spacing:0}
+.parity-table :is(th,td){text-align:center;border-bottom:1px solid var(--line)}
+.parity-table thead th{padding:6px 2px;background:#eef4ff;color:#354258;font-size:clamp(.85rem,3.9vw,1rem)}
+.parity-table tbody th{padding:5px 2px;font-size:1.125rem;font-variant-numeric:tabular-nums}
+.parity-option{display:grid;place-items:center;min-height:44px;cursor:pointer}
+.parity-option input{margin:0;width:19px;height:19px;accent-color:var(--accent)}
+.parity-option:has(input:checked){background:#eef4ff}
+.parity-option:has(input:disabled){cursor:default}
+.parity-table .feedback{display:block;font-weight:400}
 .feedback{font-size:14px;overflow-wrap:anywhere}
 .correct{color:#236637}
 .incorrect{color:#8b4430}
@@ -103,7 +112,7 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
 const assessment = {"id": 2, "title": "Проверочная работа 2. Арифметика и свойства чисел", "max": 22, "threshold": 11};
 const previousAssessment = { ...assessment, max: 14, threshold: 7 };
 
-function makeAssessmentTasks(random, extended = true) {
+function makeAssessmentTasks(random, extended = true, parityGrid = extended) {
   const digits = '0123456789ABCDEFGHIJ';
   const pick = (from, to) => from + Math.floor(random() * (to - from + 1));
   const places = (length, make) => Array.from({length}, (_, index) => make(index));
@@ -433,6 +442,50 @@ function makeAssessmentTasks(random, extended = true) {
     });
   }
 
+  if (parityGrid) {
+    const options = [
+      {value: 'even', label: 'Чётное'},
+      {value: 'odd', label: 'Нечётное'},
+    ];
+    const rows = [3, 4].flatMap((count, baseParity) => {
+      const bases = places(10 - baseParity, (index) => 2 * (index + 1) + baseParity);
+      const firstParity = pick(0, 1);
+      return places(count, (index) => {
+        const base = bases.splice(pick(0, bases.length - 1), 1)[0];
+        const length = pick(3, 5);
+        const values = places(length, (position) => pick(position === 0 ? 1 : 0, base - 1));
+        const earlierParity = values.slice(0, -2).reduce((sum, digit) => sum + digit, 0) % 2;
+        const prefixParity = index < 2 ? 1 : pick(0, 1);
+        const penultimateParity = earlierParity ^ prefixParity;
+        values[length - 2] = penultimateParity + 2 * pick(0, Math.floor((base - 1 - penultimateParity) / 2));
+        const answerParity = (firstParity + index) % 2;
+        const lastParity = answerParity ^ (baseParity * prefixParity);
+        values[length - 1] = lastParity + 2 * pick(0, Math.floor((base - 1 - lastParity) / 2));
+        const value = symbols(values);
+        return {
+          baseParity, base, value, label: `${value} в основании ${base}`,
+          kind: 'radio', options, expected: answerParity ? 'odd' : 'even', points: 0,
+        };
+      });
+    });
+    for (let index = rows.length - 1; index > 0; index--) {
+      const swap = pick(0, index);
+      [rows[index], rows[swap]] = [rows[swap], rows[index]];
+    }
+    // Keep the legacy draws above so other questions still match the same seed.
+    tasks[6] = {
+      title: 'Чётные и нечётные числа',
+      prompt: 'Отметьте в каждой строке, чётное число или нечётное. По одному баллу за все верные ответы в чётных основаниях и за все верные ответы в нечётных основаниях.',
+      layout: 'parity',
+      parts: rows,
+      rubric: [0, 1].map((baseParity) => ({
+        parts: rows.flatMap((row, index) => row.baseParity === baseParity ? [index] : []),
+        points: 1,
+      })),
+      solution: 'При чётном основании смотрим на значение последней цифры. При нечётном основании складываем значения всех цифр и проверяем чётность суммы.',
+    };
+  }
+
   return tasks;
 }
 
@@ -449,7 +502,8 @@ function assessmentRandom(seed) {
 (() => {
   'use strict';
 
-  const key = `ss-assessment:v2:${assessment.id}`;
+  const key = `ss-assessment:v3:${assessment.id}`;
+  const extendedKey = `ss-assessment:v2:${assessment.id}`;
   const previousKey = `ss-assessment:v1:${assessment.id}`;
   const byId = (id) => document.getElementById(id);
   const form = byId('assessment-form');
@@ -464,7 +518,7 @@ function assessmentRandom(seed) {
     return Math.floor(Math.random() * 4294967296);
   }
 
-  function parseProgress(text, extended) {
+  function parseProgress(text, extended, parityGrid = false) {
     try {
       const progress = JSON.parse(text);
       const scale = extended ? assessment : previousAssessment;
@@ -476,7 +530,7 @@ function assessmentRandom(seed) {
           (progress.last && (typeof progress.last.report !== 'string' || !Number.isInteger(progress.last.attempt)))) {
         return null;
       }
-      return { ...progress, extended };
+      return { ...progress, extended, parityGrid };
     } catch {
       return null;
     }
@@ -484,19 +538,26 @@ function assessmentRandom(seed) {
 
   function loadProgress() {
     try {
-      return parseProgress(localStorage.getItem(key), true) ??
+      const current = parseProgress(localStorage.getItem(key), true, true);
+      if (current) return current;
+      const older = parseProgress(localStorage.getItem(extendedKey), true) ??
         parseProgress(localStorage.getItem(previousKey), false);
+      if (older?.extended && !older.completedAt && !Object.keys(older.values).length) {
+        older.parityGrid = true;
+      }
+      return older;
     } catch {
       return null;
     }
   }
 
-  let progress = loadProgress() ?? { seed: newSeed(), attempt: 1, values: {}, completedAt: null, best: 0, last: null, extended: true };
+  let progress = loadProgress() ?? { seed: newSeed(), attempt: 1, values: {}, completedAt: null, best: 0, last: null, extended: true, parityGrid: true };
   let tasks;
 
   function saveProgress() {
     try {
-      localStorage.setItem(progress.extended ? key : previousKey, JSON.stringify(progress));
+      const progressKey = progress.parityGrid ? key : progress.extended ? extendedKey : previousKey;
+      localStorage.setItem(progressKey, JSON.stringify(progress));
     } catch {
       byId('assessment-storage').hidden = false;
     }
@@ -611,16 +672,20 @@ function assessmentRandom(seed) {
       context.innerHTML = task.context;
       section.append(context);
     }
-    task.parts.forEach((part, partIndex) => {
-      const field = renderPart(part, index, partIndex);
-      if (progress.completedAt) {
-        field.disabled = true;
-        const correct = result.correct[partIndex];
-        const hint = correct ? 'Верно.' : `Верный ответ — ${expectedAnswer(part)}.`;
-        field.append(element('p', `feedback ${correct ? 'correct' : 'incorrect'}`, hint));
-      }
-      section.append(field);
-    });
+    if (task.layout === 'parity') {
+      section.append(renderParityTable(task, index, result));
+    } else {
+      task.parts.forEach((part, partIndex) => {
+        const field = renderPart(part, index, partIndex);
+        if (progress.completedAt) {
+          field.disabled = true;
+          const correct = result.correct[partIndex];
+          const hint = correct ? 'Верно.' : `Верный ответ — ${expectedAnswer(part)}.`;
+          field.append(element('p', `feedback ${correct ? 'correct' : 'incorrect'}`, hint));
+        }
+        section.append(field);
+      });
+    }
     if (progress.completedAt) {
       section.append(element('p', 'task-score', `За задание — ${result.points} из ${result.max}.`));
       if (task.solution) section.append(element('p', 'task-explanation', `Разбор. ${task.solution}`));
@@ -628,11 +693,51 @@ function assessmentRandom(seed) {
     return section;
   }
 
+  function renderParityTable(task, taskIndex, result) {
+    const table = element('table', 'parity-table');
+    const header = table.createTHead().insertRow();
+    for (const text of ['Чётное', 'Число', 'Нечётное']) {
+      const cell = element('th', '', text);
+      cell.scope = 'col';
+      header.append(cell);
+    }
+    const body = table.createTBody();
+    task.parts.forEach((part, partIndex) => {
+      const row = body.insertRow();
+      const name = nameOf(taskIndex, partIndex);
+      const addChoice = (option) => {
+        const label = element('label', 'parity-option');
+        const input = element('input');
+        input.type = 'radio';
+        input.name = name;
+        input.value = option.value;
+        input.checked = progress.values[name] === option.value;
+        input.disabled = Boolean(progress.completedAt);
+        input.setAttribute('aria-label', `${part.label}, ${option.label.toLowerCase()}`);
+        label.append(input);
+        row.insertCell().append(label);
+      };
+      const [even, odd] = part.options;
+      addChoice(even);
+      const numberCell = element('th', '', part.value);
+      numberCell.scope = 'row';
+      numberCell.append(element('sub', '', part.base));
+      if (progress.completedAt) {
+        const correct = result.correct[partIndex];
+        const hint = correct ? 'Верно' : `Ответ — ${expectedAnswer(part).toLowerCase()}`;
+        numberCell.append(element('span', `feedback ${correct ? 'correct' : 'incorrect'}`, hint));
+      }
+      row.append(numberCell);
+      addChoice(odd);
+    });
+    return table;
+  }
+
   function render() {
     const scale = progress.extended ? assessment : previousAssessment;
     const count = progress.extended ? 'Двенадцать' : 'Девять';
     byId('assessment-scope').textContent = `${count} заданий по главам 7–9А. Для зачёта нужно набрать ${scale.threshold} из ${scale.max} баллов.`;
-    tasks = makeAssessmentTasks(assessmentRandom(progress.seed), progress.extended);
+    tasks = makeAssessmentTasks(assessmentRandom(progress.seed), progress.extended, progress.parityGrid);
     const results = evaluate();
     taskList.replaceChildren(...tasks.map((task, index) => renderTask(task, index, results[index])));
     byId('assessment-attempt').textContent = `Попытка ${progress.attempt}`;
@@ -714,7 +819,7 @@ function assessmentRandom(seed) {
     let seed = newSeed();
     while (JSON.stringify(makeAssessmentTasks(assessmentRandom(seed))) === previousVariant) seed = (seed + 1) >>> 0;
     const best = progress.extended ? progress.best : 0;
-    progress = { ...progress, seed, attempt: progress.attempt + 1, values: {}, completedAt: null, best, extended: true };
+    progress = { ...progress, seed, attempt: progress.attempt + 1, values: {}, completedAt: null, best, extended: true, parityGrid: true };
     saveProgress();
     render();
     byId('assessment-attempt').focus();
@@ -733,7 +838,7 @@ function assessmentRandom(seed) {
   });
 
   window.addEventListener('storage', (event) => {
-    if (event.key !== key && event.key !== previousKey) return;
+    if (event.key !== key && event.key !== extendedKey && event.key !== previousKey) return;
     const updated = loadProgress();
     if (!updated) return;
     progress = updated;
