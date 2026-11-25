@@ -44,7 +44,7 @@ button:disabled{opacity:.53;cursor:default}
 .result:empty{display:none}
 .result{background:#eef4ff;border:1px solid #d5e1ff;padding:12px 15px;border-radius:10px;margin:12px 0}
 .storage{color:#8b4430;margin:.6em 0}
-footer{border-top:1px solid var(--line);padding-top:12px;padding-bottom:30px}
+footer{border-top:1px solid var(--line);padding-top:12px;padding-bottom:30px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px}
 @media(max-width:540px){.question{padding:14px}.math-context{font-size:17px}nav{gap:5px 12px}}
 
 html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height) + 1rem)}
@@ -81,7 +81,7 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
 </header>
 <main>
   <h1>Проверочная работа 1. Запись, сравнение и перевод чисел</h1>
-  <p class="lead">Шесть заданий по главам 1–6. Для зачёта нужно набрать 5 из 10 баллов.</p>
+  <p class="lead">Шесть заданий по главам 1–6А. Для зачёта нужно набрать 5 из 10 баллов.</p>
   <p>Вводите ответы без индекса основания. Буквенные цифры A–J пишите латиницей.</p>
   <p class="progress"><strong id="assessment-attempt" tabindex="-1"></strong><span id="assessment-best"></span></p>
   <noscript>Для генерации заданий и проверки ответов включите JavaScript в браузере.</noscript>
@@ -97,6 +97,7 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
   </form>
 </main>
 <footer>
+  <a href="06a-perevod-mezhdu-sistemami.html">← 6А. Перевод между системами</a>
   <a href="07-slozhenie-i-vychitanie.html">Дальше — 7. Сложение столбиком</a>
 </footer>
 <script>

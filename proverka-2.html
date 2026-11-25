@@ -81,7 +81,7 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
 </header>
 <main>
   <h1>Проверочная работа 2. Арифметика и свойства чисел</h1>
-  <p class="lead">Девять заданий по главам 7–9А. Для зачёта нужно набрать 7 из 14 баллов.</p>
+  <p class="lead" id="assessment-scope">Двенадцать заданий по главам 7–9А. Для зачёта нужно набрать 11 из 22 баллов.</p>
   <p>Вводите ответы без индекса основания. Буквенные цифры A–J пишите латиницей. Дробную часть отделяйте запятой.</p>
   <p class="progress"><strong id="assessment-attempt" tabindex="-1"></strong><span id="assessment-best"></span></p>
   <noscript>Для генерации заданий и проверки ответов включите JavaScript в браузере.</noscript>
@@ -100,9 +100,10 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
   <a href="09-alternativnye-alfavity.html">Дальше — 10. Альтернативные алфавиты</a>
 </footer>
 <script>
-const assessment = {"id": 2, "title": "Проверочная работа 2. Арифметика и свойства чисел", "max": 14, "threshold": 7};
+const assessment = {"id": 2, "title": "Проверочная работа 2. Арифметика и свойства чисел", "max": 22, "threshold": 11};
+const previousAssessment = { ...assessment, max: 14, threshold: 7 };
 
-function makeAssessmentTasks(random) {
+function makeAssessmentTasks(random, extended = true) {
   const digits = '0123456789ABCDEFGHIJ';
   const pick = (from, to) => from + Math.floor(random() * (to - from + 1));
   const places = (length, make) => Array.from({length}, (_, index) => make(index));
@@ -312,12 +313,34 @@ function makeAssessmentTasks(random) {
       values[length - 1] = pick(1, base - 1);
     }
     const remainder = number(values.slice(-count), base);
-    tasks.push({
+    const task = {
       title: 'Остаток от деления на степень основания',
       prompt: `Найдите остаток от деления. Запишите его в системе с основанием ${base}, без ведущих нулей.`,
       context: `Делимое <b>${marked(symbols(values), base)}</b>, делитель <b>${base}<sup>${count}</sup></b>`,
       parts: [response('Остаток', record(remainder, base))],
-    });
+    };
+    if (extended) {
+      const divisor = base + 1;
+      const terms = values.slice().reverse();
+      const alternating = terms.reduce((sum, digit, index) => sum + (index % 2 ? -digit : digit), 0);
+      const alternateRemainder = ((alternating % divisor) + divisor) % divisor;
+      const expression = terms.map((digit, index) => index === 0 ? String(digit) : `${index % 2 ? '−' : '+'} ${digit}`).join(' ');
+      const options = [
+        {value: 'suffix', label: 'Старшие веса кратны делителю, поэтому достаточно младших цифр.'},
+        {value: 'alternate', label: 'Веса справа налево заменяем на 1, −1, 1 и так далее. Значения цифр складываем с чередованием знаков.'},
+        {value: 'sum', label: 'Все веса дают остаток 1, поэтому достаточно сложить значения цифр.'},
+      ];
+      task.title = 'Остатки при двух делителях';
+      task.prompt = `Найдите остатки от деления одного числа на два делителя. В пункте а) запишите остаток в основании ${base} без ведущих нулей, в пункте б) — в десятичной системе.`;
+      task.context = `Делимое <b>${marked(symbols(values), base)}</b><br>а) делитель <b>${base}<sup>${count}</sup></b><br>б) делитель <b>${divisor}</b>`;
+      task.parts = [
+        response(`а) Остаток в основании ${base}`, record(remainder, base)),
+        response('б) Остаток в десятичной системе', alternateRemainder, 'integer'),
+        {kind: 'radio', label: 'Какое свойство весов используем в пункте б)?', options, expected: 'alternate', points: 1},
+      ];
+      task.solution = `а) Веса старших разрядов кратны ${base} в степени ${count}, поэтому берём ${count} младшие цифры. б) Основание ${base} на единицу меньше ${divisor}, поэтому веса справа налево можно заменить на 1, −1, 1 и так далее. Получаем ${expression} = ${alternating}. Остаток при делении на ${divisor} равен ${alternateRemainder}.`;
+    }
+    tasks.push(task);
   }
 
   {
@@ -331,6 +354,82 @@ function makeAssessmentTasks(random) {
       prompt: `Число позиций счётчика в основании ${base} равно ${width}. Что он покажет после указанного изменения? Запишите ровно столько цифр, сколько позиций в счётчике, включая ведущие нули.`,
       context: `Начальное состояние <b>${increment ? maximum : zeros}</b><sub>${base}</sub>, изменение <b>${increment ? '+1' : '−1'}</b>`,
       parts: [response('Показание счётчика', increment ? zeros : maximum, 'literal')],
+    });
+  }
+
+  if (!extended) return tasks;
+
+  {
+    const base = 2 * pick(2, 4);
+    const divisor = base - 1;
+    const first = pick(1, base - 1);
+    const second = pick(1, 2);
+    const last = pick(0, base - 1);
+    const fixedSum = first + second + last;
+    const digit = places(base, (value) => value).find((value) => (fixedSum + 2 * value) % divisor === 0);
+    const digitSum = fixedSum + 2 * digit;
+    // Dividing the place weights N and N² by N−1 gives quotients 1 and N+1, with remainder 1 in both cases.
+    const quotient = second * (base + 1) + first + digit + digitSum / divisor;
+    tasks.push({
+      title: 'Неизвестная цифра и делимость',
+      prompt: `Цифра x в обоих слагаемых имеет одно и то же значение. Найдите наименьшую допустимую цифру x, при которой сумма делится на ${divisor}. Для неё найдите частное. Оба ответа запишите в десятичной системе.`,
+      context: calculation(`${first}<i>x</i>`, '+', `${second}<i>x</i>${last}`, base),
+      parts: [
+        response('Наименьшее значение x', digit, 'integer'),
+        response(`Частное от деления суммы на ${divisor}`, quotient, 'integer'),
+      ],
+      solution: `Основание ${base} даёт остаток 1 при делении на ${divisor}, поэтому проверяем сумму цифр ${fixedSum} + 2 · x. Наименьшая подходящая цифра — ${digit}. Частное можно найти по разрядам. Один разряд веса ${base} даёт 1 в частное и 1 в остаток, а разряд веса ${base}² даёт ${base + 1} в частное и 1 в остаток. Получаем ${second} · ${base + 1} + (${first} + ${digit}) + ${digitSum} ÷ ${divisor} = ${quotient}.`,
+    });
+  }
+
+  {
+    const base = pick(4, 7);
+    const lowerPower = pick(2, 3);
+    const gap = pick(2, 4);
+    const upperPower = lowerPower + gap;
+    const upperDigit = pick(1, base - 1);
+    const lowerDigit = pick(2, base - 1);
+    const groups = pick(1, base - 2);
+    const limit = groups * base + pick(1, base - 1);
+    const largest = groups * base;
+    const tail = digits[base - 1].repeat(lowerPower - 2) + digits[base - groups] + '0';
+    const written = upperDigit + '0'.repeat(gap - 1) + (lowerDigit - 1) + tail;
+    tasks.push({
+      title: 'Нули после вычитания',
+      prompt: `Найдите наибольшее целое x в указанном диапазоне, при котором в записи результата по основанию ${base} ровно ${gap} нуля. Затем запишите сам результат в основании ${base} без ведущих нулей. Границы для x даны в десятичной системе.`,
+      context: `${upperDigit} · ${base}<sup>${upperPower}</sup> + ${lowerDigit} · ${base}<sup>${lowerPower}</sup> − x, &nbsp; 1 ≤ x ≤ ${limit}`,
+      parts: [
+        response('Наибольшее x в десятичной системе', largest, 'integer'),
+        response(`Результат в основании ${base}`, written),
+      ],
+      solution: `Заём уменьшает цифру ${lowerDigit} до ${lowerDigit - 1}. Число нулей между двумя старшими ненулевыми цифрами — ${gap - 1}. Ниже места займа все цифры до двух младших равны ${base - 1}. Цифра в предпоследнем разряде ненулевая, так как x < ${base - 1} · ${base}. Ещё один ноль может появиться только в единицах. Для этого x должно делиться на ${base}. Наибольшее такое x до ${limit} равно ${largest}. Младшие цифры — ${tail}, вся запись — ${written}.`,
+    });
+  }
+
+  {
+    const base = pick(4, 8);
+    const power = pick(2, 3);
+    const top = 2 * power;
+    const borrow = pick(2, top - 1);
+    const first = pick(2, base - 1);
+    const short = pick(1, base - 1);
+    const units = pick(1, base - 1);
+    const values = [
+      first - 1, ...places(top - borrow, () => base - 1),
+      ...places(borrow - 2, () => 0), short - 1, base - units,
+    ];
+    const written = symbols(values);
+    const count = values.filter((digit) => digit % 2 === 0).length;
+    const square = base * base;
+    tasks.push({
+      title: 'Чётные цифры в записи',
+      prompt: `Перепишите степени через основание ${base} и выполните действия по разрядам. Запишите значение выражения в основании ${base} и укажите, сколько в нём цифр с чётным значением. Ноль тоже считается чётной цифрой.`,
+      context: `${first} · ${square}<sup>${power}</sup> − ${base}<sup>${borrow}</sup> + ${short} · ${base} − ${units}`,
+      parts: [
+        response(`Запись в основании ${base}`, written),
+        response('Количество чётных цифр', count, 'integer'),
+      ],
+      solution: `${square} в степени ${power} равно ${base} в степени ${top}. После вычитания ${base} в степени ${borrow} старшая цифра становится ${first - 1}, а заём заполняет разряды до места вычитания цифрой ${base - 1}. Два младших разряда определяет ${short} · ${base} − ${units}. Получаем цифры ${short - 1} и ${base - units}. В записи ${written} чётных цифр: ${count}.`,
     });
   }
 
@@ -350,7 +449,8 @@ function assessmentRandom(seed) {
 (() => {
   'use strict';
 
-  const key = `ss-assessment:v1:${assessment.id}`;
+  const key = `ss-assessment:v2:${assessment.id}`;
+  const previousKey = `ss-assessment:v1:${assessment.id}`;
   const byId = (id) => document.getElementById(id);
   const form = byId('assessment-form');
   const taskList = byId('assessment-tasks');
@@ -364,18 +464,19 @@ function assessmentRandom(seed) {
     return Math.floor(Math.random() * 4294967296);
   }
 
-  function parseProgress(text) {
+  function parseProgress(text, extended) {
     try {
       const progress = JSON.parse(text);
+      const scale = extended ? assessment : previousAssessment;
       if (!progress || !Number.isInteger(progress.seed) || progress.seed < 0 || progress.seed > 0xFFFFFFFF ||
           !Number.isInteger(progress.attempt) || progress.attempt < 1 || !progress.values || typeof progress.values !== 'object' ||
           Object.values(progress.values).some((value) => typeof value !== 'string' && !Array.isArray(value)) ||
-          !Number.isInteger(progress.best) || progress.best < 0 || progress.best > assessment.max ||
+          !Number.isInteger(progress.best) || progress.best < 0 || progress.best > scale.max ||
           (progress.completedAt && typeof progress.completedAt !== 'string') ||
           (progress.last && (typeof progress.last.report !== 'string' || !Number.isInteger(progress.last.attempt)))) {
         return null;
       }
-      return progress;
+      return { ...progress, extended };
     } catch {
       return null;
     }
@@ -383,18 +484,19 @@ function assessmentRandom(seed) {
 
   function loadProgress() {
     try {
-      return parseProgress(localStorage.getItem(key));
+      return parseProgress(localStorage.getItem(key), true) ??
+        parseProgress(localStorage.getItem(previousKey), false);
     } catch {
       return null;
     }
   }
 
-  let progress = loadProgress() ?? { seed: newSeed(), attempt: 1, values: {}, completedAt: null, best: 0, last: null };
+  let progress = loadProgress() ?? { seed: newSeed(), attempt: 1, values: {}, completedAt: null, best: 0, last: null, extended: true };
   let tasks;
 
   function saveProgress() {
     try {
-      localStorage.setItem(key, JSON.stringify(progress));
+      localStorage.setItem(progress.extended ? key : previousKey, JSON.stringify(progress));
     } catch {
       byId('assessment-storage').hidden = false;
     }
@@ -521,24 +623,30 @@ function assessmentRandom(seed) {
     });
     if (progress.completedAt) {
       section.append(element('p', 'task-score', `За задание — ${result.points} из ${result.max}.`));
+      if (task.solution) section.append(element('p', 'task-explanation', `Разбор. ${task.solution}`));
     }
     return section;
   }
 
   function render() {
-    tasks = makeAssessmentTasks(assessmentRandom(progress.seed));
+    const scale = progress.extended ? assessment : previousAssessment;
+    const count = progress.extended ? 'Двенадцать' : 'Девять';
+    byId('assessment-scope').textContent = `${count} заданий по главам 7–9А. Для зачёта нужно набрать ${scale.threshold} из ${scale.max} баллов.`;
+    tasks = makeAssessmentTasks(assessmentRandom(progress.seed), progress.extended);
     const results = evaluate();
     taskList.replaceChildren(...tasks.map((task, index) => renderTask(task, index, results[index])));
     byId('assessment-attempt').textContent = `Попытка ${progress.attempt}`;
-    byId('assessment-best').textContent = progress.last ? `Лучший результат — ${progress.best} из ${assessment.max}.` : '';
+    byId('assessment-best').textContent = progress.last && (progress.last.extended ?? false) === progress.extended
+      ? `Лучший результат — ${progress.best} из ${scale.max}.`
+      : '';
     retry.hidden = !progress.completedAt;
     download.disabled = !progress.last;
     updateSubmit();
     score.replaceChildren();
     if (progress.completedAt) {
       const points = results.reduce((sum, result) => sum + result.points, 0);
-      score.append(element('strong', '', `${points} из ${assessment.max} баллов. `),
-        document.createTextNode(points >= assessment.threshold ? 'Работа зачтена.' : 'Порог пока не достигнут.'));
+      score.append(element('strong', '', `${points} из ${scale.max} баллов. `),
+        document.createTextNode(points >= scale.threshold ? 'Работа зачтена.' : 'Порог пока не достигнут.'));
     }
   }
 
@@ -555,15 +663,17 @@ function assessmentRandom(seed) {
       const marker = index.tagName === 'SUB' ? '_' : '^';
       index.replaceWith(document.createTextNode(marker + index.textContent));
     }
+    for (const lineBreak of template.content.querySelectorAll('br')) lineBreak.replaceWith(' ');
     for (const paragraph of template.content.querySelectorAll('p')) paragraph.append('\n');
     return template.content.textContent.trim().replace(/\s+/g, ' ');
   }
 
   function makeReport(results, points) {
+    const scale = progress.extended ? assessment : previousAssessment;
     const date = new Date(progress.completedAt).toLocaleString('ru-RU');
-    const status = points >= assessment.threshold ? 'Работа зачтена.' : 'Порог пока не достигнут.';
-    const lines = [assessment.title, `Попытка ${progress.attempt} от ${date}`, `Результат — ${points} из ${assessment.max}. ${status}`,
-      `Лучший результат — ${progress.best} из ${assessment.max}.`];
+    const status = points >= scale.threshold ? 'Работа зачтена.' : 'Порог пока не достигнут.';
+    const lines = [assessment.title, `Попытка ${progress.attempt} от ${date}`, `Результат — ${points} из ${scale.max}. ${status}`,
+      `Лучший результат — ${progress.best} из ${scale.max}.`];
     tasks.forEach((task, index) => {
       const { answers, max, points: taskPoints } = results[index];
       lines.push('', `${index + 1}. ${task.title} — ${taskPoints} из ${max}.`, task.prompt);
@@ -572,6 +682,7 @@ function assessmentRandom(seed) {
         lines.push(`  ${part.label}`, `  Ваш ответ — ${asText(part, answers[partIndex])}.`,
           `  Верный ответ — ${expectedAnswer(part)}.`);
       });
+      if (task.solution) lines.push(`  Разбор. ${task.solution}`);
     });
     return lines.join('\r\n') + '\r\n';
   }
@@ -591,7 +702,7 @@ function assessmentRandom(seed) {
     const results = evaluate();
     const points = results.reduce((sum, result) => sum + result.points, 0);
     progress = { ...progress, completedAt: new Date().toISOString(), best: Math.max(progress.best, points) };
-    progress.last = { attempt: progress.attempt, report: makeReport(results, points) };
+    progress.last = { attempt: progress.attempt, report: makeReport(results, points), extended: progress.extended };
     saveProgress();
     render();
     score.focus();
@@ -602,7 +713,8 @@ function assessmentRandom(seed) {
     const previousVariant = JSON.stringify(tasks);
     let seed = newSeed();
     while (JSON.stringify(makeAssessmentTasks(assessmentRandom(seed))) === previousVariant) seed = (seed + 1) >>> 0;
-    progress = { ...progress, seed, attempt: progress.attempt + 1, values: {}, completedAt: null };
+    const best = progress.extended ? progress.best : 0;
+    progress = { ...progress, seed, attempt: progress.attempt + 1, values: {}, completedAt: null, best, extended: true };
     saveProgress();
     render();
     byId('assessment-attempt').focus();
@@ -621,7 +733,7 @@ function assessmentRandom(seed) {
   });
 
   window.addEventListener('storage', (event) => {
-    if (event.key !== key) return;
+    if (event.key !== key && event.key !== previousKey) return;
     const updated = loadProgress();
     if (!updated) return;
     progress = updated;
