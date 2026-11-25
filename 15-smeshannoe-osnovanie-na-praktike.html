@@ -71,6 +71,17 @@ main [id]{scroll-margin-top:16.5rem}
 @media(min-width:700px){main [id]{scroll-margin-top:11.5rem}}
 @media(max-width:540px){main [id]{scroll-margin-top:14px}}
 .mixed-predict summary{width:fit-content;color:#1647a8;cursor:pointer}
+.mixed-worked-table{width:min(100%,34rem);font-size:clamp(12px,3.6vw,15px);line-height:1.35}
+.mixed-worked-table :is(th,td){padding:.35em .24em;text-align:center}
+.mixed-worked-table .mixed-worked-transfer{background:#e8f1ff;color:#163d82;font-weight:650}
+.mixed-worked-table .mixed-worked-remainder{background:#fff0bd;color:#533500;font-weight:650}
+.mixed-clock-column th[scope=row]{text-align:left;white-space:nowrap;padding-inline:.4em}
+.mixed-clock-column .mixed-clock-total>*{border-top:2px solid #324365;font-weight:700}
+.mixed-clock-column .mixed-clock-total td:first-of-type{background:#e8f1ff;color:#163d82}
+@media(max-width:540px){
+  .mixed-worked-table :is(th,td){padding-inline:.12em}
+  .mixed-clock-column th[scope=row]{padding-inline:.3em}
+}
 #mixed-pixel-model {
   --mxp-line: #d9e4f6;
   --mxp-muted: #5b6472;
@@ -250,19 +261,35 @@ main [id]{scroll-margin-top:16.5rem}
   <h2 id="mixed-clock-application">Как устроены разряды времени</h2>
   <p>У часов, минут и секунд основания слева направо (24, 60, 60). В 24-часовой записи часы идут от 0 до 23, минуты и секунды — от 0 до 59. Если измерять время в секундах, веса справа налево равны 1, 60 и 60 · 60.</p>
   <p>По схеме Горнера в 23:59:45 получаем (23 · 60 + 59) · 60 + 45 = 86 385 секунд от начала суток. Основание 24 используется для переноса из часов в сутки.</p>
-  <p>На часах 23:59:45. Какое время будет через 100 секунд? Разложим 100 секунд на 1 минуту и 40 секунд, чтобы можно было складывать по разрядам.</p>
+  <p>На часах 23:59:45. Какое время будет через 100 секунд? Разделим 100 на 60 с остатком. По равенству 100 = 1 · 60 + 40 получаем 1 минуту и 40 секунд.</p>
   <section class="example">
     <h3>Через полночь</h3>
+    <div class="table-wrap">
+      <table class="mixed-worked-table mixed-clock-column" id="mixed-clock-addition">
+        <caption>Сложение столбиком</caption>
+        <thead>
+          <tr><th scope="col">Разряд</th><th scope="col">Сутки</th><th scope="col">Часы</th><th scope="col">Минуты</th><th scope="col">Секунды</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Основание</th><td>—</td><td>24</td><td>60</td><td>60</td></tr>
+          <tr><th scope="row">Перенос <span aria-hidden="true">←</span></th><td class="mixed-worked-transfer">1</td><td class="mixed-worked-transfer">1</td><td class="mixed-worked-transfer">1</td><td>—</td></tr>
+          <tr><th scope="row">Было</th><td>0</td><td>23</td><td>59</td><td>45</td></tr>
+          <tr><th scope="row">+ 100 с</th><td>0</td><td>00</td><td>01</td><td>40</td></tr>
+          <tr class="mixed-clock-total"><th scope="row">Ответ</th><td>1</td><td>00</td><td>01</td><td>25</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Складываем справа налево. Строка «Перенос» показывает, какая единица пришла в каждый разряд справа.</p>
     <ol>
-      <li>В секундах получаем 45 + 40 = 85. Отделяем 60 секунд, оставляем 25 и переносим 1 минуту.</li>
-      <li>В минутах получаем 59 + 1 + 1 = 61. Отделяем 60 минут, оставляем 1 и переносим 1 час.</li>
-      <li>В часах получаем 23 + 1 = 24. Отделяем 24 часа, в разряде часов остаётся 0 и начинается новый день.</li>
+      <li>Секунды. 45 + 40 = 1 · 60 + 25. Пишем 25, переносим 1 минуту.</li>
+      <li>Минуты. 59 + 1 + 1 = 1 · 60 + 1. Пишем 01, переносим 1 час.</li>
+      <li>Часы. 23 + 1 = 1 · 24 + 0. Пишем 00, переносим 1 сутки.</li>
     </ol>
     <div class="formula">23:59:45 + 100 секунд → 00:01:25 следующего дня</div>
-    <p>Для перехода от секунд к минутам берём 60, от минут к часам тоже 60, а от часов к суткам берём 24.</p>
+    <p>Единица в столбце «Сутки» показывает, что наступил следующий день.</p>
   </section>
 
-  <p>Модель начинает с 23:59:58. Предскажите время после двух нажатий «+1 секунда». Проверьте, через какие разряды проходит перенос.</p>
+  <p>Модель начинает с 23:59:58. Предскажите время после двух нажатий «+1 секунда». Сравните цепочку переносов со строкой «Перенос» в таблице.</p>
   <div id="mixed-clock-model"></div>
 
   <h2 id="mixed-pixel-application">От координат пикселя к одному индексу</h2>
@@ -271,13 +298,21 @@ main [id]{scroll-margin-top:16.5rem}
   <section class="example">
     <h3>Семь позиций вперёд</h3>
     <p>Начинаем с координат (1, 2, 3). Это второй кадр, третья строка и четвёртый столбец. По весам получаем 1 · 20 + 2 · 5 + 3 = 33. Та же запись по Горнеру даёт (1 · 4 + 2) · 5 + 3 = 33.</p>
-    <p>Переходим на 7 позиций вперёд, к индексу 33 + 7 = 40. Восстанавливаем координаты с конца.</p>
-    <ol>
-      <li>40 = 8 · 5 + 0. Столбец имеет индекс 0.</li>
-      <li>8 = 2 · 4 + 0. Строка имеет индекс 0.</li>
-      <li>2 = 0 · 3 + 2. Кадр имеет индекс 2.</li>
-    </ol>
-    <p>Получаем <strong>(2, 0, 0)</strong>, то есть первый пиксель третьего кадра. Проверка даёт 2 · 20 + 0 · 5 + 0 = 40.</p>
+    <p>Переходим на 7 позиций вперёд и получаем индекс 33 + 7 = 40. Делим его на основания разрядов справа налево.</p>
+    <div class="table-wrap">
+      <table class="mixed-worked-table" id="mixed-pixel-division">
+        <caption>Координаты по индексу 40</caption>
+        <thead>
+          <tr><th scope="col" aria-label="Делимое">Делим</th><th scope="col" aria-label="Делитель">На</th><th scope="col">Частное</th><th scope="col">Остаток</th><th scope="col">Разряд</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">40</th><td>5</td><td class="mixed-worked-transfer">8 <span aria-hidden="true">↓</span></td><td class="mixed-worked-remainder">0</td><td>Столбец</td></tr>
+          <tr><th scope="row" class="mixed-worked-transfer">8</th><td>4</td><td class="mixed-worked-transfer">2 <span aria-hidden="true">↓</span></td><td class="mixed-worked-remainder">0</td><td>Строка</td></tr>
+          <tr><th scope="row" class="mixed-worked-transfer">2</th><td>3</td><td>0</td><td class="mixed-worked-remainder">2</td><td>Кадр</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Голубым отмечены частные, которые становятся делимыми в следующей строке. Жёлтым отмечены остатки. Читаем их снизу вверх и получаем <strong>(2, 0, 0)</strong>, первый пиксель третьего кадра. Проверка по весам даёт 2 · 20 + 0 · 5 + 0 = 40.</p>
   </section>
 
   <section class="note mixed-predict">

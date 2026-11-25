@@ -86,35 +86,23 @@ main [id]{scroll-margin-top:16.5rem}
 .mixed-digit-band span{display:block}
 .mixed-digit-band .mixed-carry-cell{background:#fff5d7;border-color:#dcc68e}
 .mixed-teaching-figure .formula:last-child{margin-bottom:0}
-.mixed-carry-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:0;list-style:none}
-.mixed-carry-steps>li{min-width:0;margin:0;padding:9px 12px;border:1px solid #eadbb0;border-radius:9px;background:#fffaf0}
-.mixed-carry-steps .formula{margin:3px 0}
 .mixed-teaching-table :is(td,th):not(:first-child){text-align:center}
+.mixed-addition-table{width:100%;max-width:28rem}
+.mixed-addition-table .mixed-addition-carry{color:#194ba3;background:#e8f1ff;font-weight:700}
+.mixed-addition-table .mixed-addition-sum>*{border-top:2px solid #324365;background:#f0f6ff;font-weight:700}
+.mixed-division-table{width:100%;max-width:36rem}
+.mixed-division-table :is(th,td){text-align:center}
+.mixed-division-quotient{color:#194ba3;background:#e8f1ff;font-weight:700}
+.mixed-division-remainder{color:#533500;background:#fff0bd;font-weight:700}
+.mixed-division-legend{font-size:14px;margin:.55em 0 0}
 @media(max-width:540px){
   .mixed-teaching-figure{padding:9px}
   .mixed-digit-band,.mixed-place-guide{gap:3px}
   .mixed-digit-band strong,.mixed-place-guide dd:last-child{font-size:13px}
   .mixed-digit-first-band strong{font-size:clamp(11px,3.7vw,13px);white-space:nowrap}
-  .mixed-carry-steps{grid-template-columns:minmax(0,1fr)}
   .mixed-teaching-table :is(th,td){padding-inline:4px}
-}
-.mixed-division-figure{background:#fff;margin:12px 0}
-.mixed-division-run{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;max-width:30rem;padding:0;list-style:none}
-.mixed-division-run>li{position:relative;min-width:0;margin:0;border:1px solid #d6e0ef;border-radius:8px;padding:6px 2px;text-align:center}
-.mixed-division-run>li:not(:last-child)::after{content:'→';position:absolute;left:100%;top:34%;width:14px;font-weight:700;color:#194ba3}
-.mixed-division-run>li>span{display:block;font-size:13px;line-height:1.3;color:var(--muted)}
-.mixed-division-figure .division-corner{border-collapse:separate;border-spacing:0;margin:0 auto 4px;font:19px/1.25 Consolas,Menlo,monospace}
-.mixed-division-figure .division-corner td{min-width:1em;height:1.45em;padding:0 3px;text-align:right;border:0;border-left:2px solid transparent;border-bottom:2px solid transparent}
-.mixed-division-figure .division-corner .division-side{border-left-color:var(--ink);text-align:left}
-.mixed-division-figure .division-corner .division-under{border-bottom-color:var(--ink)}
-.mixed-division-quotient{color:#194ba3;background:#edf3ff;font-weight:700}
-.mixed-division-remainder{color:#533500;background:#fff0bd;font-weight:700}
-.mixed-division-legend{font-size:14px;margin:.55em 0 0}
-.mixed-division-legend b{padding:1px 3px;border-radius:3px}
-@media(max-width:540px){
-  .mixed-division-figure .division-corner{font-size:16px}
-  .mixed-division-figure .division-corner td{padding-inline:1px}
-  .mixed-division-run>li>span{font-size:11px}
+  :is(.mixed-addition-table,.mixed-division-table){font-size:13px;line-height:1.3}
+  :is(.mixed-addition-table,.mixed-division-table) :is(th,td){padding:5px 2px;overflow-wrap:anywhere}
 }
 .mrank-widget [hidden]{display:none!important}
 .mrank-controls{display:flex;flex-wrap:wrap;align-items:end;gap:8px 14px}
@@ -131,6 +119,10 @@ main [id]{scroll-margin-top:16.5rem}
 .mrank-actions{align-items:center;gap:6px}
 .mrank-actions [aria-disabled="true"]{opacity:.55;cursor:default}
 .mrank-readout p{margin:.45em 0}
+.mrank-group-summary{display:flex;flex-wrap:wrap;gap:4px;margin:.6em 0;padding:0;list-style:none;font-size:13px}
+.mrank-group-summary li{margin:0;padding:2px 6px;border:1px solid #d6e0ef;border-radius:6px;background:#fff;white-space:nowrap}
+.mrank-group-summary .mrank-passed{background:#e8f1ff;color:#163d82}
+.mrank-group-summary .mrank-chosen{border-color:#b7872e;background:#fff0bd;color:#533500;font-weight:700}
 .mrank-scroll{max-height:19rem;overflow:auto;overscroll-behavior:contain;border:1px solid #d6e0ef;border-radius:8px;background:#fff}
 .mrank-table{--mrank-heading-height:2.75rem;width:100%;max-width:100%;border-collapse:separate;border-spacing:0;background:#fff;table-layout:fixed}
 .mrank-table caption{text-align:left;padding:4px 8px;background:#fff;color:#263d67;font-size:14px}
@@ -274,22 +266,30 @@ main [id]{scroll-margin-top:16.5rem}
     <li>После (0, 1, 4) справа снова собирается группа из пяти. В средней позиции теперь две такие группы, а основание там равно 2. Собираем из них одну группу слева. Справа и в середине пишем 0, поэтому получается (1, 0, 0).</li>
   </ul>
 
-  <figure class="mixed-teaching-figure" id="mixed-digit-figure">
-    <figcaption>Четыре записи подряд</figcaption>
-    <ol class="mixed-digit-band" role="list" start="18">
-      <li><strong>(1, 1, 3)</strong><span>18</span></li>
-      <li class="mixed-carry-cell"><strong>(1, 1, 4)</strong><span>19</span></li>
-      <li class="mixed-carry-cell"><strong>(2, 0, 0)</strong><span>20</span></li>
-      <li><strong>(2, 0, 1)</strong><span>21</span></li>
-    </ol>
-    <p class="formula" id="mixed-digit-carry">(1, 1, 4) + (0, 0, 1) = (2, 0, 0)</p>
-  </figure>
-  <p>При переходе от 19 к 20 единица переноса проходит через два разряда. Начинаем справа.</p>
-  <ol class="mixed-carry-steps" id="mixed-digit-carry-steps" role="list">
-    <li><strong>Справа · основание 5</strong><div class="formula">4 + 1 = 1 · 5 + 0</div><div>Пишем 0. Передаём одну группу веса 5 в средний разряд.</div></li>
-    <li><strong>В середине · основание 2</strong><div class="formula">1 + 1 = 1 · 2 + 0</div><div>Пишем 0. Передаём одну группу веса 10 в левый разряд.</div></li>
-    <li><strong>Слева · основание 3</strong><div class="formula">1 + 1 = 2</div><div>Двойка меньше 3. Пишем 2, перенос заканчивается.</div></li>
-  </ol>
+  <section class="example" id="mixed-digit-figure">
+    <h3>Прибавим одну палочку к 24</h3>
+    <p>Запишем (2, 0, 4) и (0, 0, 1) друг под другом. Начинаем с правого столбца. Перенос пишем над тем разрядом, который получает единицу.</p>
+    <div class="table-wrap" id="mixed-digit-carry-steps">
+      <table class="mixed-teaching-table mixed-addition-table">
+        <caption>24 + 1 в основаниях (3, 2, 5)</caption>
+        <thead><tr><th scope="col">Разряд</th><th scope="col">Левый</th><th scope="col">Средний</th><th scope="col">Правый</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Основание</th><td>3</td><td>2</td><td>5</td></tr>
+          <tr><th scope="row">Перенос <span aria-hidden="true">←</span></th><td>—</td><td class="mixed-addition-carry">1</td><td>—</td></tr>
+          <tr><th scope="row">24</th><td>2</td><td>0</td><td>4</td></tr>
+          <tr><th scope="row">+ 1</th><td>0</td><td>0</td><td>1</td></tr>
+          <tr class="mixed-addition-sum"><th scope="row">Сумма</th><td>2</td><td>1</td><td>0</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Справа 4 + 1 = 5. Пишем 0, а одну пятёрку переносим в средний разряд. В середине 0 + 0 + 1 = 1, что меньше основания 2. Перенос останавливается, поэтому левая цифра остаётся 2.</p>
+    <p class="formula">(2, 0, 4) + (0, 0, 1) = (2, 1, 0)</p>
+  </section>
+  <details class="note mixed-predict" id="mixed-digit-carry">
+    <summary>Как перенос проходит через два разряда при 19 + 1</summary>
+    <p>Справа 4 + 1 = 5. Пишем 0, переносим одну пятёрку в середину. Там 1 + 1 = 2. Пишем 0 и переносим один десяток влево. Слева получаем 1 + 1 = 2.</p>
+    <p class="formula">(1, 1, 4) + (0, 0, 1) = (2, 0, 0)</p>
+  </details>
 
   <h2 id="mixed-weights">Как находятся веса разрядов</h2>
   <p>Нумеруем разряды справа налево с нуля. Пусть <i>b</i><sub>i</sub> — основание разряда <i>i</i>. Цифра <i>a</i><sub>i</sub> принимает значения от 0 до <i>b</i><sub>i</sub> − 1.</p>
@@ -329,48 +329,24 @@ main [id]{scroll-margin-top:16.5rem}
     </details>
   </section>
   <p>Схема Горнера приводит запись к десятичному значению. Чтобы восстановить цифры по известному значению, действуем в обратную сторону. Как при <a href="05-perevod-iz-desyatichnoy.html">переводе из десятичной системы</a>, начинаем с младшего разряда и делим с остатком. Теперь при переходе к следующему разряду берём его основание.</p>
-  <p>Последнее действие в схеме Горнера для (2, 0, 4) — умножение на 5 и прибавление 4. Поэтому деление 24 на 5 даёт остаток 4, то есть правую цифру. Частное 4 — это значение оставшейся части записи, (2, 0). Следующее деление восстанавливает её правую цифру тем же способом.</p>
+  <p>Последнее действие в схеме Горнера для (2, 0, 4) — умножение на 5 и прибавление 4. Поэтому деление 24 на 5 даёт остаток 4, то есть правую цифру. Частное 4 считает пятёрки. В записи (2, 0) это две группы по две пятёрки и ноль отдельных пятёрок. Следующее деление восстанавливает среднюю цифру.</p>
 
   <section class="example" id="mixed-digit-inverse">
-    <h3>Деление столбиком в основаниях 3, 2 и 5</h3>
-    <p>Восстановим запись числа 24. Начинаем с основания 5 справа, затем берём 2 и 3. В следующий столбик передаём частное, а остаток записываем в соответствующий разряд.</p>
-    <figure class="mixed-teaching-figure mixed-division-figure" id="mixed-division-figure">
-      <figcaption>Три деления для трёх цифр</figcaption>
-      <ol class="mixed-division-run" role="list">
-        <li>
-          <div role="img" aria-label="24 делим на 5. Вычитаем 20, получаем частное 4 и остаток 4.">
-            <table class="division-corner" aria-hidden="true"><tbody>
-              <tr><td></td><td>24</td><td class="division-side division-under">5</td></tr>
-              <tr><td>−</td><td class="division-under">20</td><td class="division-side mixed-division-quotient">4</td></tr>
-              <tr><td></td><td class="mixed-division-remainder">4</td><td></td></tr>
-            </tbody></table>
-          </div>
-          <span>Правая цифра</span>
-        </li>
-        <li>
-          <div role="img" aria-label="Частное 4 делим на 2. Вычитаем 4, получаем частное 2 и остаток 0.">
-            <table class="division-corner" aria-hidden="true"><tbody>
-              <tr><td></td><td class="mixed-division-quotient">4</td><td class="division-side division-under">2</td></tr>
-              <tr><td>−</td><td class="division-under">4</td><td class="division-side mixed-division-quotient">2</td></tr>
-              <tr><td></td><td class="mixed-division-remainder">0</td><td></td></tr>
-            </tbody></table>
-          </div>
-          <span>Средняя цифра</span>
-        </li>
-        <li>
-          <div role="img" aria-label="Частное 2 делим на 3. Вычитаем 0, частное равно 0 и остаток равен 2.">
-            <table class="division-corner" aria-hidden="true"><tbody>
-              <tr><td></td><td class="mixed-division-quotient">2</td><td class="division-side division-under">3</td></tr>
-              <tr><td>−</td><td class="division-under">0</td><td class="division-side">0</td></tr>
-              <tr><td></td><td class="mixed-division-remainder">2</td><td></td></tr>
-            </tbody></table>
-          </div>
-          <span>Левая цифра</span>
-        </li>
-      </ol>
-      <p class="mixed-division-legend"><b class="mixed-division-quotient">Частное</b> идёт дальше. <b class="mixed-division-remainder">Остаток</b> даёт цифру.</p>
-    </figure>
-    <p>Последнее частное 0, поэтому трёх разрядов хватило. Остатки получены справа налево. Читаем их слева направо по позициям и получаем <strong>(2, 0, 4)</strong>.</p>
+    <h3>Восстанавливаем запись делением с остатком</h3>
+    <p>Начинаем с числа 24. Делителями будут основания справа налево, то есть 5, 2 и 3. Читаем таблицу сверху вниз.</p>
+    <div class="table-wrap" id="mixed-division-figure">
+      <table class="mixed-division-table" aria-describedby="mixed-division-route">
+        <caption>Три деления для трёх цифр</caption>
+        <thead><tr><th scope="col" aria-label="Делимое">Делим</th><th scope="col" aria-label="Делитель">На</th><th scope="col">Частное</th><th scope="col">Остаток</th><th scope="col">Разряд</th></tr></thead>
+        <tbody>
+          <tr><td>24</td><td>5</td><td class="mixed-division-quotient">4 <span aria-hidden="true">↓</span></td><td class="mixed-division-remainder">4</td><td>Правый</td></tr>
+          <tr><td class="mixed-division-quotient">4</td><td>2</td><td class="mixed-division-quotient">2 <span aria-hidden="true">↓</span></td><td class="mixed-division-remainder">0</td><td>Средний</td></tr>
+          <tr><td class="mixed-division-quotient">2</td><td>3</td><td>0</td><td class="mixed-division-remainder">2</td><td>Левый</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="mixed-division-legend" id="mixed-division-route">Стрелка вниз отмечает частное, которое становится делимым в следующей строке. Остаток записываем в указанный разряд. В первой строке 24 = 4 · 5 + 4. Частное 4 переносим в следующую строку, а остаток 4 записываем в правый разряд.</p>
+    <p>Последнее частное 0, поэтому трёх разрядов хватило. Записываем остатки справа налево и получаем <strong>(2, 0, 4)</strong>.</p>
   </section>
 
   <h3 id="mixed-list-title">От номера строки к цифрам</h3>
@@ -661,12 +637,13 @@ function initMixedRankTable(root, mixed, chapterBases, configurable = false) {
       <div class="model-actions mrank-actions">
         <button type="button" data-mrank-back aria-label="Предыдущий шаг таблицы">Назад</button>
         <span data-mrank-progress></span>
-        <button type="button" data-mrank-next>Далее</button>
+        <button type="button" data-mrank-next>Разделить</button>
       </div>
       <div class="mrank-readout" role="status" aria-live="polite" aria-atomic="true">
         <p class="formula mrank-equation" data-mrank-equation hidden></p>
         <p data-mrank-status></p>
       </div>
+      ${configurable ? '' : '<ul class="mrank-group-summary" data-mrank-group-summary role="list" aria-label="Диапазоны индексов по группам" hidden></ul>'}
       <div class="mrank-scroll" data-mrank-scroll tabindex="0" role="region" aria-label="Таблица записей с прокруткой">
         <table class="mrank-table" data-mrank-table></table>
       </div>
@@ -689,6 +666,7 @@ function initMixedRankTable(root, mixed, chapterBases, configurable = false) {
   const progress = find('[data-mrank-progress]');
   const equation = find('[data-mrank-equation]');
   const status = find('[data-mrank-status]');
+  const groupSummary = find('[data-mrank-group-summary]');
   const scroller = find('[data-mrank-scroll]');
   const table = find('[data-mrank-table]');
   const digitBoxes = find('[data-mrank-digits]');
@@ -819,9 +797,20 @@ function initMixedRankTable(root, mixed, chapterBases, configurable = false) {
     progress.textContent = `Шаг ${cursor} из ${totalSteps}`;
     back.setAttribute('aria-disabled', String(cursor === 0));
     next.setAttribute('aria-disabled', String(finished));
-    next.setAttribute('aria-label', finished ? 'Далее. Все шаги выполнены' : divided ? 'Далее. Свернуть группы' : 'Далее. Выполнить деление');
+    next.textContent = finished ? 'Готово' : divided ? 'Свернуть группы' : 'Разделить';
     equation.hidden = !detail;
     equation.textContent = detail ? `${detail.value} = ${detail.quotient} · ${detail.base} + ${detail.remainder}` : '';
+    if (groupSummary) {
+      groupSummary.hidden = !detail;
+      groupSummary.innerHTML = detail ? Array.from({length: rows.length / radix}, (_, group) => {
+        const start = group * radix;
+        const end = start + radix - 1;
+        const state = group < detail.quotient ? 'mrank-passed' : group === detail.quotient ? 'mrank-chosen' : '';
+        const label = group < detail.quotient ? ' · до выбранной' : group === detail.quotient ? ' · выбранная' : '';
+        const picked = group === detail.quotient ? `№ ${group}: ` : '';
+        return `<li class="${state}" aria-label="Группа ${group}, индексы ${start}–${end}${label}">${picked}${start}–${end}</li>`;
+      }).join('') : '';
+    }
     if (detail) {
       const prior = detail.quotient * detail.base;
       const highlight = prior ? ` Синим выделены строки этих групп (${prior}).` : '';
