@@ -10,7 +10,7 @@
 body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
 [hidden]{display:none!important}
 a{color:#164aad}
-header{background:var(--card);border-bottom:1px solid var(--line)}
+header.top{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
 main,nav,footer{max-width:880px;margin:0 auto;padding-left:16px;padding-right:16px}
 nav{display:flex;flex-wrap:wrap;gap:8px 18px;padding-top:12px;padding-bottom:12px;font-size:15px}
 main{padding-top:24px;padding-bottom:32px}
@@ -46,16 +46,38 @@ button:disabled{opacity:.53;cursor:default}
 .storage{color:#8b4430;margin:.6em 0}
 footer{border-top:1px solid var(--line);padding-top:12px;padding-bottom:30px}
 @media(max-width:540px){.question{padding:14px}.math-context{font-size:17px}nav{gap:5px 12px}}
+
+html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height) + 1rem)}
+.chapter-menu>summary{
+  display:flex;align-items:center;justify-content:space-between;gap:.75rem;
+  min-height:var(--chapter-bar-height);max-width:1048px;margin:0 auto;padding:.35rem 1rem;
+  cursor:pointer;list-style:none;color:var(--accent);font-size:.95rem;font-weight:650
+}
+.chapter-menu>summary:focus-visible{outline:3px solid var(--accent);outline-offset:-3px}
+.chapter-menu>summary::-webkit-details-marker{display:none}
+.chapter-menu-title{display:flex;align-items:center;gap:.6rem}
+.chapter-menu-title::before{
+  content:"";width:.45rem;height:.45rem;border-right:2px solid;border-bottom:2px solid;transform:rotate(-45deg)
+}
+.chapter-menu[open] .chapter-menu-title::before{transform:rotate(45deg)}
+.chapter-menu-current{white-space:nowrap;color:var(--muted);font-size:.875rem;font-weight:500}
+.chapter-menu nav{max-height:60vh;max-height:60svh;overflow-y:auto;overscroll-behavior:contain}
 </style>
 </head>
 <body>
-<header>
-  <nav aria-label="Навигация по учебнику">
-    <a href="index.html">Оглавление</a>
-    <a href="05-perevod-iz-desyatichnoy.html">6. Перевод из десятичной системы</a>
-    <a href="06a-perevod-mezhdu-sistemami.html">6А. Перевод между системами</a>
-    <a href="07-slozhenie-i-vychitanie.html">7. Сложение столбиком</a>
-  </nav>
+<header class="top">
+  <details class="chapter-menu">
+    <summary>
+      <span class="chapter-menu-title">Главы учебника</span>
+      <span class="chapter-menu-current">Проверка 1</span>
+    </summary>
+    <nav aria-label="Навигация по учебнику">
+      <a href="index.html">Оглавление</a>
+      <a href="05-perevod-iz-desyatichnoy.html">6. Перевод из десятичной системы</a>
+      <a href="06a-perevod-mezhdu-sistemami.html">6А. Перевод между системами</a>
+      <a href="07-slozhenie-i-vychitanie.html">7. Сложение столбиком</a>
+    </nav>
+  </details>
 </header>
 <main>
   <h1>Проверочная работа 1. Запись, сравнение и перевод чисел</h1>
