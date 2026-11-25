@@ -44,6 +44,10 @@ button.ghost:disabled{background:#eef0f4;color:#a3aab8}
   font-size:clamp(1.4rem,3.8vw,2.5rem);
   line-height:1.55;
 }
+.formula.math-display.math-display-compact{
+  padding:clamp(10px,1.5vw,14px);
+  font-size:clamp(1.25rem,3vw,1.75rem);
+}
 .math-display .math-line{display:inline-block;white-space:nowrap}
 .math-display var{font-style:italic}
 .math-display sup,.math-display sub{font-size:.65em;line-height:0}
@@ -195,7 +199,7 @@ table.t.horner-steps th,table.t.horner-steps td{padding:5px 7px}
     </div>
   </figure>
   <p>На каждом шаге число палочек в одном пучке уменьшается в 7 раз, а число развязанных пучков становится в 7 раз больше. В конце все палочки лежат по одной.</p>
-  <div class="formula math-display" role="math" aria-label="Начинаем с 263 в основании 7. 2 умножить на 7, прибавить 6, результат умножить на 7 и прибавить 3. Получаем 143 в десятичной системе.">
+  <div class="formula math-display math-display-compact" role="math" aria-label="Начинаем с 263 в основании 7. 2 умножить на 7, прибавить 6, результат умножить на 7 и прибавить 3. Получаем 143 в десятичной системе.">
     <span class="math-line">263<sub>7</sub> =</span>
     <span class="math-line">(2 · 7 + 6) · 7 + 3</span>
     <span class="math-line">= 143<sub>10</sub></span>
