@@ -65,6 +65,14 @@ table.t tr.new td{background:#eaf1ff}
 svg.grp{display:block;overflow:visible}
 .readout{font-size:16px;margin-top:14px;text-align:center}
 .readout b{color:var(--accent)}
+.input-error{color:#982a25;font-weight:600}
+.input-error:empty{margin:0}
+input[aria-invalid="true"]{border-color:#a92620}
+table.t.binding-table{width:min(100%,32rem)}
+table.t.binding-table th small{display:block;font-weight:400;color:var(--muted)}
+@media(max-width:480px){
+  table.t.binding-table th,table.t.binding-table td{padding:4px 3px;font-size:.875rem}
+}
 .pager{display:flex;flex-wrap:wrap;justify-content:space-between;margin-top:36px;gap:10px}
 .pager a{text-decoration:none;color:var(--accent);background:#eef2ff;padding:10px 16px;border-radius:9px;font-size:15px}
 .task{border-top:1px dashed #b9dcbc;padding-top:10px;margin-top:14px}
@@ -164,7 +172,7 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
 <main>
   <h1>6. Перевод из десятичной системы</h1>
   <p class="lead">У нас 143 палочки. Как записать это количество, если связывать их по семь? Найдём цифры новой записи двумя способами. Деление на основание начинает с младшей цифры, а подбор по весам — со старшей.</p>
-  <p>В <a href="04-razvernutaya-zapis.html">главе 5</a> мы получили 143, когда сложили вклады цифр записи 263<sub>7</sub>. Теперь решаем обратную задачу и проверим результат тем же сложением вкладов. Цифры в основании N имеют значения от 0 до N − 1. Значения буквенных цифр можно сверить с таблицей в <a href="03-osnovaniya.html">главе 4</a>.</p>
+  <p>В <a href="04-razvernutaya-zapis.html">главе 5</a> мы получили 143, когда сложили вклады цифр записи 263<sub>7</sub>. Теперь решаем обратную задачу для неотрицательных целых чисел и проверим результат тем же сложением вкладов. Цифры в основании N имеют значения от 0 до N − 1. Значения буквенных цифр можно сверить с таблицей в <a href="03-osnovaniya.html">главе 4</a>.</p>
 
   <h2 id="two-methods">143 палочки, два способа</h2>
   <p>При делении связываем по семь палочек, затем по семь пучков. <b>Частное</b> показывает, сколько групп получилось. <b>Остаток</b> показывает, сколько не вошло в группы. Он становится цифрой текущего разряда. При подборе по весам сразу берём самые крупные группы, которые помещаются в исходное число.</p>
@@ -201,19 +209,22 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
     <p>В этой модели можно связать от 1 до 500 палочек в пучки по 2–10.</p>
     <p><b>Задание.</b> 1) Пройдите пример 143 при N = 7. Перед каждым нажатием назовите, сколько получится пучков и сколько останется, затем сверьтесь с таблицей под рисунком. 2) Кнопкой «Назад» вернитесь на шаг и убедитесь, что пучки развязались обратно. 3) Наберите 147 при N = 7 и объясните, откуда в записи берутся нули.</p>
     <div class="controls">
-      <label>Палочек: <input type="number" id="gnum" min="1" max="500" value="143"></label>
+      <label>Палочек <input type="text" inputmode="numeric" id="gnum" value="143" aria-describedby="gerror"></label>
       <label>Размер пучка N: <select id="gbase"></select></label>
     </div>
+    <p class="input-error" id="gerror" role="status"></p>
     <div class="controls">
       <button id="gnext" onclick="gStep()">Связать</button>
       <button class="ghost" id="gprev" onclick="gBack()">Назад</button>
-      <button class="ghost" onclick="gReset()">Сначала</button>
+      <button class="ghost" id="greset" onclick="gReset()">Сначала</button>
     </div>
-    <div class="scroll"><table class="t" id="glog"></table></div>
-    <div class="pile" id="gpile"></div>
-    <div class="subcap">Готовые разряды</div>
-    <div class="places" id="gplaces"></div>
-    <div class="readout" id="gout"></div>
+    <div id="gview">
+      <div class="scroll"><table class="t binding-table" id="glog" aria-label="Деление при связывании палочек"></table></div>
+      <div class="pile" id="gpile"></div>
+      <div class="subcap">Готовые разряды</div>
+      <div class="places" id="gplaces"></div>
+      <div class="readout" id="gout"></div>
+    </div>
   </div>
 
   <h3>Почему остатки становятся цифрами</h3>
@@ -254,17 +265,20 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
     <p>Проследите тот же алгоритм в таблице. Здесь можно попробовать большие числа и основания с буквенными цифрами.</p>
     <p><b>Задание.</b> 1) Пройдите по шагам перевод 3867 в основание 16. Перед каждым шагом посчитайте частное и остаток сами. 2) Смените основание на 20 и найдите остаток, который записывается буквой. 3) Смените основание на 2 и объясните, почему шагов стало больше.</p>
     <div class="controls">
-      <label>Число: <input type="number" id="dnum" min="0" max="999999" value="3867"></label>
+      <label>Исходное число <input type="text" inputmode="numeric" id="dnum" value="3867" aria-describedby="derror"></label>
       <label>Основание N: <select id="dbase"></select></label>
     </div>
+    <p class="input-error" id="derror" role="status"></p>
     <div class="controls">
       <button id="dnext" onclick="D.step()">Шаг</button>
       <button class="ghost" id="dprev" onclick="D.back()">Назад</button>
       <button class="ghost" id="dall" onclick="D.all()">Все шаги</button>
-      <button class="ghost" onclick="D.reset()">Сначала</button>
+      <button class="ghost" id="dreset" onclick="D.reset()">Сначала</button>
     </div>
-    <div class="scroll"><table class="t rem-table" id="dtab" aria-label="Шаги деления с остатком"></table></div>
-    <div class="readout" id="dout"></div>
+    <div id="dview">
+      <div class="scroll"><table class="t rem-table" id="dtab" aria-label="Шаги деления с остатком"></table></div>
+      <div class="readout" id="dout"></div>
+    </div>
   </div>
   <h2 id="weights-selection">Подбор по весам</h2>
   <p>При подборе идём от самых больших пучков к отдельным палочкам. В примере с числом 143 начали с веса 49, затем использовали веса 7 и 1. Ноль записываем одной цифрой 0.</p>
@@ -291,17 +305,20 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
     <span class="tag">Интерактив · подбор по весам</span>
     <p><b>Задание.</b> 1) Пройдите 143 при N = 7 и сравните ответ с результатом деления. 2) Наберите 1100 при N = 2 и назовите веса, которые не поместились. 3) Наберите 344 при N = 7 и объясните, почему в записи два нуля подряд.</p>
     <div class="controls">
-      <label>Число: <input type="number" id="wnum" min="0" max="999999" value="143"></label>
+      <label>Исходное число <input type="text" inputmode="numeric" id="wnum" value="143" aria-describedby="werror"></label>
       <label>Основание N: <select id="wbase"></select></label>
     </div>
+    <p class="input-error" id="werror" role="status"></p>
     <div class="controls">
       <button id="wnext" onclick="W.step()">Шаг</button>
       <button class="ghost" id="wprev" onclick="W.back()">Назад</button>
       <button class="ghost" id="wall" onclick="W.all()">Все шаги</button>
-      <button class="ghost" onclick="W.reset()">Сначала</button>
+      <button class="ghost" id="wreset" onclick="W.reset()">Сначала</button>
     </div>
-    <div class="scroll"><table class="t rem-table" id="wtab" aria-label="Шаги подбора по весам"></table></div>
-    <div class="readout" id="wout"></div>
+    <div id="wview">
+      <div class="scroll"><table class="t rem-table" id="wtab" aria-label="Шаги подбора по весам"></table></div>
+      <div class="readout" id="wout"></div>
+    </div>
   </div>
 
   <h2>Обобщение</h2>
@@ -446,17 +463,20 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
     <span class="tag">Интерактив · лесенка</span>
     <p><b>Задание.</b> 1) Пройдите перевод 1409 в основание 7. Перед каждым шагом выполните деление столбиком в тетради и сравните с экраном. 2) Наберите 147 при N = 7 и найдите в лесенке остатки, равные нулю. 3) Наберите 1100 при N = 2 и посчитайте, сколько столбиков в лесенке.</p>
     <div class="controls">
-      <label>Число: <input type="number" id="lnum" min="0" max="9999" value="1409"></label>
+      <label>Исходное число <input type="text" inputmode="numeric" id="lnum" value="1409" aria-describedby="lerror"></label>
       <label>Основание N: <select id="lbase"></select></label>
     </div>
+    <p class="input-error" id="lerror" role="status"></p>
     <div class="controls">
       <button id="lnext" onclick="LD.step()">Шаг</button>
       <button class="ghost" id="lprev" onclick="LD.back()">Назад</button>
       <button class="ghost" id="lall" onclick="LD.all()">Все шаги</button>
-      <button class="ghost" onclick="LD.reset()">Сначала</button>
+      <button class="ghost" id="lreset" onclick="LD.reset()">Сначала</button>
     </div>
-    <div class="scroll"><table class="ld" id="ltab"></table></div>
-    <div class="readout" id="lout"></div>
+    <div id="lview">
+      <div class="scroll"><table class="ld" id="ltab" aria-label="Лесенка делений"></table></div>
+      <div class="readout" id="lout"></div>
+    </div>
   </div>
   </details>
 
@@ -672,19 +692,34 @@ function bundleHTML(level,N,cap){
     '" height="'+f(inf.h*sc)+'"><use href="#'+inf.id+'"/></svg>';
 }
 
+function readWholeNumber(field, error, min, max){
+  const raw=field.value.trim();
+  const value=Number(raw);
+  const valid=/^[0-9]+$/.test(raw) && Number.isInteger(value) && value>=min && value<=max;
+  field.setAttribute('aria-invalid',String(!valid));
+  error.textContent=valid ? '' : `Введите целое число от ${min} до ${max}. Используйте цифры без знака и запятой.`;
+  return valid ? value : null;
+}
+
 /* ===== интерактив 1: деление как связывание ===== */
 var gX=143,gN=7,gH=[];          // gH — выполненные деления: {a: делимое, q: частное, r: остаток}
 (function(){var o='';for(var n=2;n<=10;n++)o+='<option value="'+n+'"'+(n===7?' selected':'')+'>'+n+'</option>';$('gbase').innerHTML=o;})();
 
 function gCount(){return gH.length?gH[gH.length-1].q:gX;}
 function gRead(){
-  var x=Math.floor(+$('gnum').value)||1;
-  x=Math.max(1,Math.min(500,x));
-  $('gnum').value=x; gX=x; gN=+$('gbase').value; gH=[]; gDraw();
+  gX=readWholeNumber($('gnum'),$('gerror'),1,500);
+  gN=+$('gbase').value;
+  gH=[];
+  const invalid=gX===null;
+  $('gview').hidden=invalid;
+  $('gnext').disabled=invalid;
+  $('gprev').disabled=invalid;
+  $('greset').disabled=invalid;
+  if(!invalid) gDraw();
 }
-function gStep(){var c=gCount(); if(c===0) return; gH.push({a:c,q:Math.floor(c/gN),r:c%gN}); gDraw();}
+function gStep(){var c=gCount(); if(!c) return; gH.push({a:c,q:Math.floor(c/gN),r:c%gN}); gDraw();}
 function gBack(){if(gH.length){gH.pop(); gDraw();}}
-function gReset(){gH=[]; gDraw();}
+function gReset(){if(gX!==null){gH=[]; gDraw();}}
 
 function gDraw(){
   var c=gCount(),L=gH.length,w=Math.pow(gN,L),done=(c===0),i,k,html;
@@ -720,7 +755,7 @@ function gDraw(){
   $('gplaces').innerHTML=ph;
 
   /* таблица делений */
-  var t='<tr><th>Делим</th><th>Частное (пучков)</th><th>Остаток (цифра)</th><th>Разряд</th></tr>';
+  var t='<tr><th scope="col">Делим</th><th scope="col">Частное<small>Пучки</small></th><th scope="col">Остаток<small>Цифра</small></th><th scope="col">Разряд</th></tr>';
   for(i=0;i<L;i++)
     t+='<tr'+(i===L-1?' class="new"':'')+'><td>'+gH[i].a+' : '+gN+'</td><td>'+gH[i].q+'</td><td><b>'+gH[i].r+'</b></td><td>№ '+i+'</td></tr>';
   $('glog').innerHTML=t;
@@ -737,13 +772,14 @@ function gDraw(){
   $('gnext').disabled=done;
   $('gprev').disabled=(L===0);
 }
-$('gnum').onchange=gRead;
+$('gnum').oninput=gRead;
 $('gbase').onchange=gRead;
 gRead();
 
 /* ===== общий пошаговый показ таблицы (интерактивы 2 и 3) ===== */
 function makeStepper(p,maxX,defBase,make,view){
-  var num=$(p+'num'),base=$(p+'base'),S={x:0,n:defBase,rows:[],k:0},o='',n;
+  var num=$(p+'num'),base=$(p+'base'),S={x:null,n:defBase,rows:[],k:0},o='',n;
+  const buttonIds=['next','prev','all','reset'];
   for(n=2;n<=20;n++) o+='<option value="'+n+'"'+(n===defBase?' selected':'')+'>'+n+'</option>';
   base.innerHTML=o;
   function draw(){
@@ -753,18 +789,27 @@ function makeStepper(p,maxX,defBase,make,view){
     $(p+'next').disabled=end;
     $(p+'all').disabled=end;
     $(p+'prev').disabled=(S.k===0);
+    $(p+'reset').disabled=false;
   }
   function read(){
-    var x=Math.floor(+num.value)||0;
-    x=Math.max(0,Math.min(maxX,x));
-    num.value=x; S.x=x; S.n=+base.value; S.rows=make(x,S.n); S.k=0; draw();
+    S.x=readWholeNumber(num,$(p+'error'),0,maxX);
+    S.n=+base.value;
+    S.k=0;
+    const invalid=S.x===null;
+    S.rows=invalid ? [] : make(S.x,S.n);
+    $(p+'view').hidden=invalid;
+    if(invalid){
+      buttonIds.forEach((id)=>{$(p+id).disabled=true;});
+      return;
+    }
+    draw();
   }
-  num.onchange=read; base.onchange=read; read();
+  num.oninput=read; base.onchange=read; read();
   return {
     step:function(){if(S.k<S.rows.length){S.k++;draw();}},
     back:function(){if(S.k>0){S.k--;draw();}},
-    all:function(){S.k=S.rows.length;draw();},
-    reset:function(){S.k=0;draw();}
+    all:function(){if(S.x!==null){S.k=S.rows.length;draw();}},
+    reset:function(){if(S.x!==null){S.k=0;draw();}}
   };
 }
 

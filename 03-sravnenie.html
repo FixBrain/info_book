@@ -354,9 +354,21 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
     </div>
   </section>
 
-  <details class="note cmp-proof" id="compare-fractions">
-    <summary>Дополнительно. Сравнение записей с запятой</summary>
+  <section class="note" id="compare-fractions" aria-labelledby="compare-fractions-title">
+    <h2 id="compare-fractions-title">Сравнение записей с запятой</h2>
     <p>У двух неотрицательных чисел в одном основании сначала сравниваем целые части. Если они равны, выравниваем дробные части, дописывая нули справа. Затем сравниваем цифры после запятой слева направо. Добавленные нули дают нулевой вклад.</p>
+    <figure class="cmp-illustration" id="fraction-zero-places">
+      <figcaption>Какую роль играет ноль в 2,03 и 2,30</figcaption>
+      <div class="cmp-board" style="--cmp-width:4" role="img" aria-label="Слева направо в каждой строке идут единицы, запятая, десятые и сотые. Строка А — 2,03. Строка Б — 2,30, справа добавлен серый ноль. Выделены десятые: 0 меньше 3.">
+        <span class="cmp-side">А</span>
+        <span class="cmp-digit cmp-seen">2</span><span>,</span><span class="cmp-digit cmp-decisive">0</span><span class="cmp-digit">3</span>
+        <span class="cmp-side">Б</span>
+        <span class="cmp-digit cmp-seen">2</span><span>,</span><span class="cmp-digit cmp-decisive">3</span><span class="cmp-digit cmp-added">0</span>
+      </div>
+      <p>В записи <b>2,03</b> ноль занимает место десятых, а цифра 3 обозначает три сотых. Если убрать этот ноль, тройка перейдёт в разряд десятых и значение изменится.</p>
+      <p>Серый ноль дописали справа к записи <b>2,3</b>. Получилось <b>2,30</b>. Тройка по-прежнему в разряде десятых, а в разряде сотых ничего не добавилось.</p>
+      <p>Единицы равны. В десятых 0 меньше 3, поэтому <b>2,03 &lt; 2,3 = 2,30</b>.</p>
+    </figure>
     <figure class="cmp-illustration">
       <figcaption>Сравним десятичные числа 2,3 и 2,27</figcaption>
       <div class="cmp-board" style="--cmp-width:4" role="img" aria-label="Запись 2,30 над записью 2,27. Справа к первой записи дописали ноль. В разряде десятых 3 больше 2.">
@@ -367,7 +379,7 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
       </div>
       <p>Целые части равны. В разряде десятых у первого числа 3, а у второго 2. Значит, <b>2,3 &gt; 2,27</b>.</p>
     </figure>
-  </details>
+  </section>
 
   <nav class="pager" aria-label="Соседние главы">
     <a href="02-razryady.html">← Назад: термины</a>

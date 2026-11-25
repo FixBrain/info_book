@@ -103,7 +103,7 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
 <script>
 const assessment = {"id": 1, "title": "Проверочная работа 1. Запись, сравнение и перевод чисел", "max": 10, "threshold": 5};
 
-function makeAssessmentTasks(random) {
+function makeAssessmentTasks(random, compareEquality = true) {
   const alphabet = '0123456789ABCDEFGHIJ';
   const between = (min, max) => min + Math.floor(random() * (max - min + 1));
   const format = (value, base) => value.toString(base).toUpperCase();
@@ -169,7 +169,6 @@ function makeAssessmentTasks(random) {
   const smaller = prefix + alphabet[smallerDigit] + alphabet[compareBase - 1].repeat(tailLength);
   const larger = prefix + alphabet[largerDigit] + '0'.repeat(tailLength);
   const smallerFirst = between(0, 1) === 0;
-  const secondPair = smallerFirst ? [smaller, larger] : [larger, smaller];
 
   const expansionBase = between(2, 20);
   const expansionDigits = [
@@ -191,6 +190,18 @@ function makeAssessmentTasks(random) {
   const from = nonDecimalBases.splice(between(0, nonDecimalBases.length - 1), 1)[0];
   const to = nonDecimalBases[between(0, nonDecimalBases.length - 1)];
   const sharedValue = between(31, 229);
+
+  // Draw the new comparison variant last to preserve the other tasks for saved seeds.
+  const compareVariant = compareEquality ? between(0, 2) : 2;
+  const equalSecondPair = compareVariant === 0;
+  const secondRecord = compareVariant === 2 ? larger : '0' + (equalSecondPair ? smaller : larger);
+  const secondPair = smallerFirst ? [smaller, secondRecord] : [secondRecord, smaller];
+  const differencePlace = sameLength - 1 - firstDifference;
+  const differenceOptions = Array.from({length: Math.max(smaller.length, secondRecord.length)}, (_, position) => ({
+    value: String(position),
+    label: `Разряд № ${position}`,
+  }));
+  differenceOptions.push({value: 'none', label: 'Различий нет'});
 
   return [
     {
@@ -218,13 +229,17 @@ function makeAssessmentTasks(random) {
     },
     {
       title: 'Два сравнения',
-      prompt: 'В первой паре выровняйте записи нулями слева у короткого числа и выберите знак. Во второй паре выберите знак и укажите номер первого различающегося разряда при просмотре слева направо. Единицы — разряд 0.',
+      prompt: compareEquality
+        ? 'В первой паре дополните короткую запись нулями слева и выберите знак. Во второй паре совместите одноимённые разряды, сравните цифры слева направо и выберите знак. Укажите первый различающийся разряд или выберите «Различий нет». Единицы — разряд 0.'
+        : 'В первой паре выровняйте записи нулями слева у короткого числа и выберите знак. Во второй паре выберите знак и укажите номер первого различающегося разряда при просмотре слева направо. Единицы — разряд 0.',
       context: `<p><strong>Первая пара</strong> ${notation(firstPair[0], paddingBase)} и ${notation(firstPair[1], paddingBase)}</p><p><strong>Вторая пара</strong> ${notation(secondPair[0], compareBase)} и ${notation(secondPair[1], compareBase)}</p>`,
       parts: [
         text(`Первая пара. Короткая запись после выравнивания до ${longRecord.length} цифр`, shortRecord.padStart(longRecord.length, '0'), {points: 0, normalization: 'literal'}),
         sign('Первая пара. Знак сравнения', shortFirst ? '<' : '>'),
-        sign('Вторая пара. Знак сравнения', smallerFirst ? '<' : '>'),
-        text('Вторая пара. Номер первого различающегося разряда', sameLength - 1 - firstDifference, {points: 0}),
+        sign('Вторая пара. Знак сравнения', equalSecondPair ? '=' : (smallerFirst ? '<' : '>')),
+        compareEquality
+          ? {label: 'Вторая пара. Первый различающийся разряд', kind: 'radio', options: differenceOptions, expected: equalSecondPair ? 'none' : String(differencePlace), points: 0}
+          : text('Вторая пара. Номер первого различающегося разряда', differencePlace, {points: 0}),
       ],
       rubric: [
         {parts: [0, 1], points: 1},
@@ -314,7 +329,7 @@ function assessmentRandom(seed) {
     }
   }
 
-  let progress = loadProgress() ?? { seed: newSeed(), attempt: 1, values: {}, completedAt: null, best: 0, last: null };
+  let progress = loadProgress() ?? { seed: newSeed(), attempt: 1, values: {}, completedAt: null, best: 0, last: null, compareEquality: true };
   let tasks;
 
   function saveProgress() {
@@ -451,7 +466,7 @@ function assessmentRandom(seed) {
   }
 
   function render() {
-    tasks = makeAssessmentTasks(assessmentRandom(progress.seed));
+    tasks = makeAssessmentTasks(assessmentRandom(progress.seed), progress.compareEquality === true);
     const results = evaluate();
     taskList.replaceChildren(...tasks.map((task, index) => renderTask(task, index, results[index])));
     byId('assessment-attempt').textContent = `Попытка ${progress.attempt}`;
@@ -527,7 +542,7 @@ function assessmentRandom(seed) {
     const previousVariant = JSON.stringify(tasks);
     let seed = newSeed();
     while (JSON.stringify(makeAssessmentTasks(assessmentRandom(seed))) === previousVariant) seed = (seed + 1) >>> 0;
-    progress = { ...progress, seed, attempt: progress.attempt + 1, values: {}, completedAt: null };
+    progress = { ...progress, seed, attempt: progress.attempt + 1, values: {}, completedAt: null, compareEquality: true };
     saveProgress();
     render();
     byId('assessment-attempt').focus();

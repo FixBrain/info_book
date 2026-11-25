@@ -277,12 +277,12 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
       </ol>
     </figure>
     <p>Все шесть четвёрок вошли в восьмёрки, поэтому в разряде четвёрок остался ноль. Запишем оставшиеся группы от самых крупных к самым мелким.</p>
-    <table class="binary-result">
+    <table class="binary-result" id="binary-place-values">
       <caption>Цифры по весам разрядов</caption>
-      <thead><tr><th scope="col">16</th><th scope="col">8</th><th scope="col">4</th><th scope="col">2</th><th scope="col">1</th></tr></thead>
-      <tbody><tr><td>1</td><td>1</td><td class="binary-zero">0</td><td>1</td><td>1</td></tr></tbody>
+      <thead><tr><th scope="col">Вес</th><th scope="col">16</th><th scope="col">8</th><th scope="col"><span class="binary-zero">4</span></th><th scope="col">2</th><th scope="col">1</th></tr></thead>
+      <tbody><tr><th scope="row">Цифра</th><td>1</td><td>1</td><td class="binary-zero">0</td><td>1</td><td>1</td></tr></tbody>
     </table>
-    <p>Всего 16 + 8 + 2 + 1 = 27 палочек. Число то же, а цифры в записи другие, поэтому <b>27<sub>10</sub> = 11011<sub>2</sub></b>.</p>
+    <p>Всего 16 + 8 + 0 · 4 + 2 + 1 = 27 палочек. Ноль сохраняет место между восьмёрками и парами. Если его убрать, получится 1111<sub>2</sub> = 8 + 4 + 2 + 1 = 15. Поэтому для 27 палочек записываем <b>27<sub>10</sub> = 11011<sub>2</sub></b>.</p>
   </div>
 
   <h2>Основания от 3 до 9</h2>
@@ -293,7 +293,8 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
   </div>
 
   <h2>Основания от 11 до 20</h2>
-  <p>В лотке из двенадцати ячеек могут остаться десять или одиннадцать предметов. Для одного разряда нужна одна цифра, поэтому значения от десяти и дальше обозначают латинскими буквами. В каждом основании берём столько первых цифр этого ряда, сколько в нём ячеек.</p>
+  <p>В лотке из двенадцати ячеек могут остаться десять или одиннадцать предметов. Для одного разряда нужна одна цифра, поэтому значения от десяти и дальше обозначают латинскими буквами.</p>
+  <p>Для оснований до 20 полный ряд <b>0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A, B, C, D, E, F, G, H, I, J</b> упорядочен по возрастанию значений. При основании <i>N</i> берём первые <i>N</i> знаков ряда, начиная с 0. Их значения идут от 0 до <i>N</i> − 1.</p>
   <dl class="alphabet-digits" aria-label="Буквенные цифры и их десятичные значения">
     <div><dt>A</dt><dd>10</dd></div>
     <div><dt>B</dt><dd>11</dd></div>
