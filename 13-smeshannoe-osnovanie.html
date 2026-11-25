@@ -783,6 +783,16 @@ const mixed = (() => {
     return { value, steps };
   }
 
+  function hornerExpressions(digits, bases) {
+    const expressions = [String(digits[0])];
+    for (let i = 1; i < digits.length; i++) {
+      const previous = expressions[i - 1];
+      const prefix = i === 1 ? previous : `(${previous})`;
+      expressions.push(`${prefix} · ${bases[i]} + ${digits[i]}`);
+    }
+    return expressions;
+  }
+
   function add(left, right, bases) {
     limit(bases);
     checkDigits(left, bases);
@@ -803,7 +813,7 @@ const mixed = (() => {
     return { digits, carry, steps };
   }
 
-  return { limit, encode, decode, add };
+  return { limit, encode, decode, hornerExpressions, add };
 })();
 
 function initMixedClock(root) {
@@ -1050,14 +1060,15 @@ function initMixedWordModel(root, mixed) {
   }
 
   function decoding(digits, decoded) {
-    return decoded.steps.map(({i, base, before, digit, value}) => frame(
-      `Схема Горнера. Позиция ${i + 1}`,
-      i === 0
-        ? 'Начинаем с нуля. После первой позиции накопленное значение равно первой цифре.'
-        : 'Умножаем накопленное значение на основание текущей позиции и прибавляем её цифру.',
-      cells(digits, i, true),
-      `${before} · ${base} + ${digit} = ${value}`,
-    ));
+    return mixed.hornerExpressions(digits, bases).map((expression, i) => {
+      const last = i === digits.length - 1;
+      const instruction = i === 0
+        ? 'Начинаем со значения первой цифры.'
+        : 'Умножаем всё выражение на основание текущей позиции и прибавляем её цифру.';
+      const note = last ? `${instruction} Теперь вычисляем выражение целиком и получаем индекс слова.` : instruction;
+      const formula = last ? `${expression} = ${decoded.value}` : expression;
+      return frame(`Схема Горнера. Позиция ${i + 1}`, note, cells(digits, i, true), formula);
+    });
   }
 
   function encoding(encoded, title, showLetters) {
@@ -1533,12 +1544,6 @@ function initMixedRankTable(root, mixed) {
     }
   }
 
-  function horner(digits, bases) {
-    let expression = String(digits[0]);
-    for (let i = 1; i < digits.length; i++) expression = `${i > 1 ? `(${expression})` : expression} · ${bases[i]} + ${digits[i]}`;
-    return expression;
-  }
-
   function render() {
     root.dataset.mrankPhase = cursor;
     view.hidden = !model;
@@ -1591,7 +1596,7 @@ function initMixedRankTable(root, mixed) {
     });
     result.hidden = !finished;
     answer.textContent = finished ? `${value} → (${encoded.digits.join(', ')})` : '';
-    check.textContent = finished && bases.length > 1 ? `Проверим по схеме Горнера. ${horner(encoded.digits, bases)} = ${mixed.decode(encoded.digits, bases).value}.` : '';
+    check.textContent = finished && bases.length > 1 ? `Проверим по схеме Горнера. ${mixed.hornerExpressions(encoded.digits, bases)[bases.length - 1]} = ${mixed.decode(encoded.digits, bases).value}.` : '';
     check.hidden = !check.textContent;
   }
 
