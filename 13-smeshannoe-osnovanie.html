@@ -371,7 +371,8 @@ button:disabled{opacity:.55;cursor:default}
 .mrank-table .mrank-index-cell{font-weight:400}
 .mrank-table [data-mrank-target]>.mrank-index-cell{font-weight:700}
 .mrank-table .mrank-index-cell:only-child{text-align:center}
-.mrank-group-content{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:0 .35rem;position:sticky;top:var(--mrank-heading-height);bottom:.25rem}
+.mrank-digit-content{position:sticky;top:var(--mrank-heading-height);bottom:.25rem}
+.mrank-group-content{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:0 .35rem}
 .mrank-group-badge{border:1px solid #c1d2ec;border-radius:999px;padding-inline:.25rem;background:#eef3fa;color:#3b5379;font-size:12px;font-weight:650;line-height:1.4;white-space:nowrap}
 .mrank-table [data-mrank-full-group] .mrank-group-badge{border-color:#98bde9;background:#dceafe;color:#163d82}
 .mrank-table [data-mrank-selected-group] .mrank-group-badge{border-color:#b7872e;background:#fff0bd;color:#533500;font-weight:700}
@@ -1479,8 +1480,10 @@ function initMixedRankTable(root, mixed) {
           const groupNumber = index / weight;
           digit.dataset.mrankGroupNumber = groupNumber;
           digit.setAttribute('aria-label', `Цифра ${value}. Группа ${groupNumber}`);
-          digit.innerHTML = `<div class="mrank-group-content"><span>${value}</span><span class="mrank-group-badge">№ ${groupNumber}</span></div>`;
+          digit.innerHTML = `<div class="mrank-digit-content mrank-group-content"><span>${value}</span><span class="mrank-group-badge">№ ${groupNumber}</span></div>`;
           groupCells.push(digit);
+        } else if (weight > 1) {
+          digit.innerHTML = `<div class="mrank-digit-content">${value}</div>`;
         } else {
           digit.textContent = value;
         }
