@@ -294,7 +294,7 @@ main [id]{scroll-margin-top:16.5rem}
 
   <section class="interactive" id="mixed-digit-figure" aria-labelledby="mixed-add24-title">
     <h3 id="mixed-add24-title">Прибавим одну палочку</h3>
-    <p>Начнём с 24. Нажмите «+1 палочка» и проследите, когда нужно связать пучок и перенести его влево. Затем попробуйте другое число.</p>
+    <p>Начнём с 24. Нажмите «+1» и проследите, как полные пучки связываются и переходят влево. Можете ввести своё число.</p>
     <div class="model-controls" id="mixed-add24-inputs" hidden>
       <label for="mixed-add24-number">Начальное число от 0 до 29
         <input id="mixed-add24-number" type="text" inputmode="numeric" autocomplete="off" value="24" aria-describedby="mixed-add24-error">
@@ -611,6 +611,18 @@ function initMixedStickAddition(root, mixed, bases) {
   const settings = document.getElementById('mixed-add24-inputs');
   const input = document.getElementById('mixed-add24-number');
   const error = document.getElementById('mixed-add24-error');
+  root.innerHTML = `
+    <div class="mxstep-actions">
+      <button type="button" class="primary" data-mxstep-next>+1</button>
+    </div>
+    <div class="mxstep-stage" data-mxstep-stage></div>
+    <p class="model-status" data-mxstep-note role="status"></p>`;
+  const next = root.querySelector('[data-mxstep-next]');
+  const stage = root.querySelector('[data-mxstep-stage]');
+  const note = root.querySelector('[data-mxstep-note]');
+  let value = 0;
+  let running = false;
+  let generation = 0;
 
   function picture(weight, attrs = '') {
     const index = weight === limit ? weights.length : right - weights.indexOf(weight);
@@ -628,7 +640,7 @@ function initMixedStickAddition(root, mixed, bases) {
     const needsCarry = Boolean(addition.steps[0].carry);
     record('add', right,
       needsCarry
-        ? 'Справа стало 5 палочек. Их можно связать в один пучок веса 5.'
+        ? 'Справа стало 5 палочек. Они образуют один пучок веса 5.'
         : `Справа стало ${counted(counts[right], right)}. Это меньше основания 5, поэтому переноса нет.`);
 
     for (const {i, carry} of addition.steps) {
@@ -636,128 +648,157 @@ function initMixedStickAddition(root, mixed, bases) {
       const pendingWeight = weights[i] * bases[i];
       const oldCount = counts[i];
       counts[i] = 0;
-      record('bind', i, `Из ${oldCount} ${items[i].many} получается один пучок веса ${pendingWeight}. Перенесите его влево.`, {pendingWeight});
+      record('bind', i, `Из ${oldCount} ${items[i].many} собирается один пучок веса ${pendingWeight}.`, {pendingWeight});
       const destination = i - 1;
       if (destination < 0) {
-        record('move', destination, 'Три десятка образовали пучок веса 30. Для числа 30 нужен ещё один разряд слева.', {overflow: true});
+        record('move', destination, 'Три десятка образовали пучок веса 30. Для числа 30 нужен ещё один разряд слева. Для нового примера введите число от 0 до 29.', {overflow: true});
         break;
       }
       counts[destination] += carry;
       const countTo = counts[destination];
       const again = countTo === bases[destination];
       const ending = again
-        ? `Свяжите их в пучок веса ${weights[destination] * bases[destination]}.`
+        ? `Из них собираем пучок веса ${weights[destination] * bases[destination]}.`
         : `Это меньше основания ${bases[destination]}, поэтому перенос останавливается.`;
       record('move', destination, `Пучок перенесён влево. Теперь в ${placeNames[destination]} разряде ${counted(countTo, destination)}. ${ending}`);
     }
 
-    return {digits, addition, frames};
-  }
-
-  function start() {
-    const text = input.value.trim();
-    const value = Number(text);
-    const valid = /^\d+$/.test(text) && Number.isSafeInteger(value) && value < limit;
-    input.setAttribute('aria-invalid', String(!valid));
-    error.textContent = valid ? '' : `Введите целое число от 0 до ${limit - 1}.`;
-    root.hidden = !valid;
-    if (!valid) {
-      root.replaceChildren();
-      return;
-    }
-
-    const {digits, addition, frames} = prepare(value);
-    const nextLabel = {add:'+1 палочка', bind:'Связать в пучок', move:'Перенести влево'};
-    const labels = frames.slice(1).map(({kind}) => nextLabel[kind]).concat('Готово');
-    const notes = frames.map(({note}) => note);
-    const format = (values) => `(${values.join(', ')})`;
+    const format = (tuple) => `(${tuple.join(', ')})`;
     const answer = addition.carry
       ? `${value} + 1 = ${value + 1}`
       : `${format(digits)} + ${format(addend)} = ${format(addition.digits)}`;
-
-    function render(stage, step, motion) {
-      const {kind, counts, active, pendingWeight, overflow} = frames[step];
-      const last = step === frames.length - 1;
-      const priorBundle = motion && kind === 'move'
-        ? stage.querySelector('[data-mxstep-pending]').getBoundingClientRect()
-        : null;
-      const gathering = motion && kind === 'bind'
-        ? Array.from(stage.querySelectorAll(`[data-mxstep-place="${active}"] .mxstep-piece`), (piece) =>
-          [piece.cloneNode(), piece.getBoundingClientRect()])
-        : [];
-      const overflowPlace = overflow ? `<div class="mxstep-place mxstep-active">
-        <b>Новый</b><span class="mxstep-base">Вес ${limit}</span>
-        <div class="mxstep-objects" aria-hidden="true">${picture(limit, 'data-mxstep-arrived')}</div>
-        <span class="mxstep-digit" data-mxstep-digit>1</span>
-      </div>` : '';
-
-      const boardClass = overflow ? ' mxstep-board-extended' : counts[0] === bases[0] ? ' mxstep-board-full-tens' : '';
-      stage.innerHTML = `<div class="mxstep-board${boardClass}" role="group" aria-label="Разряды и пучки">
-        ${overflowPlace}
-        ${counts.map((count, i) => {
-          const isActive = i === active;
-          const pending = pendingWeight && isActive;
-          const digit = pending || count >= bases[i] ? '—' : count;
-          const art = pending
-            ? picture(pendingWeight, 'data-mxstep-pending')
-            : Array.from({length: count}, (_, index) => {
-              let attribute = '';
-              if (isActive && index === count - 1) {
-                if (kind === 'add') attribute = 'data-mxstep-added';
-                if (kind === 'move') attribute = 'data-mxstep-arrived';
-              }
-              return picture(weights[i], attribute);
-            }).join('');
-          return `<div class="mxstep-place${isActive ? ' mxstep-active' : ''}" data-mxstep-place="${i}">
-            <b>${overflow && i === right ? '<abbr title="Единицы">Ед.</abbr>' : positions[i]}</b>
-            <span class="mxstep-base">${overflow ? '<abbr title="Основание">Осн.</abbr>' : 'Основание'} ${bases[i]}</span>
-            <div class="mxstep-objects" aria-hidden="true">${art}</div>
-            <span class="mxstep-digit" data-mxstep-digit aria-label="${pending ? 'Пучок готов к переносу' : counted(count, i)}">${digit}</span>
-          </div>`;
-        }).join('')}
-      </div><p class="formula mxstep-result" data-mxstep-answer ${last ? '' : 'hidden'}>${answer}</p>`;
-
-      if (!motion) return;
-      if (kind === 'add') {
-        return stage.querySelector('[data-mxstep-added]').animate([
-          {transform:'translateY(-14px)', opacity:0}, {transform:'translateY(0)', opacity:1},
-        ], {duration:420, easing:'ease-out'});
-      }
-      if (kind === 'bind') {
-        const bundle = stage.querySelector('[data-mxstep-pending]');
-        const group = bundle.parentElement;
-        const origin = group.getBoundingClientRect();
-        const target = bundle.getBoundingClientRect();
-        const tying = bundle.animate([{opacity:0,transform:'scale(.85)'}, {opacity:1,transform:'scale(1)'}],
-          {delay:910, duration:290, fill:'backwards', easing:'ease-out'});
-        for (const [ghost, startRect] of gathering) {
-          ghost.removeAttribute('data-mxstep-added');
-          ghost.removeAttribute('data-mxstep-arrived');
-          ghost.classList.add('mxstep-ghost');
-          ghost.style.left = `${startRect.left - origin.left}px`;
-          ghost.style.top = `${startRect.top - origin.top}px`;
-          group.append(ghost);
-          const x = target.left + (target.width - startRect.width) / 2 - startRect.left;
-          const y = target.top + (target.height - startRect.height) / 2 - startRect.top;
-          const destination = `translate(${x}px, ${y}px) scale(.75)`;
-          const gatheringAnimation = ghost.animate([
-            {opacity:1, transform:'none'},
-            {offset:.72, opacity:1, transform:destination},
-            {opacity:0, transform:destination},
-          ], {duration:1080, fill:'forwards', easing:'ease-in-out'});
-          gatheringAnimation.finished.then(() => ghost.remove(), () => ghost.remove());
-        }
-        return tying;
-      }
-      if (priorBundle) return moveMixedToken(stage.querySelector('[data-mxstep-arrived]'), priorBundle, {duration:650});
-    }
-
-    initMixedStepExample(root, labels, notes, render);
+    return {frames, answer};
   }
 
-  input.addEventListener('input', start);
+  function render({frames, answer}, step, motion) {
+    const {kind, counts, active, pendingWeight, overflow} = frames[step];
+    const priorBundle = motion && kind === 'move'
+      ? stage.querySelector('[data-mxstep-pending]').getBoundingClientRect()
+      : null;
+    const gathering = motion && kind === 'bind'
+      ? Array.from(stage.querySelectorAll(`[data-mxstep-place="${active}"] .mxstep-piece`), (piece) =>
+        [piece.cloneNode(), piece.getBoundingClientRect()])
+      : [];
+    const overflowPlace = overflow ? `<div class="mxstep-place mxstep-active">
+      <b>Новый</b><span class="mxstep-base">Вес ${limit}</span>
+      <div class="mxstep-objects" aria-hidden="true">${picture(limit, 'data-mxstep-arrived')}</div>
+      <span class="mxstep-digit" data-mxstep-digit>1</span>
+    </div>` : '';
+
+    const boardClass = overflow ? ' mxstep-board-extended' : counts[0] === bases[0] ? ' mxstep-board-full-tens' : '';
+    stage.innerHTML = `<div class="mxstep-board${boardClass}" role="group" aria-label="Разряды и пучки">
+      ${overflowPlace}
+      ${counts.map((count, i) => {
+        const isActive = i === active;
+        const pending = pendingWeight && isActive;
+        const digit = pending || count >= bases[i] ? '—' : count;
+        const art = pending
+          ? picture(pendingWeight, 'data-mxstep-pending')
+          : Array.from({length: count}, (_, index) => {
+            let attribute = '';
+            if (isActive && index === count - 1) {
+              if (kind === 'add') attribute = 'data-mxstep-added';
+              if (kind === 'move') attribute = 'data-mxstep-arrived';
+            }
+            return picture(weights[i], attribute);
+          }).join('');
+        return `<div class="mxstep-place${isActive ? ' mxstep-active' : ''}" data-mxstep-place="${i}">
+          <b>${overflow && i === right ? '<abbr title="Единицы">Ед.</abbr>' : positions[i]}</b>
+          <span class="mxstep-base">${overflow ? '<abbr title="Основание">Осн.</abbr>' : 'Основание'} ${bases[i]}</span>
+          <div class="mxstep-objects" aria-hidden="true">${art}</div>
+          <span class="mxstep-digit" data-mxstep-digit aria-label="${pending ? 'Пучок готов к переносу' : counted(count, i)}">${digit}</span>
+        </div>`;
+      }).join('')}
+    </div><p class="formula mxstep-result" data-mxstep-answer hidden>${answer}</p>`;
+
+    if (!motion) return;
+    if (kind === 'add') {
+      return stage.querySelector('[data-mxstep-added]').animate([
+        {transform:'translateY(-14px)', opacity:0}, {transform:'translateY(0)', opacity:1},
+      ], {duration:420, easing:'ease-out'});
+    }
+    if (kind === 'bind') {
+      const bundle = stage.querySelector('[data-mxstep-pending]');
+      const group = bundle.parentElement;
+      const origin = group.getBoundingClientRect();
+      const target = bundle.getBoundingClientRect();
+      const tying = bundle.animate([{opacity:0,transform:'scale(.85)'}, {opacity:1,transform:'scale(1)'}],
+        {delay:910, duration:290, fill:'backwards', easing:'ease-out'});
+      for (const [ghost, startRect] of gathering) {
+        ghost.removeAttribute('data-mxstep-added');
+        ghost.removeAttribute('data-mxstep-arrived');
+        ghost.classList.add('mxstep-ghost');
+        ghost.style.left = `${startRect.left - origin.left}px`;
+        ghost.style.top = `${startRect.top - origin.top}px`;
+        group.append(ghost);
+        const x = target.left + (target.width - startRect.width) / 2 - startRect.left;
+        const y = target.top + (target.height - startRect.height) / 2 - startRect.top;
+        const destination = `translate(${x}px, ${y}px) scale(.75)`;
+        const gatheringAnimation = ghost.animate([
+          {opacity:1, transform:'none'},
+          {offset:.72, opacity:1, transform:destination},
+          {opacity:0, transform:destination},
+        ], {duration:1080, fill:'forwards', easing:'ease-in-out'});
+        gatheringAnimation.finished.then(() => ghost.remove(), () => ghost.remove());
+      }
+      return tying;
+    }
+    if (priorBundle) return moveMixedToken(stage.querySelector('[data-mxstep-arrived]'), priorBundle, {duration:650});
+  }
+
+  function show(example, step, motion) {
+    const animation = render(example, step, motion);
+    root.dataset.mxstepPhase = step;
+    note.textContent = example.frames[step].note;
+    return animation;
+  }
+
+  function readNumber() {
+    generation++;
+    running = false;
+    for (const animation of stage.getAnimations?.({subtree: true}) ?? []) animation.cancel();
+
+    const text = input.value.trim();
+    const number = Number(text);
+    const valid = /^\d+$/.test(text) && Number.isSafeInteger(number) && number < limit;
+    input.setAttribute('aria-invalid', String(!valid));
+    error.textContent = valid ? '' : `Введите целое число от 0 до ${limit - 1}.`;
+    root.hidden = !valid;
+    next.setAttribute('aria-disabled', String(!valid));
+    value = valid ? number : null;
+    if (valid) show(prepare(value), 0, false);
+  }
+
+  async function addOne() {
+    if (running || value === null || value >= limit) return;
+    const run = ++generation;
+    running = true;
+    next.setAttribute('aria-disabled', 'true');
+
+    const example = prepare(value);
+    const motion = typeof stage.animate === 'function' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    for (let step = 1; step < example.frames.length; step++) {
+      const animation = show(example, step, motion);
+      if (animation) await animation.finished.catch(() => {});
+      if (run !== generation) return;
+
+      if (step < example.frames.length - 1) {
+        await new Promise((resolve) => setTimeout(resolve, motion ? 280 : 560));
+        if (run !== generation) return;
+      }
+    }
+
+    value++;
+    input.value = value;
+    root.querySelector('[data-mxstep-answer]').hidden = false;
+    running = false;
+    next.setAttribute('aria-disabled', String(value >= limit));
+  }
+
+  input.addEventListener('input', readNumber);
+  next.addEventListener('click', addOne);
   settings.hidden = false;
-  start();
+  readNumber();
 }
 
 function initMixedDivisionSteps(root, mixed, bases) {
