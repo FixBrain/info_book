@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>15. Смешанное основание на практике</title>
+<title>14. Смешанное основание на практике</title>
 <style>
 :root{--accent:#2563eb;--bg:#f7f8fa;--card:#fff;--line:#e3e7ee;--ink:#1f2430;--muted:#525e71}
 *{box-sizing:border-box}
@@ -72,12 +72,23 @@ button:disabled{opacity:.55;cursor:default}
 .mixed-worked-table :is(th,td){padding:.35em .24em;text-align:center}
 .mixed-worked-table .mixed-worked-transfer{background:#e8f1ff;color:#163d82;font-weight:650}
 .mixed-worked-table .mixed-worked-remainder{background:#fff0bd;color:#533500;font-weight:650}
+.mixed-clock-column{font-size:15px}
 .mixed-clock-column th[scope=row]{text-align:left;white-space:nowrap;padding-inline:.4em}
 .mixed-clock-column .mixed-clock-total>*{border-top:2px solid #324365;font-weight:700}
 .mixed-clock-column .mixed-clock-total td:first-of-type{background:#e8f1ff;color:#163d82}
-@media(max-width:540px){
+.clock-steps li{padding:.45em .65em;border:1px solid #d6e0ef;border-radius:8px;background:#fff}
+.clock-steps b,.clock-steps .clock-step-equation{display:block}
+.clock-step-equation{font-weight:650;font-variant-numeric:tabular-nums;color:#172644}
+.pixel-methods{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}
+.pixel-methods>div{min-width:0;padding:.65em .75em;border:1px solid #d6e0ef;border-radius:9px;background:#fff}
+.pixel-methods h4{margin:0;font-size:16px;line-height:1.35}
+.pixel-methods .formula{margin:.35em 0}
+.pixel-methods p:last-child{margin-bottom:0}
+@media screen and (max-width:540px){
   .mixed-worked-table :is(th,td){padding-inline:.12em}
-  .mixed-clock-column th[scope=row]{padding-inline:.3em}
+  .clock-addition-table,.clock-table-note{display:none}
+  .example .clock-steps{padding-inline-start:1.25rem}
+  .pixel-methods{grid-template-columns:minmax(0,1fr)}
 }
 #mixed-pixel-model {
   --mxp-line: #d9e4f6;
@@ -251,7 +262,7 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
   <details class="chapter-menu">
     <summary>
       <span class="chapter-menu-title">Главы учебника</span>
-      <span class="chapter-menu-current">Глава 15</span>
+      <span class="chapter-menu-current">Глава 14</span>
     </summary>
     <nav class="menu" aria-label="Главы учебника">
       <a href="index.html">Оглавление</a>
@@ -268,15 +279,15 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
       <a href="09a-kratnost-i-ostatki.html">9А. Кратность и остатки</a>
       <a href="09-alternativnye-alfavity.html">10. Альтернативные алфавиты</a>
       <a href="10-numeratsiya-slov.html">11. Сравнение и нумерация слов</a>
-      <a href="13-smeshannoe-osnovanie.html">13. Числа со смешанным основанием</a>
-      <a href="14-slova-nomera-sdvigi.html">14. Слова, номера и сдвиги</a>
-      <a href="15-smeshannoe-osnovanie-na-praktike.html" aria-current="page">15. Часы и пиксели</a>
+      <a href="13-smeshannoe-osnovanie.html">12. Числа со смешанным основанием</a>
+      <a href="14-slova-nomera-sdvigi.html">13. Слова, номера и сдвиги</a>
+      <a href="15-smeshannoe-osnovanie-na-praktike.html" aria-current="page">14. Часы и пиксели</a>
       <a href="11-itogi.html">Памятка</a>
     </nav>
   </details>
 </header>
 <main>
-  <h1>15. Смешанное основание на практике</h1>
+  <h1>14. Смешанное основание на практике</h1>
   <p class="lead">Часы и координаты пикселей на первый взгляд устроены по-разному. В обоих случаях вес позиции зависит от числа вариантов в позициях справа.</p>
 
   <h2 id="mixed-clock-application">Как устроены разряды времени</h2>
@@ -285,7 +296,7 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
   <p>На часах 23:59:45. Какое время будет через 100 секунд? Разделим 100 на 60 с остатком. По равенству 100 = 1 · 60 + 40 получаем 1 минуту и 40 секунд.</p>
   <section class="example">
     <h3>Через полночь</h3>
-    <div class="table-wrap">
+    <div class="table-wrap clock-addition-table">
       <table class="mixed-worked-table mixed-clock-column" id="mixed-clock-addition">
         <caption>Сложение столбиком</caption>
         <thead>
@@ -300,17 +311,18 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
         </tbody>
       </table>
     </div>
-    <p>Складываем справа налево. Строка «Перенос» показывает, какая единица пришла в каждый разряд справа.</p>
-    <ol>
-      <li>Секунды. 45 + 40 = 1 · 60 + 25. Пишем 25, переносим 1 минуту.</li>
-      <li>Минуты. 59 + 1 + 1 = 1 · 60 + 1. Пишем 01, переносим 1 час.</li>
-      <li>Часы. 23 + 1 = 1 · 24 + 0. Пишем 00, переносим 1 сутки.</li>
+    <p class="clock-table-note">Строка «Перенос» показывает, какая единица пришла в каждый разряд справа.</p>
+    <p>Складываем справа налево.</p>
+    <ol class="clock-steps">
+      <li><b>Секунды</b><span class="clock-step-equation">45 + 40 = 1 · 60 + 25</span>Пишем 25 секунд, переносим 1 минуту.</li>
+      <li><b>Минуты</b><span class="clock-step-equation">59 + 1 + 1 = 1 · 60 + 1</span>К 59 минутам прибавляем минуту из 100 секунд и минуту переноса. Пишем 01, переносим 1 час.</li>
+      <li><b>Часы</b><span class="clock-step-equation">23 + 1 = 1 · 24 + 0</span>Пишем 00 часов, переносим 1 сутки.</li>
     </ol>
     <div class="formula">23:59:45 + 100 секунд → 00:01:25 следующего дня</div>
-    <p>Единица в столбце «Сутки» показывает, что наступил следующий день.</p>
+    <p>Время на часах повторяется каждые 24 часа. После 23:59:59 часы показывают 00:00:00. Если считаем ещё и дни, перенос увеличивает число суток на 1.</p>
   </section>
 
-  <p>Модель начинает с 23:59:58. Предскажите время после двух нажатий «+1 секунда». Сравните цепочку переносов со строкой «Перенос» в таблице.</p>
+  <p>Модель начинает с 23:59:58. Предскажите время после двух нажатий «+1 секунда». Проследите, в каком порядке заполняются разряды и куда уходит перенос.</p>
   <div id="mixed-clock-model"></div>
 
   <h2 id="mixed-pixel-application">От координат пикселя к одному индексу</h2>
@@ -333,7 +345,21 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
         </tbody>
       </table>
     </div>
-    <p>Голубым отмечены частные, которые становятся делимыми в следующей строке. Жёлтым отмечены остатки. Читаем их снизу вверх и получаем <strong>(2, 0, 0)</strong>, первый пиксель третьего кадра. Проверка по весам даёт 2 · 20 + 0 · 5 + 0 = 40.</p>
+    <p>Голубым отмечены частные, которые становятся делимыми в следующей строке. Первое частное <b>8</b> — это индекс строки во всей последовательности. В каждом кадре четыре строки, поэтому в третьем кадре индексы строк идут от 8 до 11. Делим 8 на 4 и получаем кадр 2 и строку 0 внутри кадра.</p>
+    <p>Жёлтым отмечены остатки. Читаем их снизу вверх и получаем <strong>(2, 0, 0)</strong>, первый пиксель третьего кадра.</p>
+    <div class="pixel-methods">
+      <div>
+        <h4>Сразу выделяем целые кадры</h4>
+        <p class="formula">40 = 2 · 20 + 0<br>0 = 0 · 5 + 0</p>
+        <p>Вес кадра равен 20. Перед пикселем два полных кадра. Смещение внутри кадра делим на вес строки 5. Получаем строку 0 и столбец 0.</p>
+      </div>
+      <div>
+        <h4>Сначала выделяем целые строки</h4>
+        <p class="formula">40 = 8 · 5 + 0<br>8 = 2 · 4 + 0</p>
+        <p>Из восьми полных строк собираются два полных кадра. Первый остаток даёт столбец, второй даёт строку внутри кадра.</p>
+      </div>
+    </div>
+    <p>Оба способа дают одни координаты. Проверка по весам даёт <b>2 · 20 + 0 · 5 + 0 = 40</b>.</p>
   </section>
 
   <section class="note mixed-predict">
@@ -344,13 +370,21 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
   <p>В модели выберите индекс 14 и нажмите «+1». Затем сравните с переходом от 39 к 40. В первом случае начинается новая строка, во втором — новый кадр.</p>
   <p>В блоке вычислений модели достаточно двух делений. После деления на 5 и на 4 оставшееся частное уже лежит в диапазоне от 0 до 2 и является номером кадра. Третье деление из примера даёт тот же номер в виде остатка.</p>
   <div id="mixed-pixel-model"></div>
+  <p>Часы возвращаются к полуночи, потому что время суток идёт по кругу. У списка из трёх кадров есть конец. После индекса 59 значение 60 потребовало бы четвёртый кадр. Для такого списка переход к индексу 0 нужно задать отдельным правилом.</p>
 
   <section class="selfcheck" aria-labelledby="mixed-applications-practice">
     <h2 id="mixed-applications-practice">Самопроверка</h2>
-    <p>В модели из трёх кадров у пикселя координаты (1, 3, 4). Какие координаты будут у следующего пикселя? Какие разряды изменятся?</p>
     <details>
-      <summary>Проверить решение</summary>
-      <p>В столбце переходим с 4 на 0 и переносим единицу в номер строки. В номере строки переходим с 3 на 0 и переносим единицу в номер кадра. Получаем <strong>(2, 0, 0)</strong>, а индекс меняется с 39 на 40.</p>
+      <summary>Какие координаты у пикселя с индексом 54?</summary>
+      <p>Делим на 5. Получаем 54 = 10 · 5 + 4. Столбец имеет индекс 4, а строка во всей последовательности — 10. Делим 10 на 4. Получаем 10 = 2 · 4 + 2, то есть кадр 2 и строку 2 внутри кадра. Ответ — <strong>(2, 2, 4)</strong>. Проверка по весам даёт 2 · 20 + 2 · 5 + 4 = 54.</p>
+    </details>
+    <details>
+      <summary>Где пиксель с индексом 59? Можно ли в этой модели выбрать индекс 60?</summary>
+      <p>Индекс 59 даёт <strong>(2, 3, 4)</strong>. Это последняя строка и последний столбец третьего кадра. Индекс 60 потребовал бы кадр с индексом 3. В списке есть кадры 0, 1 и 2, поэтому пикселя с индексом 60 здесь нет.</p>
+    </details>
+    <details>
+      <summary>На часах 12:59:50. Что они покажут через 15 секунд?</summary>
+      <p>В секундах 50 + 15 = 1 · 60 + 5, пишем 05 и переносим минуту. В минутах 59 + 1 = 1 · 60 + 0, пишем 00 и переносим час. Получаем <strong>13:00:05</strong>. До 13:00:00 прошло 10 секунд, затем ещё 5. Вместе ровно 15 секунд.</p>
     </details>
   </section>
 
@@ -362,7 +396,7 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
     </ul>
   </section>
   <nav class="pager" aria-label="Соседние главы">
-    <a href="14-slova-nomera-sdvigi.html">← 14. Слова, номера и сдвиги</a>
+    <a href="14-slova-nomera-sdvigi.html">← 13. Слова, номера и сдвиги</a>
     <a href="11-itogi.html">Памятка →</a>
     <a href="index.html">Оглавление</a>
   </nav>
@@ -619,8 +653,8 @@ function initMixedPixelModel(root, mixed) {
     at('selection').textContent = `Индекс ${index}. Кадр ${frame}, строка ${row}, столбец ${col}`;
     at('equation').textContent = `(${frame} · ${rowCount} + ${row}) · ${columnCount} + ${col} = ${value}`;
     at('inverse').innerHTML = `
-      <span><b>${index} = ${rowNumber} · ${columnCount} + ${col}</b>. Остаток ${col} даёт номер столбца.</span>
-      <span><b>${rowNumber} = ${frame} · ${rowCount} + ${row}</b>. Остаток ${row} даёт номер строки, частное ${frame} — номер кадра.</span>`;
+      <span><b>${index} = ${rowNumber} · ${columnCount} + ${col}</b>. Частное ${rowNumber} — индекс строки во всей последовательности. Остаток ${col} — индекс столбца.</span>
+      <span><b>${rowNumber} = ${frame} · ${rowCount} + ${row}</b>. Частное ${frame} — индекс кадра. Остаток ${row} — индекс строки внутри кадра.</span>`;
   }
 
   field.addEventListener('input', () => {

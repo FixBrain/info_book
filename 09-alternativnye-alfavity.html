@@ -134,9 +134,9 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
       <a href="09a-kratnost-i-ostatki.html">9А. Кратность и остатки</a>
       <a href="09-alternativnye-alfavity.html" aria-current="page">10. Альтернативные алфавиты</a>
       <a href="10-numeratsiya-slov.html">11. Сравнение и нумерация слов</a>
-      <a href="13-smeshannoe-osnovanie.html">13. Числа со смешанным основанием</a>
-      <a href="14-slova-nomera-sdvigi.html">14. Слова, номера и сдвиги</a>
-      <a href="15-smeshannoe-osnovanie-na-praktike.html">15. Часы и пиксели</a>
+      <a href="13-smeshannoe-osnovanie.html">12. Числа со смешанным основанием</a>
+      <a href="14-slova-nomera-sdvigi.html">13. Слова, номера и сдвиги</a>
+      <a href="15-smeshannoe-osnovanie-na-praktike.html">14. Часы и пиксели</a>
       <a href="11-itogi.html">Памятка</a>
     </nav>
   </details>
@@ -248,11 +248,13 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
   </section>
 
   <h2 id="adding">Сложение с буквенными цифрами</h2>
+  <p>Для сложения снова расположим буквы из слова «СОЛНЦЕ» по русскому алфавиту.
+    Получаем <b>Е, Л, Н, О, С, Ц</b> со значениями от 0 до 5. Ноль обозначает Е.</p>
   <p>Вычисляем по значениям цифр и записываем результат знаками текущего алфавита. При переносе одна единица старшего разряда по-прежнему соответствует <i>N</i> единицам младшего разряда.</p>
-  <p>В алфавитном порядке <b>Ц + Л = ЛЕ</b>. Сумма 5 + 1 даёт одну шестёрку Л и ноль единиц Е.</p>
+  <p><b>Ц + Л = ЛЕ</b>. Сумма 5 + 1 даёт одну шестёрку Л и ноль единиц Е.</p>
   <div class="example" id="alphabet-carry">
     <h3>Сложение двух буквенных записей</h3>
-    <p>Сложим <b>ОЦ + ЛН</b> в алфавите из слова «СОЛНЦЕ». Поставим единицы под единицами и запишем перенос над старшим разрядом.</p>
+    <p>Сложим <b>ОЦ + ЛН</b> в основании 6. Поставим единицы под единицами и запишем перенос над старшим разрядом.</p>
     <div class="alphabet-columns">
       <div role="img" aria-label="ОЦ плюс ЛН равно ЦЛ. Над старшим разрядом стоит перенос Л.">
         <table aria-hidden="true">
@@ -267,7 +269,7 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
       </div>
       <div role="img" aria-label="35 в основании 6 плюс 12 в основании 6 равно 51 в основании 6. Перенос одной шестёрки.">
         <table aria-hidden="true">
-          <caption>Цифрами в основании 6</caption>
+          <caption>Цифрами</caption>
           <tbody>
             <tr class="carry"><td></td><td>1</td><td></td></tr>
             <tr><td></td><td>3</td><td>5</td></tr>
@@ -285,8 +287,14 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
     <p>Собери алфавит из слова «МОЛОКО» в порядке русского алфавита. Каковы основание и знак нуля?</p>
     <details><summary>Показать ответ</summary><p>К, Л, М, О. Основание 4, ноль обозначает К.</p></details>
     <details><summary>Какой алфавит получится из «ПЕРЕПЁЛКА»?</summary><p>А, Е, Ё, К, Л, П, Р. Е и Ё занимают отдельные места. Основание 7.</p></details>
-    <p>В алфавите из слова «СОЛНЦЕ» запиши число 17<sub>10</sub>. Проверь перевод обратно.</p>
+    <p>В алфавите из слова «СОЛНЦЕ», составленном по русскому алфавиту, запиши число 17<sub>10</sub>. Проверь перевод обратно.</p>
     <details><summary>Показать ответ</summary><p>17 = 2 · 6 + 5. Цифры 2 и 5 обозначаются Н и Ц, поэтому ответ <b>НЦ</b>.</p></details>
+    <details id="alphabet-carry-practice">
+      <summary>Чему равна сумма ОЦ + Л в порядке Е, Л, Н, О, С, Ц?</summary>
+      <p>В единицах Ц + Л даёт 5 + 1 = 6. Пишем Е (0) и переносим единицу.
+        В разряде шестёрок к О (3) прибавляем перенос и получаем С (4).
+        Ответ <b>СЕ</b>. Проверка даёт 35<sub>6</sub> + 1<sub>6</sub> = 40<sub>6</sub>.</p>
+    </details>
   </section>
 
   <p>Значения букв позволяют расположить слова по порядку. В следующей главе по этой таблице найдём, какое слово стоит на заданном месте в списке.</p>

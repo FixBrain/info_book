@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>14. Слова, номера и сдвиги</title>
+<title>13. Слова, номера и сдвиги</title>
 <style>
 :root{--accent:#2563eb;--bg:#f7f8fa;--card:#fff;--line:#e3e7ee;--ink:#1f2430;--muted:#525e71}
 *{box-sizing:border-box}
@@ -121,6 +121,9 @@ button:disabled{opacity:.55;cursor:default}
 .mixed-word-actions { display: flex; flex-wrap: wrap; gap: .45rem .6rem; align-items: center; }
 .mixed-word-actions button { min-height: 2.5rem; padding-inline: .65rem; }
 .mixed-word-actions [aria-disabled="true"] { opacity: .55; cursor: default; }
+.mixed-word-phases{display:flex;flex-wrap:wrap;gap:.3rem .5rem;margin:.85rem 0 .5rem;padding:0;list-style:none}
+.mixed-word-phases li{margin:0;padding:.2rem .5rem;border:1px solid #d6e0ef;border-radius:7px;background:#fff;color:var(--muted);font-size:.84rem}
+.mixed-word-phases [aria-current="step"]{border-color:#6597ed;background:#e5eeff;color:#183f91;font-weight:700}
 .mixed-word-announcement {
   position: absolute;
   width: 1px;
@@ -137,6 +140,15 @@ button:disabled{opacity:.55;cursor:default}
 .mixed-letter-mark{background:#fff5d7;border-color:#dcc68e}
 .mixed-teaching-table :is(td,th):not(:first-child){text-align:center}
 #mixed-letter-transition span{display:inline-block}
+.prefix-groups{margin:12px 0;padding:10px 12px;border:1px solid #e7d4b1;border-radius:10px;background:#fff9ec;color:#5c402d}
+.prefix-groups figcaption{font-weight:700}
+.prefix-groups ol{display:grid;gap:6px;padding:0;margin:.5em 0;list-style:none}
+.prefix-groups li{display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 8px;margin:0;padding:6px 8px;border:1px solid #ece1cd;border-radius:7px;background:#fffdf8}
+.prefix-groups small{display:block;color:#715944}
+.prefix-count{font-weight:700;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.position-key{width:min(100%,29rem);margin:.7em 0;text-align:center;table-layout:fixed}
+.position-key :is(th,td){padding:4px;text-align:center}
+.position-key th[scope="row"]{width:52%;text-align:left;font-size:.875rem;overflow-wrap:anywhere}
 .worked-table{width:min(100%,26rem);table-layout:fixed;margin:12px 0 8px}
 .worked-table th,.worked-table td{padding:5px 3px;text-align:center}
 .worked-division thead th{font-size:clamp(12px,3.75vw,15px);line-height:1.25;overflow-wrap:anywhere}
@@ -178,7 +190,7 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
   <details class="chapter-menu">
     <summary>
       <span class="chapter-menu-title">Главы учебника</span>
-      <span class="chapter-menu-current">Глава 14</span>
+      <span class="chapter-menu-current">Глава 13</span>
     </summary>
     <nav class="menu" aria-label="Главы учебника">
       <a href="index.html">Оглавление</a>
@@ -195,15 +207,15 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
       <a href="09a-kratnost-i-ostatki.html">9А. Кратность и остатки</a>
       <a href="09-alternativnye-alfavity.html">10. Альтернативные алфавиты</a>
       <a href="10-numeratsiya-slov.html">11. Сравнение и нумерация слов</a>
-      <a href="13-smeshannoe-osnovanie.html">13. Числа со смешанным основанием</a>
-      <a href="14-slova-nomera-sdvigi.html" aria-current="page">14. Слова, номера и сдвиги</a>
-      <a href="15-smeshannoe-osnovanie-na-praktike.html">15. Часы и пиксели</a>
+      <a href="13-smeshannoe-osnovanie.html">12. Числа со смешанным основанием</a>
+      <a href="14-slova-nomera-sdvigi.html" aria-current="page">13. Слова, номера и сдвиги</a>
+      <a href="15-smeshannoe-osnovanie-na-praktike.html">14. Часы и пиксели</a>
       <a href="11-itogi.html">Памятка</a>
     </nav>
   </details>
 </header>
 <main>
-  <h1>14. Слова, номера и сдвиги</h1>
+  <h1>13. Слова, номера и сдвиги</h1>
   <p class="lead">У каждой позиции слова может быть свой набор букв. Найдём место слова в списке, восстановим слово по номеру и разберём, как перейти на заданное число мест вперёд.</p>
 
   <section class="note mixed-predict" aria-labelledby="mixed-word-recall">
@@ -261,8 +273,17 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
   <section class="example">
     <h3 id="mixed-word-nika">Задача 1. На каком месте стоит НИКА</h3>
     <p>Ищем каждую букву в списке её позиции. Получаем Н → 2, И → 2, К → 3, А → 0. Числовая запись слова — (2, 2, 3, 0).</p>
-    <p>Перед НИКА идут слова на В и К — по 98. Среди слов на Н раньше идут группы НА… и НВ… — по 14 слов. Среди слов на НИ раньше идут группы НИА…, НИВ… и НИИ… — по два слова.</p>
-    <div class="formula">2 · 98 + 2 · 14 + 3 · 2 + 0 · 1 = 230</div>
+    <figure class="prefix-groups">
+      <figcaption>Какие группы слов идут перед НИКА</figcaption>
+      <ol>
+        <li><span><b>В…, К…</b><small>Первая буква меньше Н. Справа три свободные позиции.</small></span><span class="prefix-count">2 · 98 = 196</span></li>
+        <li><span><b>НА…, НВ…</b><small>Н уже совпала. Вторая буква меньше И.</small></span><span class="prefix-count">2 · 14 = 28</span></li>
+        <li><span><b>НИА…, НИВ…, НИИ…</b><small>НИ уже совпали. Третья буква меньше К.</small></span><span class="prefix-count">3 · 2 = 6</span></li>
+        <li><span><b>НИК…</b><small>НИК совпали. А — первая допустимая буква, меньших здесь нет.</small></span><span class="prefix-count">0 · 1 = 0</span></li>
+      </ol>
+      <p>Каждое слово перед НИКА попадает в одну строку по месту первого отличия.</p>
+    </figure>
+    <div class="formula">196 + 28 + 6 + 0 = 230</div>
     <p>При чтении по Горнеру получится ((2 · 7 + 2) · 7 + 3) · 2 + 0 = 230. Перед НИКА стоят 230 слов, поэтому его <strong>номер 231</strong>.</p>
   </section>
 
@@ -341,6 +362,13 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
 
   <section class="note">
     <h3>Почему перенос сохраняет сумму</h3>
+    <p>В таблицах позиции слова считаем слева направо. В формуле индекс <i>i</i> считаем от крайнего правого разряда, как в главе 12. При переносе влево <i>i</i> увеличивается на 1.</p>
+    <table class="position-key" aria-label="Как связаны позиции слова и индексы в формуле">
+      <tbody>
+        <tr><th scope="row">Позиция в слове</th><td>1</td><td>2</td><td>3</td><td>4</td></tr>
+        <tr><th scope="row">Индекс <i>i</i> разряда</th><td>3</td><td>2</td><td>1</td><td>0</td></tr>
+      </tbody>
+    </table>
     <p>Пусть в разряде веса <i>w</i><sub>i</sub> собрано <i>s</i> групп. Разделим <i>s</i> на <i>b</i><sub>i</sub> и получим частное <i>q</i> и остаток <i>r</i>. Каждые <i>b</i><sub>i</sub> групп составляют одну группу слева, поэтому в соседний разряд переходят <i>q</i> групп, а здесь остаются <i>r</i>.</p>
     <div class="formula"><i>s</i> · <i>w</i><sub>i</sub> = (<i>q</i> · <i>b</i><sub>i</sub> + <i>r</i>) · <i>w</i><sub>i</sub> = <i>q</i> · <i>w</i><sub>i + 1</sub> + <i>r</i> · <i>w</i><sub>i</sub></div>
     <p>При сложении двух допустимых записей перенос равен 0 или 1. Справа входящий перенос равен нулю, а в каждом следующем разряде две цифры и входящая единица дают не больше 2<i>b</i><sub>i</sub> − 1.</p>
@@ -348,7 +376,7 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
 
   <section id="mixed-word-model" aria-labelledby="mixed-word-title">
     <h3 id="mixed-word-title">Слово, номер и сдвиг</h3>
-    <p>Выберите «Сдвиг вперёд». Введите НТТИ и сдвиг 1. Предскажите, в каких позициях произойдёт перенос, затем проверьте по шагам.</p>
+    <p>Выберите «Сдвиг вперёд». Для НИКА и сдвига 100 модель проведёт по четырём этапам задачи. Для НТТИ и сдвига 1 предскажите, в каких позициях будет перенос, и проверьте по шагам.</p>
   </section>
 
   <section class="selfcheck" aria-labelledby="mixed-word-practice">
@@ -358,12 +386,22 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
       <summary>Проверить решение</summary>
       <p>Индекс равен 98. Первые 98 слов начинаются с В, значит, следующее слово первое среди слов на К. У остальных позиций берём первые допустимые буквы. Получается <strong>КААА</strong>.</p>
     </details>
+    <p>Какое слово стоит на два места дальше КТТИ? Укажите, где возникает перенос.</p>
+    <details>
+      <summary>Проверить сдвиг</summary>
+      <p>Цифры КТТИ — (1, 6, 6, 1), а сдвига 2 — (0, 0, 1, 0). Правая цифра 1 сохраняется. В третьей и второй позициях получается по 7, поэтому обе дают 0 и перенос влево. В первой позиции из 1 и переноса получаем 2. Запись (2, 0, 0, 1) даёт <strong>НААИ</strong>.</p>
+    </details>
+    <p>У ТТТА номер 489. Можно ли сдвинуться от него на одно место? А на два?</p>
+    <details>
+      <summary>Проверить границу списка</summary>
+      <p>У ТТТА цифры (4, 6, 6, 0). Сдвиг на одно место меняет последнюю цифру на 1, получаем <strong>ТТТИ</strong> на месте 490. При сдвиге на два прибавляем (0, 0, 1, 0). Перенос проходит через третью, вторую и первую позиции. Для результата нужна пятая позиция. Места 491 в списке нет.</p>
+    </details>
   </section>
 
   <nav class="pager" aria-label="Соседние главы">
-    <a href="13-smeshannoe-osnovanie.html">← 13. Числа со смешанным основанием</a>
+    <a href="13-smeshannoe-osnovanie.html">← 12. Числа со смешанным основанием</a>
     <a href="index.html">Оглавление</a>
-    <a href="15-smeshannoe-osnovanie-na-praktike.html">15. Часы и пиксели →</a>
+    <a href="15-smeshannoe-osnovanie-na-praktike.html">14. Часы и пиксели →</a>
   </nav>
 </main>
 <script>
@@ -453,6 +491,7 @@ function initMixedWordModel(root, mixed) {
   const alphabets = ['ВКНСТ', 'АВИКНСТ', 'АВИКНСТ', 'АИ'];
   const bases = alphabets.map((letters) => letters.length);
   const total = bases.reduce((product, base) => product * base, 1);
+  const shiftPhases = ['Переводим сдвиг', 'Складываем', 'Читаем слово', 'Находим номер'];
   const blank = () => bases.map(() => null);
   const split = (digits) => digits.map((digit, index) => alphabets[index][digit]);
   const state = {steps: [], step: 0};
@@ -479,6 +518,9 @@ function initMixedWordModel(root, mixed) {
       </label>
     </div>
     <p class="error mixed-word-error" data-mixed-error role="status" aria-atomic="true"></p>
+    <ol class="mixed-word-phases" data-mixed-phases aria-label="Этапы сдвига" hidden>
+      ${shiftPhases.map((phase) => `<li>${phase}</li>`).join('')}
+    </ol>
     <div class="model-stage mixed-word-stage" data-mixed-stage></div>
     <p class="mixed-word-announcement" data-mixed-announcement role="status" aria-atomic="true"></p>
     <div class="model-actions mixed-word-actions" data-mixed-actions>
@@ -496,6 +538,7 @@ function initMixedWordModel(root, mixed) {
     shift: find('[data-mixed-input="shift"]'),
   };
   const stage = find('[data-mixed-stage]');
+  const phases = find('[data-mixed-phases]');
   const error = find('[data-mixed-error]');
   const announcement = find('[data-mixed-announcement]');
   let suffix = 1;
@@ -630,23 +673,31 @@ function initMixedWordModel(root, mixed) {
       );
     });
     const decoded = mixed.decode(addition.digits, bases);
-    return [
-      frame('Готовим сдвиг', `Слово <b>${word.letters}</b> уже записано цифрами. Число мест сдвига <b>${distance}</b> переведём в ту же систему с основаниями по позициям.`,
-        cells(word.digits, -1, true)),
-      ...encoding(encoded, 'Кодируем сдвиг', false),
-      ...columns,
-      frame('Читаем полученные буквы', `Цифры суммы дают слово <b>${shiftedWord}</b>. Теперь найдём его порядковый номер.`,
-        cells(addition.digits, -1, true)),
-      ...decoding(addition.digits, decoded),
-      frame('Переходим к порядковому номеру', `После сдвига получаем слово <b>${shiftedWord}</b>, его номер <b>${decoded.value + 1}</b>.`,
-        cells(addition.digits, -1, true), `${decoded.value} + 1 = ${decoded.value + 1}`, true),
+    const groups = [
+      [
+        frame('Готовим сдвиг', `Слово <b>${word.letters}</b> уже записано цифрами. Число мест сдвига <b>${distance}</b> переведём в ту же систему с основаниями по позициям.`,
+          cells(word.digits, -1, true)),
+        ...encoding(encoded, 'Кодируем сдвиг', false),
+      ],
+      columns,
+      [
+        frame('Читаем полученные буквы', `Цифры суммы дают слово <b>${shiftedWord}</b>. Теперь найдём его порядковый номер.`,
+          cells(addition.digits, -1, true)),
+      ],
+      [
+        ...decoding(addition.digits, decoded),
+        frame('Переходим к порядковому номеру', `После сдвига получаем слово <b>${shiftedWord}</b>, его номер <b>${decoded.value + 1}</b>.`,
+          cells(addition.digits, -1, true), `${decoded.value} + 1 = ${decoded.value + 1}`, true),
+      ],
     ];
+    return groups.flatMap((group, phase) => group.map((item) => ({ ...item, phase })));
   }
 
   function render() {
     const current = state.steps[state.step];
     stage.hidden = !current;
     actions.hidden = !current;
+    phases.hidden = current?.phase === undefined;
     if (!current) {
       stage.replaceChildren();
       announcement.textContent = '';
@@ -659,7 +710,16 @@ function initMixedWordModel(root, mixed) {
     back.setAttribute('aria-disabled', String(state.step === 0));
     next.setAttribute('aria-disabled', String(state.step === state.steps.length - 1));
     progress.textContent = `Шаг ${state.step + 1} из ${state.steps.length}`;
-    announcement.textContent = Array.from(stage.querySelectorAll('p'), (line) => line.textContent).join(' ');
+    const text = Array.from(stage.querySelectorAll('p'), (line) => line.textContent).join(' ');
+    if (phases.hidden) {
+      announcement.textContent = text;
+    } else {
+      Array.from(phases.children).forEach((item, phase) => {
+        if (phase === current.phase) item.setAttribute('aria-current', 'step');
+        else item.removeAttribute('aria-current');
+      });
+      announcement.textContent = `Этап ${current.phase + 1} из ${shiftPhases.length}. ${shiftPhases[current.phase]}. ${text}`;
+    }
   }
 
   function invalid(field, message) {

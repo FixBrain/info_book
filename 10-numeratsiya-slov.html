@@ -43,6 +43,8 @@ li+li{margin-top:.35em}
 .worked-table th,.worked-table td{padding:.36rem .4rem;border:1px solid #dbe2ed;text-align:center;overflow-wrap:anywhere}
 .worked-table th{background:#f2f5fa}
 .worked-table td{background:var(--card)}
+.rank-boundary .marker{display:inline-block}
+.rank-proof summary{cursor:pointer;font-weight:650}
 .rank-config{display:flex;align-items:center;flex-wrap:wrap;gap:.55rem 1rem;margin:12px 0}
 .rank-config label,.rank-form label{display:grid;gap:.25rem;font-weight:680}
 .rank-limit{margin:0;color:var(--muted)}
@@ -127,9 +129,9 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
       <a href="09a-kratnost-i-ostatki.html">9А. Кратность и остатки</a>
       <a href="09-alternativnye-alfavity.html">10. Альтернативные алфавиты</a>
       <a href="10-numeratsiya-slov.html" aria-current="page">11. Сравнение и нумерация слов</a>
-      <a href="13-smeshannoe-osnovanie.html">13. Числа со смешанным основанием</a>
-      <a href="14-slova-nomera-sdvigi.html">14. Слова, номера и сдвиги</a>
-      <a href="15-smeshannoe-osnovanie-na-praktike.html">15. Часы и пиксели</a>
+      <a href="13-smeshannoe-osnovanie.html">12. Числа со смешанным основанием</a>
+      <a href="14-slova-nomera-sdvigi.html">13. Слова, номера и сдвиги</a>
+      <a href="15-smeshannoe-osnovanie-na-praktike.html">14. Часы и пиксели</a>
       <a href="11-itogi.html">Памятка</a>
     </nav>
   </details>
@@ -150,40 +152,32 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
   </div>
 
   <h2>Как устроен список слов</h2>
-  <p>Для нумерации договоримся о правилах. Все слова имеют ровно <i>k</i> букв. Буквы можно повторять. В первой позиции разрешена и буква со значением 0. Словом здесь считаем любую запись такой длины, которую можно составить из выбранных букв.</p>
-  <p>В каждой позиции есть <i>N</i> вариантов. При <i>k</i> позициях получаем <b><i>N</i><sup><i>k</i></sup> слов</b>. Записи представляют подряд все числа от 0 до <i>N</i><sup><i>k</i></sup> − 1. Для трёх букв из нашего алфавита всего 6<sup>3</sup> = 216 слов, от <span class="literal">ЕЕЕ</span> до <span class="literal">ЦЦЦ</span>.</p>
-  <p>Если условие запрещает повторы, порядковые номера считают внутри списка, из которого убрали слова с повторяющимися буквами.</p>
+  <p>Возьмём все цепочки заданной длины из выбранных букв. Буквы можно повторять,
+    а первой может быть Е со значением 0. В списке трёхбуквенных слов начальная Е
+    занимает полноценную позицию. Если убрать её из ЕЛЕ, получится уже двухбуквенное слово ЛЕ.</p>
   <div class="example">
     <h3>Начало списка трёхбуквенных слов</h3>
     <ol class="word-list" aria-label="Первые шесть слов в порядке возрастания">
       <li><b>ЕЕЕ</b><span>1-е</span></li><li><b>ЕЕЛ</b><span>2-е</span></li><li><b>ЕЕН</b><span>3-е</span></li><li><b>ЕЕО</b><span>4-е</span></li><li><b>ЕЕС</b><span>5-е</span></li><li><b>ЕЕЦ</b><span>6-е</span></li>
     </ol>
-    <p>Следующим будет <span class="literal">ЕЛЕ</span>. После цифры 5 в младшем разряде идёт перенос, поэтому после <b>005<sub>6</sub></b> получается <b>010<sub>6</sub></b>.</p>
+    <p>Место в списке считаем с 1. Значение записи в основании 6 даёт <b>индекс</b>
+      с 0, то есть количество слов, которые стоят перед данным словом.</p>
+    <table class="worked-table rank-boundary" id="rank-boundary">
+      <caption>Переход к следующей группе слов</caption>
+      <thead>
+        <tr><th scope="col">Слово</th><th scope="col">Запись</th><th scope="col">Индекс</th><th scope="col">Место</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row"><span class="literal">ЕЕЦ</span></th><td>00<span class="marker">5</span><sub>6</sub></td><td>5</td><td>6-е</td></tr>
+        <tr><th scope="row"><span class="literal">ЕЛЕ</span></th><td>0<span class="marker">10</span><sub>6</sub></td><td>6</td><td>7-е</td></tr>
+      </tbody>
+    </table>
+    <p>Когда младшая цифра 5, следующий шаг даёт перенос. Запись 005<sub>6</sub>
+      превращается в 010<sub>6</sub>, а слово ЕЕЦ сменяется словом ЕЛЕ.</p>
   </div>
-  <p><b>Почему алфавитный и числовой порядок совпадают?</b> Находим первую отличающуюся букву слева. Порядок букв совпадает с порядком их значений. Если различие приходится на разряд с весом <i>N</i><sup><i>j</i></sup>, вклад этого разряда отличается хотя бы на <i>N</i><sup><i>j</i></sup>. Все младшие разряды вместе дают не больше <i>N</i><sup><i>j</i></sup> − 1. Поэтому первая отличающаяся буква определяет и порядок слов, и порядок чисел.</p>
-
-  <div class="example" id="rank-repeat-cases">
-    <h3>На каком месте ЛН в списке двухбуквенных слов</h3>
-    <p>Возьмём один алфавит Е, Л, Н, О, С, Ц. В обоих списках слово может начинаться с Е.</p>
-    <div class="rank-cases">
-      <div class="rank-case">
-        <b>Повторы разрешены</b>
-        <p>В блоке на Е шесть слов. Блок на Л начинается так.</p>
-        <ol class="rank-cards" start="7" aria-label="Начало блока на Л в списке с повторами">
-          <li><b>ЛЕ</b><small>7-е</small></li><li><b>ЛЛ</b><small>8-е</small></li><li><b>ЛН</b><small>9-е</small></li>
-        </ol>
-        <p>Место ЛН — <b>6 + 3 = 9</b>.</p>
-      </div>
-      <div class="rank-case">
-        <b>Повторы запрещены</b>
-        <p>В блоке на Е пять слов. В блоке на Л пропускаем ЛЛ.</p>
-        <ol class="rank-cards" start="6" aria-label="Начало блока на Л в списке без повторов">
-          <li><b>ЛЕ</b><small>6-е</small></li><li><b>ЛН</b><small>7-е</small></li>
-        </ol>
-        <p>Место ЛН — <b>5 + 2 = 7</b>.</p>
-      </div>
-    </div>
-  </div>
+  <p>В каждой позиции есть <i>N</i> вариантов. При <i>k</i> позициях получаем
+    <b><i>N</i><sup><i>k</i></sup> слов</b> с индексами от 0 до <i>N</i><sup><i>k</i></sup> − 1.
+    В нашем трёхбуквенном списке 6<sup>3</sup> = 216 слов, от ЕЕЕ до ЦЦЦ.</p>
 
   <h2>От слова к номеру</h2>
   <p>Если список содержит все слова заданной длины и допускает повторы и нулевой знак в начале, замени буквы цифрами и вычисли значение записи. Это <b>индекс с нуля</b>. Порядковый номер начинается с единицы, поэтому к индексу прибавь 1.</p>
@@ -213,9 +207,22 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
     <p>Читаем остатки снизу вверх. Получаем <b>12<sub>6</sub></b>. Для трёхбуквенного слова дописываем слева ноль, получаем <b>012<sub>6</sub></b> и слово <b>ЕЛН</b>.</p>
   </div>
 
+  <details class="note rank-proof">
+    <summary>Почему алфавитный и числовой порядок совпадают</summary>
+    <p>Слова одной длины сравнивают по первой различающейся букве слева.
+      Мы назначили цифры в порядке букв, поэтому эта буква соответствует
+      первой различающейся цифре. Для записей одной длины
+      <a href="03-sravnenie.html#cmp-figure-same-length">эта цифра определяет порядок чисел</a>.</p>
+    <p>Если первое различие приходится на разряд с весом <i>N</i><sup><i>j</i></sup>,
+      вклады в нём отличаются хотя бы на <i>N</i><sup><i>j</i></sup>.
+      Младшие разряды вместе дают не больше <i>N</i><sup><i>j</i></sup> − 1,
+      поэтому они не могут изменить порядок.</p>
+  </details>
+
   <section class="interactive" id="word-ranker" aria-labelledby="rank-title">
     <h3 id="rank-title">Нумератор слов</h3>
-    <p>Выбери длину и введи слово или его порядковый номер. Буквы идут в порядке <b>Е, Л, Н, О, С, Ц</b>.</p>
+    <p>Выбери длину и введи слово или его порядковый номер. Буквы идут в порядке
+      <b>Е, Л, Н, О, С, Ц</b>. Повторы и начальная Е разрешены.</p>
     <div class="rank-config">
       <label for="rank-length">Длина слова
         <select id="rank-length">
@@ -242,6 +249,30 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
     <div class="rank-output" id="rank-output" aria-live="polite"></div>
   </section>
 
+  <div class="example" id="rank-repeat-cases">
+    <h3>Как запрет повторов меняет номер слова</h3>
+    <p>Найдём номер ЛН среди двухбуквенных слов. В обоих списках слово может начинаться с Е.
+      При запрете повторов некоторые слова исчезают, поэтому их места занимают следующие слова.</p>
+    <div class="rank-cases">
+      <div class="rank-case">
+        <b>Повторы разрешены</b>
+        <p>В блоке на Е шесть слов. Блок на Л начинается так.</p>
+        <ol class="rank-cards" start="7" aria-label="Начало блока на Л в списке с повторами">
+          <li><b>ЛЕ</b><small>7-е</small></li><li><b>ЛЛ</b><small>8-е</small></li><li><b>ЛН</b><small>9-е</small></li>
+        </ol>
+        <p>Место ЛН — <b>6 + 3 = 9</b>.</p>
+      </div>
+      <div class="rank-case">
+        <b>Повторы запрещены</b>
+        <p>В блоке на Е пять слов. В блоке на Л пропускаем ЛЛ.</p>
+        <ol class="rank-cards" start="6" aria-label="Начало блока на Л в списке без повторов">
+          <li><b>ЛЕ</b><small>6-е</small></li><li><b>ЛН</b><small>7-е</small></li>
+        </ol>
+        <p>Место ЛН — <b>5 + 2 = 7</b>.</p>
+      </div>
+    </div>
+  </div>
+
   <div class="selfcheck">
     <h3>Самопроверка</h3>
     <details>
@@ -255,6 +286,15 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
     <details>
       <summary>Какое трёхбуквенное слово стоит на 31-м месте?</summary>
       <p>Индекс 31 − 1 = 30. Это <b>50<sub>6</sub></b>. Дополняем запись до <b>050<sub>6</sub></b> и получаем <b>ЕЦЕ</b>.</p>
+    </details>
+    <details id="rank-word-practice">
+      <summary>На каком месте стоит ЕЛЦ в полном списке трёхбуквенных слов?</summary>
+      <p>Запись 015<sub>6</sub> даёт индекс 1 · 6 + 5 = 11. Слово стоит на <b>12-м месте</b>.</p>
+    </details>
+    <details id="rank-repeat-practice">
+      <summary>На каком месте стоит НЕ в списке двухбуквенных слов без повторов?</summary>
+      <p>Перед блоком на Н идут блоки на Е и на Л. В каждом пять слов, потому что
+        вторую букву выбирают из пяти оставшихся. НЕ открывает блок на Н и стоит на <b>11-м месте</b>.</p>
     </details>
     <details id="letter-sum-rank">
       <summary>Какое слово получится при сложении ЛЦ + Л и на каком месте оно стоит в полном списке двухбуквенных слов?</summary>

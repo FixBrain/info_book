@@ -25,6 +25,8 @@ a{color:#1647a8}
 .summary-card{min-width:0;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
 .summary-card h3{margin-bottom:.35em}
 .summary-card p:last-child{margin-bottom:0}
+.summary-card ul{margin:.5em 0;padding-inline-start:1.2em}
+.summary-card li + li{margin-top:.3em}
 .summary-figures{max-width:40rem;margin:1rem auto}
 .summary-figures figure{margin:0;padding:12px;border:1px solid #deccae;border-radius:12px;background:#fff9ed}
 .summary-figures figcaption{margin:.65rem 0 0;color:#615347;font-size:.9rem}
@@ -96,9 +98,9 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
       <a href="09a-kratnost-i-ostatki.html">9А. Кратность и остатки</a>
       <a href="09-alternativnye-alfavity.html">10. Альтернативные алфавиты</a>
       <a href="10-numeratsiya-slov.html">11. Сравнение и нумерация слов</a>
-      <a href="13-smeshannoe-osnovanie.html">13. Числа со смешанным основанием</a>
-      <a href="14-slova-nomera-sdvigi.html">14. Слова, номера и сдвиги</a>
-      <a href="15-smeshannoe-osnovanie-na-praktike.html">15. Часы и пиксели</a>
+      <a href="13-smeshannoe-osnovanie.html">12. Числа со смешанным основанием</a>
+      <a href="14-slova-nomera-sdvigi.html">13. Слова, номера и сдвиги</a>
+      <a href="15-smeshannoe-osnovanie-na-praktike.html">14. Часы и пиксели</a>
       <a href="11-itogi.html" aria-current="page">Памятка</a>
     </nav>
   </details>
@@ -112,29 +114,29 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
     <div class="summary-grid summary-figures">
       <figure aria-labelledby="expansion-title">
         <h3 id="expansion-title">В десятичную систему</h3>
-        <table class="weight-expansion" aria-label="Цифры, веса и вклады числа 101 в основании 5">
+        <table class="weight-expansion" aria-label="Цифры, веса и вклады записи 102 в основании 5">
           <thead>
-            <tr><th scope="row">Цифра</th><th scope="col">1</th><th scope="col">0</th><th scope="col">1</th></tr>
+            <tr><th scope="row">Цифра</th><th scope="col">1</th><th scope="col">0</th><th scope="col">2</th></tr>
           </thead>
           <tbody>
             <tr><th scope="row">Вес</th><td>5<sup>2</sup></td><td>5<sup>1</sup></td><td>5<sup>0</sup></td></tr>
-            <tr><th scope="row">Вклад</th><td>25</td><td>0</td><td>1</td></tr>
+            <tr><th scope="row">Вклад</th><td>25</td><td>0</td><td>2</td></tr>
           </tbody>
         </table>
-        <p class="formula">101<sub>5</sub> = 1 · 5<sup>2</sup> + 0 · 5 + 1 = <b>26</b></p>
+        <p class="formula">102<sub>5</sub> = 1 · 5<sup>2</sup> + 0 · 5 + 2 = <b>27<sub>10</sub></b></p>
         <p id="recap-horner"><b>Схема Горнера.</b> Начинаем со старшей цифры. На каждом следующем шаге умножаем накопленное значение на основание и прибавляем очередную цифру.</p>
-        <p class="formula">(1 · 5 + 0) · 5 + 1 = <b>26</b></p>
+        <p class="formula">(1 · 5 + 0) · 5 + 2 = <b>27</b></p>
         <figcaption><a href="04-razvernutaya-zapis.html">Развёрнутая запись и схема Горнера</a></figcaption>
       </figure>
 
       <figure aria-labelledby="division-title">
         <h3 id="division-title">Из десятичной системы</h3>
-        <div role="img" aria-label="Деление столбиком. 26 делим на 5, частное 5, остаток 1. Затем 5 делим на 5, частное 1, остаток 0. Затем 1 делим на 5, частное 0, остаток 1. Остатки снизу вверх дают 101.">
+        <div role="img" aria-label="Деление столбиком. 27 делим на 5, частное 5, остаток 2. Затем 5 делим на 5, частное 1, остаток 0. Затем 1 делим на 5, частное 0, остаток 1. Остатки снизу вверх дают 102 в основании 5.">
           <ol class="division-steps" aria-hidden="true">
             <li class="division-step">
-              <span>26</span><span class="divisor">5</span>
+              <span>27</span><span class="divisor">5</span>
               <span class="subtract">−25</span><span class="quotient">5</span>
-              <span class="remainder">1</span>
+              <span class="remainder">2</span>
             </li>
             <li class="division-link"><span>↓</span> делим частное 5</li>
             <li class="division-step">
@@ -150,11 +152,11 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
             </li>
           </ol>
         </div>
-        <p class="formula division-answer"><span>↑ Остатки снизу вверх</span> <b>101<sub>5</sub></b></p>
+        <p class="formula division-answer"><span>↑ Остатки снизу вверх</span> <b>102<sub>5</sub></b></p>
         <figcaption>Делим на новое основание, пока частное не станет нулём. Первый остаток даёт младшую цифру. <a href="05-perevod-iz-desyatichnoy.html">Деление с остатком</a></figcaption>
       </figure>
     </div>
-    <p><a href="06a-perevod-mezhdu-sistemami.html">Перевод между основаниями</a> можно сделать через десятичное число. Например, <b>101<sub>5</sub> → 26<sub>10</sub> → 11010<sub>2</sub></b>.</p>
+    <p><a href="06a-perevod-mezhdu-sistemami.html">Перевод между основаниями</a> можно сделать через десятичную запись. Например, <b>102<sub>5</sub> → 27<sub>10</sub> → 11011<sub>2</sub></b>.</p>
   </section>
 
   <section aria-labelledby="operations-title">
@@ -167,7 +169,7 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
       </div>
       <div class="summary-card">
         <h3><a href="07-slozhenie-i-vychitanie.html">Сложение</a> и <a href="08-vychitanie.html">вычитание</a></h3>
-        <p>Совмещаем разряды, а если есть запятая — совмещаем запятые. Считаем справа налево. При сложении, если набралось <i>N</i> единиц, переносим одну группу влево. При вычитании заём из соседнего старшего разряда даёт <i>N</i> единиц текущего.</p>
+        <p>Совмещаем одноимённые разряды и запятые. Считаем справа налево. Если сумма двух цифр и входящего переноса не меньше <i>N</i>, вычитаем <i>N</i>, пишем остаток и переносим 1 влево. При вычитании заём из соседнего левого разряда даёт <i>N</i> единиц текущего. Если соседний разряд пуст, начинаем размен с ближайшего ненулевого разряда слева.</p>
         <div class="carry-example formula"><span>44<sub>5</sub> + 1 = 100<sub>5</sub></span><span>100<sub>5</sub> − 1 = 44<sub>5</sub></span></div>
       </div>
     </div>
@@ -179,12 +181,18 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
       <div class="summary-card">
         <h3><a href="08-svoystva-chisel.html">Диапазон</a></h3>
         <p>В <i>k</i> позициях помещаются числа от 0 до <i>N</i><sup><i>k</i></sup> − 1. Наименьшее положительное число ровно с <i>k</i> цифрами равно <i>N</i><sup><i>k</i>−1</sup>.</p>
-        <p>От целого <i>a</i> до целого <i>b</i> включительно — <i>b</i> − <i>a</i> + 1 чисел. Исключённую границу сдвигаем внутрь на единицу. Например, при 4 &lt; <i>x</i> ≤ 12 считаем от 5 до 12 и получаем 8 чисел.</p>
+        <p>Исключённую целую границу сдвигаем внутрь на единицу. Для полученных границ <i>a</i> и <i>b</i> число целых равно <i>b</i> − <i>a</i> + 1, если <i>a</i> ≤ <i>b</i>. Если левая граница стала больше правой, подходящих чисел 0. Например, при 4 &lt; <i>x</i> ≤ 12 считаем от 5 до 12 и получаем 8 чисел.</p>
       </div>
       <div class="summary-card">
         <h3><a href="09a-kratnost-i-ostatki.html">Кратность и остатки</a></h3>
-        <p>Если вес разряда кратен делителю, весь вклад этого разряда можно отбросить. Например, при делении на 5 в основании 5 остаётся только цифра единиц.</p>
-        <p>При сложении и умножении заменяем числа их остатками от деления на один и тот же делитель. Вычисляем сумму или произведение и снова находим остаток.</p>
+        <p>Заменяем вес каждого разряда его остатком по делителю <i>m</i>. Умножаем на значения цифр, складываем и снова берём остаток. Если он равен 0, число кратно <i>m</i>.</p>
+        <ul>
+          <li>Если <i>m</i> делит <i>N</i><sup><i>k</i></sup>, достаточно найти остаток значения <i>k</i> младших цифр.</li>
+          <li>Если <i>m</i> делит <i>N</i> − 1, берём остаток суммы значений цифр.</li>
+          <li>Если <i>m</i> делит <i>N</i> + 1, чередуем знаки, начиная с плюса у правой цифры.</li>
+        </ul>
+        <p>Для чётности берём модуль 2. При чётном основании смотрим на младшую цифру, при нечётном — на сумму значений цифр.</p>
+        <p>При сложении, вычитании и умножении можно заменить оба числа их остатками по одному модулю. После действия снова находим остаток.</p>
       </div>
     </div>
   </section>
@@ -195,12 +203,20 @@ html{--chapter-bar-height:3rem;scroll-padding-top:calc(var(--chapter-bar-height)
       <div class="summary-card">
         <h3><a href="09-alternativnye-alfavity.html">Буквы как цифры</a></h3>
         <p>В упорядоченном алфавите символы обозначают 0, 1, 2 и так далее. Заменяем буквы цифрами, затем работаем с весами разрядов.</p>
-        <p>В полном списке слов одинаковой длины значение записи даёт индекс с нуля. Для <a href="10-numeratsiya-slov.html">номера слова</a> с единицы прибавляем 1.</p>
+        <p>Значение записи даёт индекс с нуля, если список включает все слова заданной длины, буквы можно повторять и в начале разрешена буква со значением 0. Для <a href="10-numeratsiya-slov.html">порядкового номера слова</a> прибавляем к индексу 1.</p>
       </div>
       <div class="summary-card">
         <h3><a href="13-smeshannoe-osnovanie.html">Смешанное основание</a></h3>
         <p>Вес разряда — произведение оснований всех разрядов справа. При переносе и делении с остатком берём основание текущего разряда.</p>
         <p>У записи (2, 0, 4) в основаниях (3, 2, 5) веса равны 10, 5 и 1. Получаем <b>2 · 10 + 0 · 5 + 4 · 1 = 24</b>.</p>
+      </div>
+      <div class="summary-card">
+        <h3><a href="14-slova-nomera-sdvigi.html#mixed-word-carry">Конечный список слов</a></h3>
+        <p>В списке из 490 слов индекс последнего слова равен 489. Сдвиг на 1 даёт индекс 490 за границей списка. В модели <a href="15-smeshannoe-osnovanie-na-praktike.html#mixed-pixel-application">порядка пикселей</a> из трёх кадров допустимы индексы от 0 до 59.</p>
+      </div>
+      <div class="summary-card">
+        <h3><a href="15-smeshannoe-osnovanie-na-praktike.html#mixed-clock-application">Цикл часов</a></h3>
+        <p>После 23:59:59 часы показывают 00:00:00 следующих суток. Показание начинается с нуля, потому что часы отсчитывают время внутри суток.</p>
       </div>
     </div>
   </section>
