@@ -83,6 +83,9 @@ code{font-family:Consolas,Menlo,monospace;font-size:.96em;background:#eeeaf5;bor
 .cmp-illustration .cmp-added{animation:none}
 .cmp-length-examples{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}
 .cmp-length-examples .cmp-illustration{margin:0}
+.cmp-steps{padding-left:1.5rem}
+.cmp-steps li + li{margin-top:.35rem}
+.cmp-proof summary{cursor:pointer;font-weight:700}
 .cmp-length-example{display:grid;grid-template-columns:max-content max-content;gap:7px 12px;align-items:center;justify-content:center}
 .cmp-example-number{padding:3px 8px;border:1px solid #c0ccd9;border-radius:8px;background:#fff;font:800 19px/1.3 Consolas,Menlo,monospace;text-align:right}
 .cmp-example-count{padding:3px 8px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--muted);font-size:14px}
@@ -179,11 +182,14 @@ code{font-family:Consolas,Menlo,monospace;font-size:.96em;background:#eeeaf5;bor
 <h1>3. Сравнение чисел</h1>
 <p class="lead">Сравним целые неотрицательные числа, записанные в одной системе счисления. Начнём с десятичных чисел.</p>
 
-<h2>Сравнение по разрядам</h2>
-<p>Возьмём 572 и 568. Сотни совпадают. Первое различие слева — в разряде десятков. Поскольку 7 десятков больше 6 десятков, получаем 572 &gt; 568.</p>
-<p>То же правило подходит для записей разной длины. Сначала выровняем их по разряду единиц. Затем допишем слева к короткой записи столько нулей, чтобы длины совпали. Такие <b class="term">ведущие нули</b> называют незначащими, поскольку их вклад равен нулю и значение числа сохраняется.</p>
-<p>Например, для 2 и 10 получаем <b>02</b> и <b>10</b>. Теперь сравниваем цифры одного разряда слева направо. В десятках 0 &lt; 1, поэтому 2 &lt; 10. Если все цифры совпали, числа равны. Так, записи 007 и 7 после выравнивания дают 007 и 007, поэтому 007 = 7.</p>
-<p>Сравнение цифр слева направо по первому различию называют <b class="term">лексикографическим</b>. После выравнивания записей в одном основании оно даёт тот же результат, что и сравнение чисел.</p>
+<h2>Способ 1. Выравниваем записи нулями</h2>
+<p>Возьмём 27 и 1034. Чтобы сравнить цифры одних и тех же разрядов, сначала поставим единицы под единицами.</p>
+<ol class="cmp-steps">
+  <li>Заполняем пустые места слева нулями. Запись 27 становится 0027. Добавленные <b class="term">ведущие нули</b> дают нулевой вклад, поэтому число остаётся тем же.</li>
+  <li>Сравниваем цифры слева направо. Равные пропускаем. Первая пара разных цифр определяет, какое число больше.</li>
+  <li>Если все цифры совпали, числа равны. Например, записи 007 и 7 после выравнивания дают 007 и 007.</li>
+</ol>
+<p>Сравнение по первой различающейся цифре слева называют <b class="term">лексикографическим</b>. Для чисел в одном основании его применяем после выравнивания по разрядам.</p>
 
 <figure class="cmp-illustration" id="cmp-figure-padding">
   <figcaption>Выравнивание нулями. Сравним 27 и 1034</figcaption>
@@ -197,11 +203,39 @@ code{font-family:Consolas,Menlo,monospace;font-size:.96em;background:#eeeaf5;bor
   <p>Два серых нуля добавили к записи 27. Первое различие слева в разряде тысяч. Там 0 &lt; 1, поэтому <b>27 &lt; 1034</b>.</p>
 </figure>
 
-<div class="note">
-  <h3>Почему первое различие определяет порядок</h3>
-  <p>Пусть первое различие находится в разряде с номером <i>k</i>. Старшие разряды совпадают, а разница хотя бы в одну цифру в этом месте даёт преимущество не меньше 10<sup><i>k</i></sup>.</p>
-  <p>Максимальный вклад всех младших разрядов получается, когда в каждом стоит 9. Если прибавить 1 к записи из <i>k</i> девяток, выйдет единица и <i>k</i> нулей. Значит, максимум равен 10<sup><i>k</i></sup> − 1. Для разряда единиц младших разрядов нет и их вклад равен 0. Поэтому разница всех младших вкладов меньше преимущества в первом различающемся разряде.</p>
+<h2>Способ 2. Сначала сравниваем длины</h2>
+<ol class="cmp-steps">
+  <li>Убираем ведущие нули. Для самого числа ноль оставляем одну цифру 0.</li>
+  <li>Считаем цифры. Если длины различаются, больше число с более длинной записью.</li>
+  <li>Если длины равны, сравниваем цифры слева направо по первому различию. Совпадение всех цифр означает равенство.</li>
+</ol>
+
+<div class="cmp-length-examples">
+  <figure class="cmp-illustration" id="cmp-figure-different-lengths">
+    <figcaption>Разная длина. Снова сравним 27 и 1034</figcaption>
+    <div class="cmp-length-example">
+      <span class="cmp-example-number">27</span><span class="cmp-example-count">2 цифры</span>
+      <span class="cmp-example-number">1034</span><span class="cmp-example-count cmp-longer">4 цифры</span>
+    </div>
+    <p>У числа 1034 больше цифр после удаления ведущих нулей, поэтому <b>27 &lt; 1034</b>. Можно остановиться на сравнении длин.</p>
+  </figure>
+  <figure class="cmp-illustration" id="cmp-figure-same-length">
+    <figcaption>Одинаковая длина. Сравним 572 и 568</figcaption>
+    <div class="cmp-board" style="--cmp-width:3" role="img" aria-label="Запись 572 над записью 568. Цифры сотен совпадают. Первое различие в десятках, 7 больше 6.">
+      <span class="cmp-side">А</span>
+      <span class="cmp-digit cmp-seen">5</span><span class="cmp-digit cmp-decisive">7</span><span class="cmp-digit">2</span>
+      <span class="cmp-side">Б</span>
+      <span class="cmp-digit cmp-seen">5</span><span class="cmp-digit cmp-decisive">6</span><span class="cmp-digit">8</span>
+    </div>
+    <p>В каждой записи по три цифры. Сотни равны. Первое различие в десятках, где 7 &gt; 6, поэтому <b>572 &gt; 568</b>.</p>
+  </figure>
 </div>
+
+<h2>Почему решает старший разряд</h2>
+<p>У 572 и 568 сотни совпали. В десятках у 572 есть преимущество в одну группу из десяти. Даже девять отдельных единиц меньше этой группы. Поэтому цифры единиц уже не изменят результат. При разной длине работает то же правило. У длинной записи в старшем разряде есть ненулевая цифра, а после выравнивания у короткой там ноль.</p>
+
+<h3>Та же идея в пятеричной системе</h3>
+<p>В основании 5 из пяти единиц получается пятёрка, а из пяти пятёрок — группа из 25. Веса трёх разрядов слева направо равны <b>25, 5 и 1</b>. Например, у 24<sub>5</sub> всего две цифры, а у 103<sub>5</sub> их три. При выравнивании получаем 024<sub>5</sub> и 103<sub>5</sub>. В разряде с весом 25 сравниваем 0 и 1. Оба способа дают <b>24<sub>5</sub> &lt; 103<sub>5</sub></b>.</p>
 
 <figure class="cmp-illustration" id="cmp-figure-fives-proof">
   <figcaption id="cmp-fives-caption"><span>Сравним 200<sub>5</sub> и 144<sub>5</sub> по группам палочек</span></figcaption>
@@ -220,33 +254,11 @@ code{font-family:Consolas,Menlo,monospace;font-size:.96em;background:#eeeaf5;bor
   <p>В каждой записи есть общая группа из 25 палочек. У 200<sub>5</sub> остаётся ещё одна такая группа. У 144<sub>5</sub> заполнены до предела оба младших разряда. Четыре группы по 5 и четыре отдельные палочки дают 24. Поскольку 25 &gt; 24, получаем <b>200<sub>5</sub> &gt; 144<sub>5</sub></b>.</p>
 </figure>
 
-<h2>Сначала сравниваем длины</h2>
-<p>Уберём ведущие нули. Для самого числа ноль оставим одну цифру 0. Если длины различаются, больше число с более длинной записью. У него есть старший ненулевой разряд, которого нет у второго числа. Если длины совпали, сравниваем цифры слева направо по первому различию.</p>
-
-<div class="cmp-length-examples">
-  <figure class="cmp-illustration" id="cmp-figure-different-lengths">
-    <figcaption>Разная длина. Сравним 98 и 1027</figcaption>
-    <div class="cmp-length-example">
-      <span class="cmp-example-number">98</span><span class="cmp-example-count">2 цифры</span>
-      <span class="cmp-example-number">1027</span><span class="cmp-example-count cmp-longer">4 цифры</span>
-    </div>
-    <p>Четырёхзначное число больше двузначного, поэтому <b>98 &lt; 1027</b>. Сравнение уже завершено.</p>
-  </figure>
-  <figure class="cmp-illustration" id="cmp-figure-same-length">
-    <figcaption>Одинаковая длина. Сравним 572 и 568</figcaption>
-    <div class="cmp-board" style="--cmp-width:3" role="img" aria-label="Запись 572 над записью 568. Цифры сотен совпадают. Первое различие в десятках, 7 больше 6.">
-      <span class="cmp-side">А</span>
-      <span class="cmp-digit cmp-seen">5</span><span class="cmp-digit cmp-decisive">7</span><span class="cmp-digit">2</span>
-      <span class="cmp-side">Б</span>
-      <span class="cmp-digit cmp-seen">5</span><span class="cmp-digit cmp-decisive">6</span><span class="cmp-digit">8</span>
-    </div>
-    <p>В каждой записи по три цифры. Сотни равны. Первое различие в десятках, где 7 &gt; 6, поэтому <b>572 &gt; 568</b>.</p>
-  </figure>
-</div>
-
-<h2>Пример в пятеричной системе</h2>
-<p>Правило выравнивания работает и в другом основании, когда обе записи сделаны в одной системе. Сравним 24<sub>5</sub> и 103<sub>5</sub>. У этих разрядов веса 25, 5 и 1. Выровняем записи по единицам и допишем слева ноль у первой записи.</p>
-<p>Получим 024<sub>5</sub> и 103<sub>5</sub>. Первое различие находится в разряде с весом 25. Там 0 &lt; 1, поэтому 24<sub>5</sub> &lt; 103<sub>5</sub>.</p>
+<details class="note cmp-proof">
+  <summary>Обоснование для любого основания</summary>
+  <p>Пусть первое различие слева находится в разряде с номером <i>k</i>. Старшие разряды совпадают. В основании <i>N</i> одна дополнительная группа в этом разряде даёт преимущество в <i>N</i><sup><i>k</i></sup>.</p>
+  <p>Во всех младших разрядах вместе может быть не больше <i>N</i><sup><i>k</i></sup> − 1. В такой раскладке в каждом младшем разряде стоит цифра со значением <i>N</i> − 1. Если добавить к этой раскладке единицу, переносы соберут одну группу веса <i>N</i><sup><i>k</i></sup>. Для разряда единиц младших разрядов нет, и их вклад равен нулю. Поэтому даже наибольшая разница в младших разрядах меньше преимущества в первом различающемся разряде.</p>
+</details>
 
   <section class="interactive" aria-labelledby="cmp-title">
     <h2 id="cmp-title">Практика. Поставьте знак сравнения</h2>
@@ -267,11 +279,12 @@ code{font-family:Consolas,Menlo,monospace;font-size:.96em;background:#eeeaf5;bor
         </select>
       </label>
       <button type="button" class="ghost" id="cmp-new">Новая пара</button>
+      <button type="button" class="ghost" id="cmp-zero-example">Пример с 007 и 7</button>
     </div>
 
     <div class="controls cmp-inputs">
-      <label>Первое число <input id="cmp-left" type="text" inputmode="numeric" value="2" autocomplete="off" spellcheck="false" aria-describedby="cmp-error"></label>
-      <label>Второе число <input id="cmp-right" type="text" inputmode="numeric" value="10" autocomplete="off" spellcheck="false" aria-describedby="cmp-error"></label>
+      <label>Первое число <input id="cmp-left" type="text" inputmode="numeric" value="27" autocomplete="off" spellcheck="false" aria-describedby="cmp-error"></label>
+      <label>Второе число <input id="cmp-right" type="text" inputmode="numeric" value="1034" autocomplete="off" spellcheck="false" aria-describedby="cmp-error"></label>
     </div>
     <p class="feedback" id="cmp-error" role="status" hidden></p>
 
@@ -304,6 +317,21 @@ code{font-family:Consolas,Menlo,monospace;font-size:.96em;background:#eeeaf5;bor
     </div>
   </section>
 
+  <details class="note cmp-proof" id="compare-fractions">
+    <summary>Дополнительно. Сравнение записей с запятой</summary>
+    <p>У двух неотрицательных чисел в одном основании сначала сравниваем целые части. Если они равны, выравниваем дробные части, дописывая нули справа. Затем сравниваем цифры после запятой слева направо. Добавленные нули дают нулевой вклад.</p>
+    <figure class="cmp-illustration">
+      <figcaption>Сравним десятичные числа 2,3 и 2,27</figcaption>
+      <div class="cmp-board" style="--cmp-width:4" role="img" aria-label="Запись 2,30 над записью 2,27. Справа к первой записи дописали ноль. В разряде десятых 3 больше 2.">
+        <span class="cmp-side">А</span>
+        <span class="cmp-digit cmp-seen">2</span><span>,</span><span class="cmp-digit cmp-decisive">3</span><span class="cmp-digit cmp-added">0</span>
+        <span class="cmp-side">Б</span>
+        <span class="cmp-digit cmp-seen">2</span><span>,</span><span class="cmp-digit cmp-decisive">2</span><span class="cmp-digit">7</span>
+      </div>
+      <p>Целые части равны. В разряде десятых у первого числа 3, а у второго 2. Значит, <b>2,3 &gt; 2,27</b>.</p>
+    </figure>
+  </details>
+
   <nav class="pager" aria-label="Соседние главы">
     <a href="02-razryady.html">← Назад: термины</a>
     <a href="03-osnovaniya.html">Дальше: разные основания →</a>
@@ -318,6 +346,7 @@ code{font-family:Consolas,Menlo,monospace;font-size:.96em;background:#eeeaf5;bor
   const left = byId('cmp-left');
   const right = byId('cmp-right');
   const next = byId('cmp-new');
+  const zeroExample = byId('cmp-zero-example');
   const method = byId('cmp-method');
   const show = byId('cmp-show');
   const task = byId('cmp-task');
@@ -332,9 +361,10 @@ code{font-family:Consolas,Menlo,monospace;font-size:.96em;background:#eeeaf5;bor
   const lengths = byId('cmp-lengths');
   const result = byId('cmp-result');
   const answers = [...task.querySelectorAll('button[data-sign]')];
-  const inputs = [base, left, right, next, method];
+  const inputs = [base, left, right, next, zeroExample, method];
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const signText = { '-1': '<', '0': '=', '1': '>' };
+  const formatRecord = (record, radix) => `${record}<sub>${radix}</sub>`;
   let question;
   let busy = false;
   let round = 0;
@@ -389,10 +419,10 @@ code{font-family:Consolas,Menlo,monospace;font-size:.96em;background:#eeeaf5;bor
     feedback.hidden = true;
     hideSolution();
     answers.forEach((button) => button.classList.remove('cmp-good', 'cmp-wrong'));
-    question = error ? undefined : { left: a.value, right: b.value };
+    question = error ? undefined : { left: a.value, right: b.value, radix };
     if (question) {
-      prompt.textContent = `${a.value}  ?  ${b.value}`;
-      prompt.setAttribute('aria-label', `Сравните числа ${a.value} и ${b.value}`);
+      prompt.innerHTML = `${formatRecord(a.value, radix)} ? ${formatRecord(b.value, radix)}`;
+      prompt.setAttribute('aria-label', `Сравните ${a.value} и ${b.value} в основании ${radix}`);
     }
     lockControls();
   }
@@ -541,10 +571,12 @@ code{font-family:Consolas,Menlo,monospace;font-size:.96em;background:#eeeaf5;bor
         }
         await scanDigits(test);
       }
-      const symbol = signText[test.sign];
-      result.textContent = !lengthFirst && lengthDifference
-        ? `${test.a} ${symbol} ${test.b} → ${current.left} ${symbol} ${current.right}`
-        : `${current.left} ${symbol} ${current.right}`;
+      const symbol = signText[test.sign].replace('<', '&lt;');
+      const formatPair = (a, b) => `${formatRecord(a, current.radix)} ${symbol} ${formatRecord(b, current.radix)}`;
+      const originalPair = formatPair(current.left, current.right);
+      result.innerHTML = !lengthFirst && lengthDifference
+        ? `${formatPair(test.a, test.b)} → ${originalPair}`
+        : originalPair;
       result.hidden = false;
       show.textContent = 'Повторить анимацию';
     } finally {
@@ -555,6 +587,11 @@ code{font-family:Consolas,Menlo,monospace;font-size:.96em;background:#eeeaf5;bor
   }
 
   next.addEventListener('click', generate);
+  zeroExample.addEventListener('click', () => {
+    base.value = '10';
+    [left.value, right.value] = ['007', '7'];
+    refresh();
+  });
   base.addEventListener('change', () => { round = 0; generate(); });
   method.addEventListener('change', hideSolution);
   [left, right].forEach((field) => field.addEventListener('input', refresh));

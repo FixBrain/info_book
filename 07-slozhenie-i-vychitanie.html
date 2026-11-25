@@ -80,6 +80,12 @@ button:disabled{opacity:.55;cursor:default}
   box-shadow: 0 1px 0 rgba(20, 30, 60, .14);
 }
 
+.ca-playback { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px; }
+.ca-playback button { min-block-size: 44px; }
+.ca-playback .ca-back { background: #e8efff; color: #1647a8; }
+.column-model button[aria-disabled="true"] { opacity: .55; cursor: default; }
+.ca-progress { margin-inline-start: .25rem; color: var(--ca-muted); font-size: .875rem; }
+
 .ca-error { color: #a92620; font-size: 15px; overflow-wrap: anywhere; }
 .ca-error:empty, .ca-out:empty { display: none; }
 
@@ -345,8 +351,11 @@ li+li{margin-top:.35em}
 .fraction-exchanges tbody tr+tr>*{border-top:1px solid #cbdcec}
 .fraction-exchanges .fraction-changed{background:#e3eefb;color:#154f8a;font-weight:750}
 .fraction-sr{position:absolute;inline-size:1px;block-size:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-@media(min-width:541px){#addition-table,#subtraction{scroll-margin-top:16.5rem}}
-@media(min-width:700px){#addition-table,#subtraction{scroll-margin-top:11.5rem}}
+.notebook-example{background:#fff8ec;border-color:#e8d3b3}
+.notebook-example .fraction-column thead th{border-color:#d6bfa4;color:#715139}
+.notebook-example .fraction-column .fraction-answer>*{border-color:#68472e}
+@media(min-width:541px){#addition-table,#subtraction,#sum-exercise{scroll-margin-top:16.5rem}}
+@media(min-width:700px){#addition-table,#subtraction,#sum-exercise{scroll-margin-top:11.5rem}}
 </style>
 </head>
 <body>
@@ -383,25 +392,10 @@ li+li{margin-top:.35em}
     <li>Если перенос выходит за крайний левый столбец, записываем слева новую цифру <b>1</b>.</li>
   </ol>
 
-  <div class="example">
-    <h3>Пример 23<sub>4</sub> + 13<sub>4</sub></h3>
-    <ol>
-      <li>В единицах собираем шесть палочек. Четыре объединяем в одну группу, пишем <b>2</b> и переносим <b>1</b>.</li>
-      <li>В следующем столбце собираем четыре группы — две из первого слагаемого, одну из второго и одну из переноса. Пишем <b>0</b> и снова переносим <b>1</b>.</li>
-      <li>В новом старшем разряде записываем <b>1</b>. Ответ — <b>102<sub>4</sub></b>.</li>
-    </ol>
-  </div>
-
-  <div class="note">
-    <h3>Откуда берутся цифра и перенос</h3>
-    <p>Пусть в разряде с весом <i>N</i><sup><i>i</i></sup> собралось <i>s</i> палочек. Делим <i>s</i> на <i>N</i> с остатком и получаем <i>s</i> = <i>qN</i> + <i>r</i>, где 0 ≤ <i>r</i> &lt; <i>N</i>.</p>
-    <p class="formula"><i>sN</i><sup><i>i</i></sup> = <i>rN</i><sup><i>i</i></sup> + <i>qN</i><sup><i>i</i>+1</sup></p>
-    <p>Остаток <i>r</i> даёт цифру в текущем разряде, а частное <i>q</i> — перенос. Две цифры вместе с входящим переносом дают максимум (<i>N</i> − 1) + (<i>N</i> − 1) + 1 = 2<i>N</i> − 1, поэтому перенос равен либо 0, либо 1.</p>
-  </div>
-
-    <section class="interactive column-model" id="column-add" aria-labelledby="column-add-heading">
+  <section class="interactive column-model" id="column-add" aria-labelledby="column-add-heading">
     <h3 id="column-add-heading">Сложение на цветных палочках</h3>
-    <p>Выберите основание от 2 до 20 и введите два целых неотрицательных числа в этом основании. В каждом слагаемом может быть до восьми цифр.</p>
+    <p>Начните с 23<sub>4</sub> + 13<sub>4</sub>. По кнопке «Следующий шаг» модель разбирает один разряд. «Сложить целиком» проигрывает весь пример.</p>
+    <p>Для своих примеров выберите основание от 2 до 20 и введите два целых неотрицательных числа, до восьми цифр в каждом.</p>
 
     <div class="ca-panel">
       <label class="ca-field" for="add-column-base">Основание
@@ -415,10 +409,15 @@ li+li{margin-top:.35em}
       <label class="ca-field" for="add-column-second">Второе слагаемое
         <input id="add-column-second" type="text" value="13" autocomplete="off" spellcheck="false" autocapitalize="characters" aria-describedby="add-column-error">
       </label>
-      <button class="ca-start" id="add-column-start" type="button">Сложить</button>
+      <button class="ca-start" id="add-column-start" type="button">Сложить целиком</button>
     </div>
     <p class="ca-error" id="add-column-error" role="alert"></p>
 
+    <div class="ca-playback" aria-label="Шаги сложения" role="group">
+      <button class="ca-back" id="add-column-prev" type="button" aria-disabled="true">Назад</button>
+      <button id="add-column-next" type="button" aria-disabled="true">Следующий шаг</button>
+      <span class="ca-progress" id="add-column-progress"></span>
+    </div>
     <p class="ca-status" id="add-column-status" role="status" aria-atomic="true"></p>
     <div class="ca-scroll" id="add-column-scroll" tabindex="0" role="region" aria-label="Первое слагаемое плюс второе по разрядам">
       <div class="ca-grid" id="add-column-grid"></div>
@@ -426,32 +425,41 @@ li+li{margin-top:.35em}
     <p class="ca-out" id="add-column-result" role="status" aria-atomic="true"></p>
   </section>
 
+  <div class="example notebook-example">
+    <h3>Тот же пример в тетради</h3>
+    <p>Записываем перенос над разрядом, который его получает. В этом примере первая единица переноса идёт над группами по 4, вторая — над группами по 16.</p>
+    <table class="fraction-table fraction-column">
+      <caption>23<sub>4</sub> + 13<sub>4</sub> столбиком</caption>
+      <thead>
+        <tr><th scope="col">Вес разряда</th><th scope="col">16</th><th scope="col">4</th><th scope="col">1</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">Перенос</th><td class="fraction-carry">1</td><td class="fraction-carry">1</td><td></td></tr>
+        <tr><th scope="row">Первое слагаемое</th><td></td><td>2</td><td>3</td></tr>
+        <tr><th scope="row">+ Второе слагаемое</th><td></td><td>1</td><td>3</td></tr>
+        <tr class="fraction-answer"><th scope="row">Сумма</th><td>1</td><td>0</td><td>2</td></tr>
+      </tbody>
+    </table>
+    <ol>
+      <li>В единицах 3 + 3 = 6. Четыре палочки образуют одну группу. Пишем <b>2</b> внизу и <b>1</b> над средним столбцом.</li>
+      <li>В среднем столбце 2 + 1 + 1 = 4 группы по четыре. Они образуют одну группу по 16. Пишем <b>0</b> внизу и <b>1</b> над новым столбцом слева.</li>
+      <li>В новом столбце есть только перенос. Записываем <b>1</b> под чертой и читаем ответ <b>102<sub>4</sub></b>.</li>
+    </ol>
+  </div>
+
+  <div class="note">
+    <h3>Откуда берутся цифра и перенос</h3>
+    <p>В столбце единиц 6 = 1 · 4 + 2. Частное 1 показывает, сколько полных групп переносим. Остаток 2 показывает, сколько единиц остаётся на месте.</p>
+    <p>В разряде с весом <i>N</i><sup><i>i</i></sup> делим число палочек <i>s</i> на <i>N</i> с остатком. Если <i>s</i> = <i>qN</i> + <i>r</i>, их общий вес раскладывается так.</p>
+    <p class="formula"><i>sN</i><sup><i>i</i></sup> = <i>rN</i><sup><i>i</i></sup> + <i>qN</i><sup><i>i</i>+1</sup></p>
+    <p>Остаток <i>r</i> даёт цифру в текущем разряде, а частное <i>q</i> — перенос. Две цифры вместе с входящим переносом дают максимум 2<i>N</i> − 1 палочек, поэтому перенос равен 0 или 1.</p>
+  </div>
+
   <h3 id="addition-table">Таблица сложения</h3>
   <p>Чтобы каждый раз не вычислять сумму двух цифр заново, можно пользоваться таблицей сложения или запомнить её. В основании <i>N</i> есть <i>N</i> цифр, включая ноль. Запишем их в заголовки строк и столбцов. На каждом пересечении стоит сумма двух цифр в том же основании. Получается <b><i>N</i> × <i>N</i> клеток с ответами</b>.</p>
   <p>Например, в основании 4 на пересечении строки 3 и столбца 3 стоит <b>12<sub>4</sub></b>. В столбике пишем 2 под чертой и переносим 1 влево. Если единица уже пришла из младшего разряда, сначала прибавляем её к сумме из таблицы, а затем записываем цифру и перенос.</p>
   <p>При перестановке слагаемых сумма сохраняется. Поэтому клетки по разные стороны от диагонали повторяются.</p>
-
-  <section class="interactive" id="sum-exercise" aria-labelledby="sum-task-title">
-    <h3 id="sum-task-title">Составьте таблицу сложения</h3>
-    <p>В каждой клетке сложите цифру слева с цифрой сверху. Запишите сумму <b>в выбранном основании</b> без ведущих нулей. Для цифр A–J используйте латинские буквы.</p>
-    <form id="sum-form">
-      <div class="sum-controls">
-        <label>Основание <select id="sum-base"><option value="4" selected>4</option></select></label>
-        <button type="submit">Проверить таблицу</button>
-      </div>
-      <p class="sum-feedback" id="sum-feedback" role="status" hidden></p>
-      <div class="sum-scroll" tabindex="0" role="region" aria-label="Таблица для заполнения">
-        <table id="sum-input-table" class="sum-grid"></table>
-      </div>
-    </form>
-    <details id="sum-answer" class="sum-answer">
-      <summary>Показать правильную таблицу</summary>
-      <div class="sum-scroll" tabindex="0" role="region" aria-label="Правильная таблица сложения">
-        <table id="sum-answer-table" class="sum-grid"></table>
-      </div>
-    </details>
-  </section>
-  <p id="subtraction">Таблица сложения помогает <a href="08-vychitanie.html#subtraction-table">найти цифру разности</a>.</p>
+  <p>После примера с запятой можно <a href="#sum-exercise">заполнить таблицу и проверить свои ответы</a>.</p>
 
   <h2 id="fractional">Сложение чисел с запятой</h2>
   <p>Совмещаем запятые, чтобы цифры одинакового веса оказались друг под другом. При необходимости дополняем дробную часть справа нулями и начинаем с крайнего правого разряда. Когда в первом разряде после запятой набирается <i>N</i> палочек, переносим одну группу в единицы.</p>
@@ -478,6 +486,30 @@ li+li{margin-top:.35em}
     </ol>
     <p class="formula">(1,3)<sub>4</sub> + (0,13)<sub>4</sub> = <b>(2,03)<sub>4</sub></b></p>
   </div>
+  <p>При сложении (1,2)<sub>4</sub> и (0,2)<sub>4</sub> получается (2,0)<sub>4</sub>. После переноса четвертей не остаётся, поэтому записываем <b>2<sub>4</sub></b>.</p>
+
+  <section class="interactive" id="sum-exercise" aria-labelledby="sum-task-title">
+    <h3 id="sum-task-title">Составьте таблицу сложения</h3>
+    <p>В каждой клетке сложите цифру слева с цифрой сверху. Запишите сумму <b>в выбранном основании</b> без ведущих нулей. Для цифр A–J используйте латинские буквы.</p>
+    <p>Для короткой проверки в основании 4 начните с клеток 0 + 3, 1 + 2, 2 + 2 и 2 + 3. Кнопка проверки учитывает и частично заполненную таблицу.</p>
+    <form id="sum-form">
+      <div class="sum-controls">
+        <label>Основание <select id="sum-base"><option value="4" selected>4</option></select></label>
+        <button type="submit">Проверить таблицу</button>
+      </div>
+      <p class="sum-feedback" id="sum-feedback" role="status" hidden></p>
+      <div class="sum-scroll" tabindex="0" role="region" aria-label="Таблица для заполнения">
+        <table id="sum-input-table" class="sum-grid"></table>
+      </div>
+    </form>
+    <details id="sum-answer" class="sum-answer">
+      <summary>Показать правильную таблицу</summary>
+      <div class="sum-scroll" tabindex="0" role="region" aria-label="Правильная таблица сложения">
+        <table id="sum-answer-table" class="sum-grid"></table>
+      </div>
+    </details>
+  </section>
+  <p id="subtraction">Таблица сложения помогает <a href="08-vychitanie.html#subtraction-table">найти цифру разности</a>.</p>
   <nav class="pager" aria-label="Соседние главы">
     <a href="05-perevod-iz-desyatichnoy.html">← Назад: перевод из десятичной системы</a>
     <a href="proverka-1.html">Проверочная работа 1</a>
@@ -496,6 +528,9 @@ li+li{margin-top:.35em}
   const firstField = byId('add-column-first');
   const secondField = byId('add-column-second');
   const start = byId('add-column-start');
+  const previous = byId('add-column-prev');
+  const next = byId('add-column-next');
+  const counter = byId('add-column-progress');
   const feedback = byId('add-column-error');
   const status = byId('add-column-status');
   const scroller = byId('add-column-scroll');
@@ -504,7 +539,9 @@ li+li{margin-top:.35em}
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const fields = [baseField, firstField, secondField];
   let example;
+  let completed = 0;
   let busy = false;
+  const initialMessage = 'Начинаем с крайнего правого разряда, где стоят единицы.';
 
   function mixColor(color, endpoint, amount) {
     return 'rgb(' + [1, 3, 5].map((index) => {
@@ -615,7 +652,10 @@ li+li{margin-top:.35em}
 
   function updateControls() {
     fields.forEach((field) => { field.disabled = busy; });
-    start.disabled = busy || !example;
+    start.setAttribute('aria-disabled', String(busy || !example));
+    previous.setAttribute('aria-disabled', String(busy || !completed));
+    next.setAttribute('aria-disabled', String(busy || !example || completed === example.steps.length));
+    counter.textContent = example ? `Разобрано разрядов: ${completed} из ${example.steps.length}` : '';
   }
 
   function prepare(commit = false) {
@@ -626,6 +666,7 @@ li+li{margin-top:.35em}
     const error = first.error || second.error;
     feedback.hidden = !error;
     feedback.textContent = error;
+    completed = 0;
     result.hidden = true;
     if (error) {
       example = undefined;
@@ -640,7 +681,7 @@ li+li{margin-top:.35em}
       example = { base, first: first.record, second: second.record, steps: makePlan(first.record, second.record, base) };
       scroller.hidden = false;
       status.hidden = false;
-      status.textContent = 'Нажмите «Сложить». Начнём с крайнего правого разряда.';
+      status.textContent = initialMessage;
       drawBoard();
     }
     updateControls();
@@ -680,11 +721,15 @@ li+li{margin-top:.35em}
     return `${step.place ? `Разряд ${step.place}` : 'Единицы'}. ${terms.join(' + ')} = ${result} в основании ${base}.`;
   }
 
-  function writeDigit(col, digit) {
+  function writeDigit(col, digit, animate = true) {
     const written = col.querySelector('.ca-result .ca-digit');
     written.removeAttribute('aria-label');
     written.textContent = alphabet[digit];
-    written.classList.add('ca-new');
+    written.classList.toggle('ca-new', animate);
+  }
+
+  function writeCarry(marker, place) {
+    marker.innerHTML = `<span class="ca-digit ca-carry-digit" aria-label="Перенос 1">1</span>${stick(place)}`;
   }
 
   async function carryGroup(col, next, step, area) {
@@ -716,7 +761,7 @@ li+li{margin-top:.35em}
       { transform: translate(centerOf(item), centerOf(marker)), opacity: .9 }
     ], 610);
     flying.remove();
-    marker.innerHTML = `<span class="ca-digit ca-carry-digit" aria-label="Перенос 1">1</span>${draw}`;
+    writeCarry(marker, step.place + 1);
     await wait(200);
   }
 
@@ -746,24 +791,60 @@ li+li{margin-top:.35em}
     col.classList.remove('ca-active');
   }
 
-  async function runAddition() {
-    if (busy || !example) return;
-    const wasFocused = document.activeElement === start;
-    busy = true;
-    result.hidden = true;
-    updateControls();
-    drawBoard();
-    try {
-      for (const step of example.steps) await showStep(step);
+  function showCompletedStep(step) {
+    const text = columnExplanation(step, example.base);
+    const carry = step.outgoing ? ' Переносим 1 в столбец слева.' : '';
+    status.textContent = `${text} Под чертой пишем ${alphabet[step.digit]}.${carry}`;
+  }
 
-      const answer = example.steps.map((step) => alphabet[step.digit]).reverse().join('');
-      result.innerHTML = `${formatted(example.first, example.base)} + ${formatted(example.second, example.base)} = <b>${formatted(answer, example.base)}</b>`;
-      result.hidden = false;
-      status.textContent = 'Все столбцы сложены. Прочитайте результат слева направо.';
+  function goBack() {
+    if (busy || !completed) return;
+    completed -= 1;
+    result.hidden = true;
+    drawBoard();
+    for (const step of example.steps.slice(0, completed)) {
+      const col = columnAt(step.place);
+      col.querySelector('.ca-work .ca-sticks').innerHTML = sticks(step.digit, step.place);
+      writeDigit(col, step.digit, false);
+      if (step.outgoing) writeCarry(columnAt(step.place + 1).querySelector('.ca-carry'), step.place + 1);
+    }
+    if (completed) {
+      const step = example.steps[completed - 1];
+      showColumns(columnAt(step.place), step.outgoing ? columnAt(step.place + 1) : null);
+      showCompletedStep(step);
+    } else {
+      status.textContent = initialMessage;
+    }
+    updateControls();
+  }
+
+  async function runAddition(all = false) {
+    if (busy || !example || (!all && completed === example.steps.length)) return;
+    if (all) {
+      completed = 0;
+      result.hidden = true;
+      drawBoard();
+    }
+    busy = true;
+    updateControls();
+    try {
+      const end = all ? example.steps.length : completed + 1;
+      while (completed < end) {
+        const step = example.steps[completed];
+        await showStep(step);
+        completed += 1;
+        showCompletedStep(step);
+        updateControls();
+      }
+      if (completed === example.steps.length) {
+        const answer = example.steps.map((step) => alphabet[step.digit]).reverse().join('');
+        result.innerHTML = `${formatted(example.first, example.base)} + ${formatted(example.second, example.base)} = <b>${formatted(answer, example.base)}</b>`;
+        result.hidden = false;
+        status.textContent = 'Все столбцы сложены. Прочитайте результат слева направо.';
+      }
     } finally {
       busy = false;
       updateControls();
-      if (wasFocused && document.activeElement === document.body) start.focus({ preventScroll: true });
     }
   }
 
@@ -779,11 +860,16 @@ li+li{margin-top:.35em}
     field.addEventListener('keydown', (event) => {
       if (event.key === 'Enter') {
         prepare(true);
-        if (!start.disabled) runAddition();
+        if (example) {
+          start.focus({ preventScroll: true });
+          runAddition(true);
+        }
       }
     });
   });
-  start.addEventListener('click', runAddition);
+  start.addEventListener('click', () => runAddition(true));
+  previous.addEventListener('click', goBack);
+  next.addEventListener('click', () => runAddition());
   prepare(true);
 })();
 </script>

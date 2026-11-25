@@ -80,6 +80,12 @@ button:disabled{opacity:.55;cursor:default}
   box-shadow: 0 1px 0 rgba(20, 30, 60, .14);
 }
 
+.ca-playback { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px; }
+.ca-playback button { min-block-size: 44px; }
+.ca-playback .ca-back { background: #e8efff; color: #1647a8; }
+.column-model button[aria-disabled="true"] { opacity: .55; cursor: default; }
+.ca-progress { margin-inline-start: .25rem; color: var(--ca-muted); font-size: .875rem; }
+
 .ca-error { color: #a92620; font-size: 15px; overflow-wrap: anywhere; }
 .ca-error:empty, .ca-out:empty { display: none; }
 
@@ -347,8 +353,22 @@ li+li{margin-top:.35em}
 .fraction-exchanges tbody tr+tr>*{border-top:1px solid #cbdcec}
 .fraction-exchanges .fraction-changed{background:#e3eefb;color:#154f8a;font-weight:750}
 .fraction-sr{position:absolute;inline-size:1px;block-size:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-@media(min-width:541px){#subtraction-table{scroll-margin-top:16.5rem}}
-@media(min-width:700px){#subtraction-table{scroll-margin-top:11.5rem}}
+.notebook-example{background:#fff8ec;border-color:#e8d3b3}
+.notebook-example .fraction-column thead th{border-color:#d6bfa4;color:#715139}
+.notebook-example .fraction-column .fraction-answer>*{border-color:#68472e}
+.exchange-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%, 175px),1fr));gap:10px;margin:1em 0;padding:0;list-style:none}
+#short-borrow .exchange-steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+.exchange-steps li{margin:0;padding:10px;border:1px solid #dfcab0;border-radius:10px;background:#fffdf7;color:#553923}
+.exchange-steps p{margin:.35em 0 0}
+.exchange-groups{display:flex;flex-wrap:wrap;align-items:center;gap:5px;min-height:32px}
+.exchange-groups i{display:inline-block;width:10px;height:26px;border:1px solid #953d2d;border-radius:5px;background:linear-gradient(90deg,#ef8b6f,#d64430 60%,#b02a1c)}
+.exchange-groups i.group-four{border-color:#225e9f;background:linear-gradient(90deg,#8cb9ee,#307ed3 60%,#1859a2)}
+.exchange-groups i.group-sixteen{border-color:#876907;background:linear-gradient(90deg,#ffe49c,#e8ad21 60%,#b8850e)}
+.exchange-groups .exchange-empty{color:#715139}
+.borrow-mark{color:#205e9e;font-weight:750}
+.borrow-old{color:#715139;text-decoration-thickness:2px}
+@media(min-width:541px){#subtraction-table,#short-borrow{scroll-margin-top:16.5rem}}
+@media(min-width:700px){#subtraction-table,#short-borrow{scroll-margin-top:11.5rem}}
 </style>
 <style id="ns-illustration-styles">
 /* Illustration styles: scoped so the existing textbook layout is preserved. */
@@ -436,13 +456,35 @@ li+li{margin-top:.35em}
     <li>Переходим к следующему столбцу слева с учётом уже сделанных займов. В готовом ответе опускаем ведущие нули. Для нулевого результата оставляем <b>0</b>.</li>
   </ol>
 
-  <div class="example">
-    <h3>Пример 100<sub>4</sub> − 2<sub>4</sub></h3>
-    <ol>
-      <li>Единиц нет. Берём одну палочку из старшего разряда и размениваем её в соседнем разряде на четыре палочки.</li>
-      <li>Одну из этих палочек размениваем на четыре единицы. В промежуточном разряде остаются три палочки.</li>
-      <li>Из четырёх единиц убираем две. Ответ — <b>32<sub>4</sub></b>.</li>
+  <div class="example notebook-example" id="short-borrow">
+    <h3>Один заём в примере 12<sub>4</sub> − 3<sub>4</sub></h3>
+    <p>В числе 12<sub>4</sub> одна группа по четыре и две единицы. Для вычитания трёх единиц разменяем синюю группу на четыре красные палочки.</p>
+    <ol class="exchange-steps" aria-label="Размен группы по четыре на единицы">
+      <li>
+        <strong>До размена</strong>
+        <div class="exchange-groups" aria-hidden="true"><i class="group-four"></i><i></i><i></i></div>
+        <p>1 группа по 4 и 2 единицы.</p>
+      </li>
+      <li>
+        <strong>После размена</strong>
+        <div class="exchange-groups" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <p>0 групп по 4 и 6 единиц.</p>
+      </li>
     </ol>
+    <p>В тетради зачёркиваем прежние цифры сверху. Над 1 пишем 0, а над 2 — маленькую 6. Эта пометка показывает временное количество единиц. Цифры ответа в основании 4 по-прежнему выбираем от 0 до 3.</p>
+    <table class="fraction-table fraction-column">
+      <caption>12<sub>4</sub> − 3<sub>4</sub> столбиком</caption>
+      <thead>
+        <tr><th scope="col">Вес разряда</th><th scope="col">4</th><th scope="col">1</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">После размена</th><td class="borrow-mark">0</td><td class="borrow-mark">6</td></tr>
+        <tr><th scope="row">Уменьшаемое</th><td><del class="borrow-old">1</del></td><td><del class="borrow-old">2</del></td></tr>
+        <tr><th scope="row">− Вычитаемое</th><td></td><td>3</td></tr>
+        <tr class="fraction-answer"><th scope="row">Разность</th><td></td><td>3</td></tr>
+      </tbody>
+    </table>
+    <p>Из шести единиц убираем три. Ответ — <b>3<sub>4</sub></b>. Уже знакомая таблица сложения помогает найти эту цифру. В ней шесть единиц записаны как 12<sub>4</sub>, поэтому ищем, какая цифра в сумме с 3 даёт 12<sub>4</sub>.</p>
   </div>
 
   <div class="note">
@@ -465,9 +507,44 @@ li+li{margin-top:.35em}
       <tbody><tr><th scope="row">3</th><td>3</td><td>10</td><td>11</td><td class="borrow-hit">12</td></tr></tbody>
     </table>
   </div>
-  <p>В старшем разряде 12<sub>4</sub> после займа остался 0. Поэтому ответ в этом примере — <b>3<sub>4</sub></b>.</p>
+  <p>Число 12<sub>4</sub> подсвечено в строке 3 и столбце 3. Значит, 3 — цифра разности в единицах. Старший разряд после размена пуст.</p>
 
   <h3 id="subtraction-chain">Длинный заём и промежуточные вычитания</h3>
+  <p>В примере 100<sub>4</sub> − 2<sub>4</sub> оба младших разряда пусты. Группу по 16 размениваем на четыре группы по 4. Одну из них размениваем на четыре единицы. После этих разменов осталось три группы по 4 и четыре единицы. Убираем две единицы и получаем <b>32<sub>4</sub></b>.</p>
+
+  <section class="interactive column-model" id="column-subtract" aria-labelledby="column-subtract-heading">
+    <h3 id="column-subtract-heading">Вычитание на цветных палочках</h3>
+    <p>Начните с примера 100<sub>4</sub> − 2<sub>4</sub>. «Следующий шаг» показывает вычитание в очередном столбце вместе с нужными разменами. «Вычесть целиком» проигрывает весь пример.</p>
+    <p>Выберите основание от 2 до 20 и введите два целых неотрицательных числа, до восьми цифр в каждом. Уменьшаемое должно быть больше вычитаемого или равно ему.</p>
+
+    <div class="ca-panel">
+      <label class="ca-field" for="sub-column-base">Основание
+        <select id="sub-column-base" aria-describedby="sub-column-error">
+          <option value="4" selected>4</option>
+        </select>
+      </label>
+      <label class="ca-field" for="sub-column-first">Уменьшаемое
+        <input id="sub-column-first" type="text" value="100" autocomplete="off" spellcheck="false" autocapitalize="characters" aria-describedby="sub-column-error">
+      </label>
+      <label class="ca-field" for="sub-column-second">Вычитаемое
+        <input id="sub-column-second" type="text" value="2" autocomplete="off" spellcheck="false" autocapitalize="characters" aria-describedby="sub-column-error">
+      </label>
+      <button class="ca-start" id="sub-column-start" type="button">Вычесть целиком</button>
+    </div>
+    <p class="ca-error" id="sub-column-error" role="alert"></p>
+
+    <div class="ca-playback" aria-label="Шаги вычитания" role="group">
+      <button class="ca-back" id="sub-column-prev" type="button" aria-disabled="true">Назад</button>
+      <button id="sub-column-next" type="button" aria-disabled="true">Следующий шаг</button>
+      <span class="ca-progress" id="sub-column-progress"></span>
+    </div>
+    <p class="ca-status" id="sub-column-status" role="status" aria-atomic="true"></p>
+    <div class="ca-scroll" id="sub-column-scroll" tabindex="0" role="region" aria-label="Разряды вычитания">
+      <div class="ca-grid" id="sub-column-grid"></div>
+    </div>
+    <p class="ca-out" id="sub-column-result" role="status" aria-atomic="true"></p>
+  </section>
+
   <p>Если заём прошёл через несколько нулевых разрядов, в каждом из них после размена остаётся <i>N</i> − 1 палочек. Их хватает для любой нижней цифры. Когда доходим до такого столбца, вычитаем его нижнюю цифру <i>b</i> и пишем <i>N</i> − 1 − <i>b</i>. При <i>b</i> = 0 остаётся <i>N</i> − 1, при <i>b</i> = <i>N</i> − 1 получается 0.</p>
   <!-- ns-ch07-integer-illustrations:start -->
 <div class="example" id="integer-borrowing-example">
@@ -499,35 +576,33 @@ li+li{margin-top:.35em}
     </div>
     <p>Читаем цифры ответа от старшего разряда к младшему. Опускаем ведущий ноль и получаем <b>211<sub>4</sub></b>.</p>
   </div>
-  <p><b>Когда нужен ещё один заём.</b> Цифра в том разряде, из которого взяли палочку, уменьшается на 1. Когда доходим до него, сверяем с нижней цифрой. Если палочек снова не хватает, берём новый заём из ближайшего ненулевого разряда слева.</p>
-  <p>Например, в 1101<sub>4</sub> − 133<sub>4</sub> заём для единиц опустошает разряд групп по 16. В единицах получаем 2, а в разряде групп по 4 вычисляем 3 − 3 = 0. Когда доходим до разряда групп по 16, сверху 0, снизу 1. Занимаем из разряда групп по 64 и получаем в этом столбце 10<sub>4</sub> − 1<sub>4</sub> = 3<sub>4</sub>. Итог — <b>302<sub>4</sub></b>. Ноль внутри ответа показывает, что групп по 4 нет.</p>
-
-  <section class="interactive column-model" id="column-subtract" aria-labelledby="column-subtract-heading">
-    <h3 id="column-subtract-heading">Вычитание на цветных палочках</h3>
-    <p>Выберите основание от 2 до 20 и введите два целых неотрицательных числа, до восьми цифр в каждом. Уменьшаемое должно быть больше вычитаемого или равно ему.</p>
-
-    <div class="ca-panel">
-      <label class="ca-field" for="sub-column-base">Основание
-        <select id="sub-column-base" aria-describedby="sub-column-error">
-          <option value="4" selected>4</option>
-        </select>
-      </label>
-      <label class="ca-field" for="sub-column-first">Уменьшаемое
-        <input id="sub-column-first" type="text" value="100" autocomplete="off" spellcheck="false" autocapitalize="characters" aria-describedby="sub-column-error">
-      </label>
-      <label class="ca-field" for="sub-column-second">Вычитаемое
-        <input id="sub-column-second" type="text" value="2" autocomplete="off" spellcheck="false" autocapitalize="characters" aria-describedby="sub-column-error">
-      </label>
-      <button class="ca-start" id="sub-column-start" type="button">Вычесть</button>
-    </div>
-    <p class="ca-error" id="sub-column-error" role="alert"></p>
-
-    <p class="ca-status" id="sub-column-status" role="status" aria-atomic="true"></p>
-    <div class="ca-scroll" id="sub-column-scroll" tabindex="0" role="region" aria-label="Разряды вычитания">
-      <div class="ca-grid" id="sub-column-grid"></div>
-    </div>
-    <p class="ca-out" id="sub-column-result" role="status" aria-atomic="true"></p>
-  </section>
+  <div class="example notebook-example">
+    <h4>Когда нужен ещё один заём</h4>
+    <p>В примере 1101<sub>4</sub> − 133<sub>4</sub> проследим, как меняется количество групп по 16 в уменьшаемом.</p>
+    <ol class="exchange-steps" aria-label="Что происходит в разряде веса 16">
+      <li>
+        <strong>До займа</strong>
+        <div class="exchange-groups" aria-hidden="true"><i class="group-sixteen"></i></div>
+        <p>1 группа по 16.</p>
+      </li>
+      <li>
+        <strong>Отдали одну</strong>
+        <div class="exchange-groups" aria-hidden="true"><span class="exchange-empty">0</span></div>
+        <p>Единственная группа ушла в размен для младших разрядов.</p>
+      </li>
+      <li>
+        <strong>Получили четыре</strong>
+        <div class="exchange-groups" aria-hidden="true"><i class="group-sixteen"></i><i class="group-sixteen"></i><i class="group-sixteen"></i><i class="group-sixteen"></i></div>
+        <p>Дошли до этого столбца. Сверху 0, снизу 1. Разменяли группу по 64 на 4 группы по 16.</p>
+      </li>
+      <li>
+        <strong>Убрали одну</strong>
+        <div class="exchange-groups" aria-hidden="true"><i class="group-sixteen"></i><i class="group-sixteen"></i><i class="group-sixteen"></i></div>
+        <p>4 − 1 = 3. Пишем 3 в разряде веса 16.</p>
+      </li>
+    </ol>
+    <p>Первый заём уже дал 5 единиц и оставил 3 группы по 4. Вычитания в этих разрядах дают 5 − 3 = 2 и 3 − 3 = 0. После второго займа старший разряд пуст. Получаем <b>302<sub>4</sub></b>.</p>
+  </div>
 
   <h2 id="fractional">Вычитание чисел с запятой</h2>
   <p>Совмещаем запятые и при необходимости дополняем дробную часть справа нулями. Движемся от крайнего правого разряда влево. Заём проходит через запятую по тому же правилу: одну единицу можно разменять на <i>N</i> палочек первого дробного разряда.</p>
@@ -587,6 +662,9 @@ li+li{margin-top:.35em}
   const firstField = byId('sub-column-first');
   const secondField = byId('sub-column-second');
   const start = byId('sub-column-start');
+  const previous = byId('sub-column-prev');
+  const next = byId('sub-column-next');
+  const counter = byId('sub-column-progress');
   const feedback = byId('sub-column-error');
   const status = byId('sub-column-status');
   const scroller = byId('sub-column-scroll');
@@ -595,7 +673,9 @@ li+li{margin-top:.35em}
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const fields = [baseField, firstField, secondField];
   let example;
+  let completed = 0;
   let busy = false;
+  const initialMessage = 'Начинаем с крайнего правого разряда, где стоят единицы.';
 
   function mixColor(color, endpoint, amount) {
     return 'rgb(' + [1, 3, 5].map((index) => {
@@ -716,7 +796,10 @@ li+li{margin-top:.35em}
 
   function updateControls() {
     fields.forEach((field) => { field.disabled = busy; });
-    start.disabled = busy || !example;
+    start.setAttribute('aria-disabled', String(busy || !example));
+    previous.setAttribute('aria-disabled', String(busy || !completed));
+    next.setAttribute('aria-disabled', String(busy || !example || completed === example.steps.length));
+    counter.textContent = example ? `Разобрано разрядов: ${completed} из ${example.steps.length}` : '';
   }
 
   function prepare(commit = false) {
@@ -731,6 +814,7 @@ li+li{margin-top:.35em}
     }
     feedback.hidden = !error;
     feedback.textContent = error;
+    completed = 0;
     result.hidden = true;
     if (error) {
       example = undefined;
@@ -745,7 +829,7 @@ li+li{margin-top:.35em}
       example = { base, first: first.record, second: second.record, steps: makePlan(first.record, second.record, base) };
       scroller.hidden = false;
       status.hidden = false;
-      status.textContent = 'Нажмите «Вычесть». Начнём с крайнего правого разряда.';
+      status.textContent = initialMessage;
       drawBoard();
     }
     updateControls();
@@ -778,11 +862,11 @@ li+li{margin-top:.35em}
     motions.forEach((motion) => motion.cancel());
   }
 
-  function writeDigit(col, digit) {
+  function writeDigit(col, digit, animate = true) {
     const written = col.querySelector('.ca-result .ca-digit');
     written.removeAttribute('aria-label');
     written.textContent = alphabet[digit];
-    written.classList.add('ca-new');
+    written.classList.toggle('ca-new', animate);
   }
 
   function renderMinuend(col, count) {
@@ -888,27 +972,67 @@ li+li{margin-top:.35em}
     col.classList.remove('ca-active');
   }
 
-  async function runSubtraction() {
-    if (busy || !example) return;
-    const wasFocused = document.activeElement === start;
-    busy = true;
+  function showCompletedStep(step) {
+    const place = step.place ? `Разряд ${step.place}` : 'Единицы';
+    const before = step.loans.length ? 'После размена сверху' : 'Сверху';
+    status.textContent = `${place}. ${before} ${pluralSticks(step.before)}. Убираем ${pluralSticks(step.take)} и пишем ${alphabet[step.digit]} под чертой.`;
+  }
+
+  function goBack() {
+    if (busy || !completed) return;
+    completed -= 1;
     result.hidden = true;
-    updateControls();
     drawBoard();
-    try {
-      for (const step of example.steps) await showStep(step);
-      const raw = example.steps.map((step) => alphabet[step.digit]).reverse().join('');
-      const answer = raw.replace(/^0+(?=.)/, '');
-      for (let place = raw.length - 1; place >= answer.length; place -= 1) {
-        columnAt(place).querySelector('.ca-result .ca-digit').textContent = '';
+    for (const step of example.steps.slice(0, completed)) {
+      for (const loan of step.loans) {
+        renderMinuend(columnAt(loan.from), loan.fromCount);
+        renderMinuend(columnAt(loan.to), loan.toCount);
       }
-      result.innerHTML = `${formatted(example.first, example.base)} − ${formatted(example.second, example.base)} = <b>${formatted(answer, example.base)}</b>`;
-      result.hidden = false;
-      status.textContent = 'Все столбцы разобраны. Прочитайте разность слева направо.';
+      const col = columnAt(step.place);
+      col.querySelector('.ca-work .ca-sticks').innerHTML = sticks(step.digit, step.place);
+      writeDigit(col, step.digit, false);
+    }
+    if (completed) {
+      const step = example.steps[completed - 1];
+      showColumns(columnAt(step.place));
+      showCompletedStep(step);
+    } else {
+      status.textContent = initialMessage;
+    }
+    updateControls();
+  }
+
+  async function runSubtraction(all = false) {
+    if (busy || !example || (!all && completed === example.steps.length)) return;
+    if (all) {
+      completed = 0;
+      result.hidden = true;
+      drawBoard();
+    }
+    busy = true;
+    updateControls();
+    try {
+      const end = all ? example.steps.length : completed + 1;
+      while (completed < end) {
+        const step = example.steps[completed];
+        await showStep(step);
+        completed += 1;
+        showCompletedStep(step);
+        updateControls();
+      }
+      if (completed === example.steps.length) {
+        const raw = example.steps.map((step) => alphabet[step.digit]).reverse().join('');
+        const answer = raw.replace(/^0+(?=.)/, '');
+        for (let place = raw.length - 1; place >= answer.length; place -= 1) {
+          columnAt(place).querySelector('.ca-result .ca-digit').textContent = '';
+        }
+        result.innerHTML = `${formatted(example.first, example.base)} − ${formatted(example.second, example.base)} = <b>${formatted(answer, example.base)}</b>`;
+        result.hidden = false;
+        status.textContent = 'Все столбцы разобраны. Прочитайте разность слева направо.';
+      }
     } finally {
       busy = false;
       updateControls();
-      if (wasFocused && document.activeElement === document.body) start.focus({ preventScroll: true });
     }
   }
 
@@ -924,11 +1048,16 @@ li+li{margin-top:.35em}
     field.addEventListener('keydown', (event) => {
       if (event.key === 'Enter') {
         prepare(true);
-        if (!start.disabled) runSubtraction();
+        if (example) {
+          start.focus({ preventScroll: true });
+          runSubtraction(true);
+        }
       }
     });
   });
-  start.addEventListener('click', runSubtraction);
+  start.addEventListener('click', () => runSubtraction(true));
+  previous.addEventListener('click', goBack);
+  next.addEventListener('click', () => runSubtraction());
   prepare(true);
 })();
 </script>

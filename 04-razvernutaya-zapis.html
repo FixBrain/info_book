@@ -75,6 +75,21 @@ svg.grp{display:block;overflow:visible}
 .verdict.ok{color:#2e9e45}
 .verdict.no{color:#c0392b}
 .explain{margin-top:10px;background:#fff;border:1px dashed #bcd;border-radius:9px;padding:12px;display:none}
+.horner-unpacking{margin:16px 0;padding:clamp(10px,2vw,16px);border:1px solid #e0c9a7;border-radius:14px;background:#fff8ec;color:#4e3422}
+.horner-unpacking figcaption{font-weight:700;margin-bottom:10px}
+.horner-frames{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:stretch;gap:8px}
+.horner-frame{min-width:0;padding:10px;border:1px solid #e9d7bf;border-radius:10px;background:#fffcf7}
+.horner-frame b,.horner-frame small{display:block}
+.horner-frame .horner-pictogram{display:flex;align-items:center;min-height:48px;margin:7px 0}
+.horner-frame small{margin-top:7px;font-size:.875rem;color:#66513f}
+.horner-frame .horner-count{margin-top:7px;padding-left:8px;border-left:4px solid var(--bundle-color);line-height:1.35}
+.horner-arrow{align-self:center;font-size:1.2rem;color:#805531}
+.horner-steps{width:min(100%,32rem)}
+table.t.horner-steps th,table.t.horner-steps td{padding:5px 7px}
+@media(max-width:660px){
+  .horner-frames{grid-template-columns:1fr;gap:4px}
+  .horner-arrow{justify-self:center;transform:rotate(90deg);line-height:1}
+}
 @media(max-width:540px){header.top{position:static}}
 </style>
 </head>
@@ -140,25 +155,45 @@ svg.grp{display:block;overflow:visible}
   </div>
 
   <h2>Способ 2. Развязываем пучки</h2>
-  <p>Можно обойтись без степеней. Начнём со старших пучков и будем их развязывать.</p>
-  <ul>
-    <li>В старшем разряде 2 пучка по 49. Развяжем каждый: получится 2 · 7 = 14 пучков по 7.</li>
-    <li>В разряде № 1 лежат ещё 6 таких же пучков. Всего 14 + 6 = 20 пучков по 7.</li>
-    <li>Развяжем и их: 20 · 7 = 140 палочек. Добавим 3 палочки из разряда № 0: всего 143.</li>
-  </ul>
-  <div class="formula">263<sub>7</sub> = (2 · 7 + 6) · 7 + 3 = 143</div>
+  <p>В записи 263<sub>7</sub> цифры показывают 2 пучка по 49, 6 пучков по 7 и 3 отдельные палочки. Начнём с двух больших пучков. После каждого развязывания добавим то, что лежит в следующем разряде.</p>
+  <figure class="horner-unpacking">
+    <figcaption>Что мы считаем на каждом шаге</figcaption>
+    <div class="horner-frames">
+      <div class="horner-frame" style="--bundle-color:#52945b">
+        <b>Начинаем с цифры 2</b>
+        <span class="horner-pictogram" data-bundle-level="2" aria-hidden="true"></span>
+        <b class="horner-count">2 пучка по 49</b>
+      </div>
+      <span class="horner-arrow" aria-hidden="true">→</span>
+      <div class="horner-frame" style="--bundle-color:#3485b2">
+        <b>Переходим к цифре 6</b>
+        <span class="horner-pictogram" data-bundle-level="1" aria-hidden="true"></span>
+        <b class="horner-count">20 пучков по 7</b>
+        <small>После развязывания получаем 2 · 7 = 14 пучков по 7. Добавляем ещё 6 таких пучков.</small>
+      </div>
+      <span class="horner-arrow" aria-hidden="true">→</span>
+      <div class="horner-frame" style="--bundle-color:#c9533e">
+        <b>Переходим к цифре 3</b>
+        <span class="horner-pictogram" data-bundle-level="0" aria-hidden="true"></span>
+        <b class="horner-count">143 отдельные палочки</b>
+        <small>После развязывания получаем 20 · 7 = 140 палочек. Добавляем ещё 3.</small>
+      </div>
+    </div>
+  </figure>
+  <p>На каждом шаге число палочек в одном пучке уменьшается в 7 раз, а число развязанных пучков становится в 7 раз больше. В конце все палочки лежат по одной.</p>
+  <div class="formula">263<sub>7</sub> = (2 · 7 + 6) · 7 + 3 = 143<sub>10</sub></div>
   <p>Если раскрыть скобки, получится 2 · 7² + 6 · 7 + 3 — та же развёрнутая запись.</p>
   <p><b>Правило.</b> Берём старшую цифру. Умножаем текущее значение на N и прибавляем следующую цифру. Повторяем, пока цифры не закончатся. Этот приём называют схемой Горнера.</p>
   <p><b>Почему это работает для любой записи.</b> После первого шага у нас значение одной цифры. Когда к прочитанной части дописываем справа новую цифру, все прежние разряды сдвигаются на одну позицию влево и их веса умножаются на N. Новая цифра занимает позицию единиц, поэтому прибавляем её значение. Так после каждого шага получаем значение всех уже прочитанных цифр, а в конце — значение всего числа.</p>
   <div class="example">
     <span class="tag">Разобранный пример · ноль в середине</span>
     <p><b>Задача.</b> Перевести 4052<sub>7</sub> в десятичную систему.</p>
-    <div class="scroll"><table class="t">
-      <tr><th>Было</th><th>Умножаем на 7</th><th>Прибавляем цифру</th><th>Стало</th></tr>
-      <tr><td>4</td><td>4 · 7 = 28</td><td>+ 0</td><td>28</td></tr>
-      <tr><td>28</td><td>28 · 7 = 196</td><td>+ 5</td><td>201</td></tr>
-      <tr><td>201</td><td>201 · 7 = 1407</td><td>+ 2</td><td>1409</td></tr>
-    </table></div>
+    <table class="t horner-steps">
+      <tr><th scope="col">Было</th><th scope="col">Развязываем и добавляем</th><th scope="col">Стало</th></tr>
+      <tr><td>4</td><td>4 · 7 + <b>0</b></td><td>28</td></tr>
+      <tr><td>28</td><td>28 · 7 + 5</td><td>201</td></tr>
+      <tr><td>201</td><td>201 · 7 + 2</td><td>1409</td></tr>
+    </table>
     <p><b>Результат.</b> 4052<sub>7</sub> = 1409<sub>10</sub>.</p>
     <p><b>Что делает ноль.</b> На первом шаге прибавили 0, и пучков не стало больше. Но умножение на 7 выполнено: 4 пучка по 343 развязаны в 28 пучков по 49. Пропускать этот шаг нельзя.</p>
     <p><b>Как нельзя.</b> Пропустить ноль: (4 · 7 + 5) · 7 + 2 = 233. Это перевод другой записи, 452<sub>7</sub>.</p>
@@ -178,12 +213,13 @@ svg.grp{display:block;overflow:visible}
       <button class="ghost" onclick="uReset()">Сначала</button>
     </div>
     <div class="pile" id="upile"></div>
-    <div class="scroll"><table class="t" id="utab"></table></div>
+    <div class="scroll"><table class="t horner-steps" id="utab" aria-label="Шаги схемы Горнера"></table></div>
     <div class="readout" id="uout"></div>
   </div>
 
-  <h3>Как найти неизвестное основание</h3>
-  <p>В схеме Горнера можно оставить N неизвестным. Например, найдём основание из равенства 23<sub>N</sub> = 17<sub>10</sub>. Старшую цифру 2 умножаем на N и прибавляем младшую цифру 3.</p>
+  <h2 id="unknown-base">Применение. Как найти неизвестное основание</h2>
+  <p>До сих пор основание было известно, и мы искали значение записи. Теперь по записи и её значению найдём основание. Сначала составим уравнение, затем проверим, входят ли все цифры в алфавит найденного основания.</p>
+  <p>Пусть 23<sub>N</sub> = 17<sub>10</sub>. По схеме Горнера старшую цифру 2 умножаем на N и прибавляем младшую цифру 3.</p>
   <div class="formula">2 · N + 3 = 17, &nbsp; 2 · N = 14, &nbsp; N = 7.</div>
   <p>Проверим цифры и значение. Цифра 3 допустима, когда N ≥ 4. Найденное основание 7 подходит, и 2 · 7 + 3 = 17.</p>
 
@@ -282,6 +318,12 @@ svg.grp{display:block;overflow:visible}
         <p>Последняя цифра 0, но шаг выполнить нужно: 82 пучка по 5 развязываются в 410 палочек.</p>
         <p>Проверка по весам: 3 · 125 + 1 · 25 + 2 · 5 + 0 · 1 = 375 + 25 + 10 + 0 = 410.</p>
       </div>
+    </div>
+    <div class="task">
+      <details>
+        <summary>Задача 4. Найдите основание, если 31<sub>N</sub> = 16<sub>10</sub>. Проверьте, допустимы ли цифры.</summary>
+        <p>Из 3 · N + 1 = 16 получаем N = 5. Обе цифры меньше 5, поэтому запись допустима. Проверка даёт 3 · 5 + 1 = 16.</p>
+      </details>
     </div>
   </div>
 
@@ -560,6 +602,10 @@ function aDraw(){
 fillBases('abase',7);
 $('arec').oninput=aDraw;
 $('abase').onchange=aDraw;
+for (const pictogram of document.querySelectorAll('.horner-pictogram')) {
+  pictogram.innerHTML=bundleHTML(Number(pictogram.dataset.bundleLevel),7,72);
+}
+flushDefs();
 aDraw();
 
 /* ===== интерактив 2: развязываем пучки ===== */
@@ -612,10 +658,10 @@ function uDraw(){
   $('upile').innerHTML=html;
 
   /* таблица шагов */
-  var t='<tr><th>Было</th><th>Умножаем на '+uN+'</th><th>Прибавляем цифру</th><th>Стало</th></tr>';
+  var t='<tr><th scope="col">Было</th><th scope="col">Развязываем и добавляем</th><th scope="col">Стало</th></tr>';
   for(i=1;i<=k;i++){
     var was=uAcc(i-1),di=uDs[i];
-    t+='<tr'+(i===k?' class="new"':'')+'><td>'+was+'</td><td>'+was+' · '+uN+' = '+(was*uN)+'</td><td>+ '+di+
+    t+='<tr'+(i===k?' class="new"':'')+'><td>'+was+'</td><td>'+was+' · '+uN+' + '+di+
        (di>9?' (цифра '+DIG.charAt(di)+')':'')+'</td><td><b>'+uAcc(i)+'</b></td></tr>';
   }
   $('utab').innerHTML=t;
