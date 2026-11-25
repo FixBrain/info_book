@@ -200,31 +200,31 @@ main [id]{scroll-margin-top:16.5rem}
 </header>
 <main>
   <h1>13. Числа со смешанным основанием</h1>
-  <p class="lead">В привычной записи у всех разрядов одно и то же основание. Посмотрим, как считать, если в одном разряде допустимы две цифры, а в соседнем — пять.</p>
+  <p class="lead">Разложим 24 палочки двумя способами. Сначала вспомним, как собрать их в одинаковые пучки. Затем посмотрим, что меняется, когда в каждом разряде действует своё правило группировки.</p>
 
   <section class="note mixed-predict" aria-labelledby="mixed-recall-title">
     <h2 id="mixed-recall-title">Перед началом</h2>
     <p>Вспомним три действия из предыдущих глав. Ответьте на вопросы, затем откройте решения и сверь ход рассуждения.</p>
     <ol>
       <li>
-        <p><strong>Вес и вклад.</strong> В записи 204<sub>5</sub> слева стоит цифра 2. Чему равен вес её разряда? Каков вклад этой цифры в значение числа?</p>
+        <p><strong>Вес и вклад.</strong> Из 24 палочек получилось четыре пучка по пять и ещё четыре палочки. В пятеричной системе это 44<sub>5</sub>. Чему равны вес левого разряда и вклад левой цифры?</p>
         <details>
           <summary>Проверить вес и вклад</summary>
-          <p>В одной группе старшего разряда пять пятёрок, то есть 5 · 5 = 25 единиц. Вес разряда равен 25. Цифра 2 обозначает две такие группы, поэтому её вклад равен 2 · 25 = 50. <a href="04-razvernutaya-zapis.html">Глава 5. Развёрнутая запись</a></p>
+          <p>Вес левого разряда равен 5. Левая цифра 4 обозначает четыре пучка, поэтому её вклад равен 4 · 5 = 20. <a href="04-razvernutaya-zapis.html">Глава 5. Развёрнутая запись</a></p>
         </details>
       </li>
       <li>
-        <p><strong>Деление с остатком.</strong> Сколько полных групп по пять можно собрать из 22 единиц? Сколько единиц останется?</p>
+        <p><strong>Деление с остатком.</strong> Запишите это разбиение 24 палочек как деление с остатком. Чему равны частное и остаток?</p>
         <details>
           <summary>Проверить частное и остаток</summary>
-          <p>Получатся четыре группы по пять и две отдельные единицы. Записываем 22 = 4 · 5 + 2. Частное равно 4, остаток равен 2. Из двух оставшихся единиц пятую группу уже не собрать. <a href="05-perevod-iz-desyatichnoy.html">Глава 6. Перевод из десятичной системы</a></p>
+          <p>Записываем 24 = 4 · 5 + 4. Частное 4 — число полных пучков. Остаток 4 — число отдельных палочек. Их меньше пяти, поэтому ещё один пучок не получится. <a href="05-perevod-iz-desyatichnoy.html">Глава 6. Перевод из десятичной системы</a></p>
         </details>
       </li>
       <li>
-        <p><strong>Перенос.</strong> Прибавьте единицу к 14<sub>5</sub>. Что запишете справа и что перенесёте в соседний разряд?</p>
+        <p><strong>Перенос.</strong> Прибавьте единицу к 44<sub>5</sub>. Что запишете справа? Что произойдёт с пучками по пять?</p>
         <details>
           <summary>Проверить перенос</summary>
-          <p>Справа получаем 4 + 1 = 5. Собираем из этих единиц одну пятёрку, справа пишем 0. Слева теперь две пятёрки, поэтому ответ равен 20<sub>5</sub>. <a href="07-slozhenie-i-vychitanie.html">Глава 7. Сложение столбиком</a></p>
+          <p>Пять отдельных палочек образуют пятый пучок. В пятеричной системе пять пучков по пять образуют пучок из 25 палочек. В двух правых разрядах пишем 0, в новом разряде пишем 1. Получаем 100<sub>5</sub>. <a href="07-slozhenie-i-vychitanie.html">Глава 7. Сложение столбиком</a></p>
         </details>
       </li>
     </ol>
@@ -244,7 +244,7 @@ main [id]{scroll-margin-top:16.5rem}
   </figure>
   <p>В каждой позиции независимо выбираем одну допустимую цифру. Получаем 3 · 2 · 5 = 30 записей. Даже когда слева стоит 0, в этом списке указываем все три позиции.</p>
 
-  <p>Например, (0, 1, 2) — это одна группа из пяти и ещё две единицы, то есть 7. В (1, 0, 3) есть одна группа из десяти и ещё три единицы, поэтому значение равно 13.</p>
+  <p>Вернёмся к 24 палочкам. Из четырёх пятёрок свяжем два пучка по десять. Отдельных пятёрок теперь 0, отдельных палочек осталось 4. Получаем <strong>(2, 0, 4)</strong> в основаниях (3, 2, 5). Эту запись будем читать по весам, проверять по Горнеру и восстанавливать делением.</p>
   <p>Как в <a href="07-slozhenie-i-vychitanie.html">сложении столбиком</a>, идём справа налево. Для переноса берём основание текущего разряда.</p>
   <p>Начинаем с (0, 0, 0) и каждый раз прибавляем единицу справа. Сначала меняется только правая цифра. Когда все её варианты исчерпаны, справа снова пишем 0 и прибавляем единицу в средней позиции.</p>
   <figure class="mixed-teaching-figure" id="mixed-digit-start">
@@ -385,6 +385,35 @@ main [id]{scroll-margin-top:16.5rem}
 
   <div id="mixed-practice"></div>
 
+  <section aria-labelledby="mixed-other-bases">
+    <h2 id="mixed-other-bases">Если изменить основания</h2>
+    <p>Сохраним те же 24 палочки. Теперь сравним, как меняются веса и цифры при другой группировке. В каждой строке таблицы основания, веса и цифры указаны слева направо.</p>
+    <div class="table-wrap">
+      <table class="mixed-teaching-table">
+        <caption>Три записи числа 24</caption>
+        <thead><tr><th scope="col">Основания</th><th scope="col">Веса</th><th scope="col">Цифры</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">(3, 2, 5)</th><td>(10, 5, 1)</td><td>(2, 0, 4)</td></tr>
+          <tr><th scope="row">(2, 5, 3)</th><td>(15, 3, 1)</td><td>(1, 3, 0)</td></tr>
+          <tr><th scope="row">(3, 4, 5)</th><td>(20, 5, 1)</td><td>(1, 0, 4)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="example">
+      <h3>Те же основания в другом порядке</h3>
+      <p>В основаниях (2, 5, 3) сначала собираем тройки, затем связываем по пять троек в пучок веса 15. Из 24 палочек получается один такой пучок и ещё три тройки. Проверка по весам даёт 1 · 15 + 3 · 3 + 0 · 1 = 24. Произведение оснований по-прежнему равно 30, поэтому диапазон остаётся от 0 до 29.</p>
+    </div>
+    <div class="example">
+      <h3>Другое основание в середине</h3>
+      <p>В основаниях (3, 4, 5) по-прежнему собираем пятёрки. Теперь четыре пятёрки образуют пучок веса 20. Из 24 палочек получится один такой пучок и четыре отдельные палочки. Проверка по весам даёт 1 · 20 + 0 · 5 + 4 · 1 = 24. Теперь есть 60 записей со значениями от 0 до 59.</p>
+    </div>
+    <details class="mixed-predict" id="mixed-rank-experiments">
+      <summary>Попробовать другие основания в таблице</summary>
+      <p>Введите (2, 5, 3) или (3, 4, 5) и оставьте индекс 24. Сравните делители и остатки с результатами в таблице выше.</p>
+      <div class="interactive" id="mixed-rank-explore"></div>
+    </details>
+  </section>
+
   <noscript>
     <p>Модели слов, часов и пикселей находятся в следующих главах.</p>
     <ul>
@@ -500,7 +529,7 @@ const mixed = (() => {
   return { limit, encode, decode, hornerExpressions, add };
 })();
 
-function initMixedPractice(root) {
+function initMixedPractice(root, bases) {
   const range = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
   const tuple = (digits) => `(${digits.join(', ')})`;
   let stage = 0;
@@ -532,7 +561,6 @@ function initMixedPractice(root) {
   const next = get('mixed-practice-next');
 
   function generate() {
-    const bases = [range(3, 6), range(4, 7), range(2, 3)];
     const beginning = `Основания слева направо ${tuple(bases)}.`;
     if (stage === 0) {
       const digits = bases.map((base, index) => range(index === 0 ? 1 : 0, base - 1));
@@ -589,10 +617,10 @@ function initMixedPractice(root) {
   render();
 }
 
-function initMixedRankTable(root, mixed) {
+function initMixedRankTable(root, mixed, chapterBases, configurable = false) {
   if (!root) return;
   const maximumRows = 200;
-  const defaults = [3, 2, 5, 2];
+  const defaults = configurable ? [...chapterBases, 2] : chapterBases;
   const id = root.id || 'mixed-rank';
   const plurals = new Intl.PluralRules('ru');
   const rowCount = (number) => `${number} ${{one: 'строка', few: 'строки', many: 'строк'}[plurals.select(number)]}`;
@@ -608,19 +636,21 @@ function initMixedRankTable(root, mixed) {
   let groupCells = [];
   let animations = [];
 
+  const baseControls = configurable ? `
+    <label>Число позиций
+      <select data-mrank-count>${defaults.map((_, i) => `<option${i + 1 === chapterBases.length ? ' selected' : ''}>${i + 1}</option>`).join('')}</select>
+    </label>
+    <fieldset class="mrank-bases" aria-describedby="${id}-error">
+      <legend>Основания слева направо</legend>
+      <div>${defaults.map((base, position) => `<label${position >= chapterBases.length ? ' hidden' : ''}>Позиция ${position + 1}
+        <input type="text" inputmode="numeric" autocomplete="off" data-mrank-base="${position}" value="${base}">
+      </label>`).join('')}</div>
+    </fieldset>` : '';
   const widget = document.createElement('div');
   widget.className = 'mrank-widget';
   widget.innerHTML = `
     <div class="mrank-controls">
-      <label>Число позиций
-        <select data-mrank-count>${defaults.map((_, i) => `<option${i === 2 ? ' selected' : ''}>${i + 1}</option>`).join('')}</select>
-      </label>
-      <fieldset class="mrank-bases" aria-describedby="${id}-error">
-        <legend>Основания слева направо</legend>
-        <div>${defaults.map((base, position) => `<label${position === 3 ? ' hidden' : ''}>Позиция ${position + 1}
-          <input type="text" inputmode="numeric" autocomplete="off" data-mrank-base="${position}" value="${base}">
-        </label>`).join('')}</div>
-      </fieldset>
+      ${baseControls}
       <label>Десятичный индекс
         <input type="text" inputmode="numeric" autocomplete="off" value="24" data-mrank-number aria-describedby="${id}-range ${id}-error">
       </label>
@@ -822,9 +852,8 @@ function initMixedRankTable(root, mixed) {
     cursor = 0;
     model = null;
     let problem = '';
-    const size = Number(count.value);
-    const selected = baseFields.slice(0, size);
-    const bases = selected.map(numberText);
+    const size = count ? Number(count.value) : chapterBases.length;
+    const bases = configurable ? baseFields.slice(0, size).map(numberText) : chapterBases;
     baseFields.forEach((field, position) => {
       field.parentElement.hidden = position >= size;
       const invalid = position < size && (bases[position] === null || bases[position] < 2 || bases[position] > maximumRows);
@@ -864,7 +893,7 @@ function initMixedRankTable(root, mixed) {
     animations.push(folding);
   }
 
-  count.addEventListener('change', reset);
+  count?.addEventListener('change', reset);
   baseFields.forEach((field) => field.addEventListener('input', reset));
   number.addEventListener('input', reset);
   back.addEventListener('click', () => move(-1));
@@ -872,8 +901,17 @@ function initMixedRankTable(root, mixed) {
   reset();
 }
 
-initMixedPractice(document.getElementById('mixed-practice'));
-initMixedRankTable(document.getElementById('mixed-rank-model'), mixed);
+const chapterBases = [3, 2, 5];
+initMixedPractice(document.getElementById('mixed-practice'), chapterBases);
+initMixedRankTable(document.getElementById('mixed-rank-model'), mixed, chapterBases);
+
+const experiments = document.getElementById('mixed-rank-experiments');
+function openExperiments() {
+  if (!experiments.open) return;
+  experiments.removeEventListener('toggle', openExperiments);
+  initMixedRankTable(document.getElementById('mixed-rank-explore'), mixed, chapterBases, true);
+}
+experiments.addEventListener('toggle', openExperiments);
 </script>
 </body>
 </html>
