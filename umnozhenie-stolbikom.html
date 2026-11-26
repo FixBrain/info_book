@@ -79,6 +79,11 @@ button[aria-disabled="true"] { opacity: .56; cursor: default; }
 .digit.row-start { outline: 2px solid #b67822; outline-offset: -2px; }
 .digit.placeholder { background: var(--blue-soft); border-color: #aac4ee; color: #174384; }
 .digit.done { background: #e7f4eb; border-color: #a2cbb1; color: #215638; }
+.spare-row .digit { background: #f1f6ff; }
+.spare-row .digit.active { background: var(--warm-soft); }
+.spare-row .digit.implied-zero { background: #fff; border-style: dashed; }
+.spare-row .digit.implied-zero.active { background: var(--blue-soft); border-color: #7499cf; }
+.spare-row .row-name { color: #19468b; font-weight: 650; overflow-wrap: anywhere; }
 .board-rule { height: 2px; background: #6d81a0; margin: .33rem 0; }
 .calculation {
   margin: .45rem 0; padding: .35rem .45rem; min-height: 3.65rem;
@@ -168,7 +173,8 @@ footer { display: flex; flex-wrap: wrap; gap: .3rem 1rem; font-size: .88rem; mar
   <details class="read-more">
     <summary>Правило умножения столбиком</summary>
     <p>Для каждой цифры второго числа заводим свою строку. Если цифра стоит в разряде номер <i>j</i> (считаем справа с нуля), сразу ставим <i>j</i> нулей справа. Остальные цифры вписываем левее этих нулей.</p>
-    <p>Двигаемся справа налево. Произведение двух цифр берём из таблицы и прибавляем входящий перенос. Последнюю цифру результата пишем в текущий столбец, а всю часть слева переносим в соседний разряд.</p>
+    <p>Двигаемся справа налево. Произведение двух цифр берём из таблицы. Если цифры стоят в разрядах <i>i</i> и <i>j</i>, оставляем <i>i</i> + <i>j</i> мест справа. В запасной строке эти места можно оставить пустыми. При сложении они считаются нулями.</p>
+    <p>Первое произведение записываем сразу. Каждое следующее кладём в запасную строку, складываем с текущим результатом по столбцам, затем убираем запасную строку.</p>
     <p>В конце складываем строки по столбцам и пользуемся тем же правилом переноса. Все вычисления записаны в выбранном основании.</p>
   </details>
   <footer><a href="umnozhenie-i-delenie-chernovik.html#multiply">Черновик об умножении</a><a href="index.html">Оглавление</a></footer>
@@ -201,6 +207,7 @@ let model;
 let current = 0;
 let cells;
 let weightLabels;
+let spareRows;
 let equation;
 let calcLabel;
 let shiftExplanation;
@@ -230,7 +237,8 @@ function makeModel(first, second, base) {
   let stage = 0;
   const token = (text, from = '') => ({text: String(text), from});
   const take = (row, index, value) => token(alphabet[value], `${row}:${index}`);
-  const out = value => ({text: String(value), result: true});
+  const out = (value, zeros = 0) => ({text: String(value), result: true, zeros});
+  const offsetWords = ['без нулей', 'один ноль', 'два нуля', 'три нуля', 'четыре нуля', 'пять нулей', 'шесть нулей'];
 
   function step(title, note, opts = {}) {
     steps.push({
@@ -268,6 +276,52 @@ function makeModel(first, second, base) {
     return quotient;
   }
 
+  function addToPartial(row, previous, increment, rightZeros, spare, context) {
+    const total = inBase(previous + increment);
+    const original = inBase(previous);
+    const shifted = out(inBase(increment), increment ? spare.place : 0);
+    const heading = [original, '+', shifted];
+    const columnFormulas = [];
+    let carry = 0;
+    for (let place = rightZeros; place < total.length; place += 1) {
+      const left = lines[row][place];
+      const right = spare.digits[place];
+      const a = left ? alphabet.indexOf(left) : 0;
+      const b = right ? alphabet.indexOf(right) : 0;
+      const terms = [];
+      if (left) terms.push(take(row, place, a));
+      if (right) terms.push(take(`${row}-spare`, place, b));
+      else if (left) terms.push('0');
+      if (carry) terms.push(token(inBase(carry), `carry:${place}`));
+      const column = terms.flatMap((term, index) => index ? ['+', term] : [term]);
+      if (!column.length) column.push('0');
+      const sum = a + b + carry;
+      carry = Math.floor(sum / base);
+      const digit = inBase(sum % base);
+      const transfer = inBase(carry);
+      const focus = [...context.focus, `${row}:${place}`, `${row}-spare:${place}`];
+      column.push('=', out(inBase(sum)));
+      if (carry) column.push('→', {text: transfer, quotient: true}, '│', out(digit));
+      columnFormulas.push(column);
+      carryMark = carry ? {place: place + 1, digit: transfer} : null;
+      const label = inBase(places[place]);
+      const prefix = right ? '' : 'Пустая клетка запасной строки считается нулём. ';
+      const instruction = carry ? `Получили ${inBase(sum)}. Пишем ${digit}, переносим ${transfer} влево.` : `Пишем ${digit} в этом разряде.`;
+      step('Складываем по столбцам', `Разряд веса ${label}. ${prefix}${instruction}`, {
+        ...context, formulas: [heading, ...columnFormulas], focus, spare, activePlace: place, showCarry: Boolean(carry),
+      });
+    }
+    carryMark = null;
+    const updated = [...total.padStart(rightZeros + 1, '0')].reverse();
+    const changed = updated.flatMap((digit, place) => lines[row][place] === digit ? [] : [`${row}:${place}`]);
+    updated.forEach((digit, place) => { lines[row][place] = digit; });
+    step('Записываем сумму в строку', `Получили ${total}. Сумма остаётся в строке результата, запасную строку убираем.`, {
+      ...context, formulas: [[...heading, '=', out(total)], ...columnFormulas],
+      changed,
+    });
+    return previous + increment;
+  }
+
   step('Записываем числа по разрядам',
     'Начнём с правой цифры множителя. Для каждой цифры второго числа будет своя строка.',
     {formulas: [[first, '×', second]]});
@@ -297,34 +351,38 @@ function makeModel(first, second, base) {
         {focus, mark, shift});
     }
 
-    let carry = 0;
+    let partial = 0;
     a.forEach((value, i) => {
       const place = j + i;
       const focus = [`top:${i}`, `bottom:${j}`];
       const lookup = [value, digit];
       const product = value * digit;
-      const multiplication = [take('top', i, value), '×', take('bottom', j, digit), '=', out(inBase(product))];
-      let formulas = [multiplication];
+      const productDigits = inBase(product);
+      const increment = product * places[place];
+      const multiplication = [take('top', i, value), '×', take('bottom', j, digit), '=', out(productDigits)];
+      const formulas = [multiplication];
       step('Умножаем цифры', `В таблице берём строку ${inBase(value)} и столбец ${inBase(digit)}. На пересечении получаем ${inBase(product)}.`,
         {formulas, focus, lookup, fromTable: true});
-
-      if (carry) {
-        const addition = [inBase(product), '+', token(inBase(carry), `carry:${place}`), '=', out(inBase(product + carry))];
-        formulas = [multiplication, addition];
-        step('Прибавляем входящий перенос', 'Перенос уже относится к текущему разряду. Прибавляем его к произведению цифр.', {
-          formulas, focus, lookup,
-        });
+      const positioned = productDigits + '0'.repeat(place);
+      const shifted = out(inBase(increment), increment ? place : 0);
+      const positionedFormulas = place ? [...formulas, [productDigits, '×', inBase(places[place]), '=', shifted]] : formulas;
+      const digits = [...positioned].reverse().map((digit, index) => index < place ? '' : digit);
+      while (digits.length < width) digits.push('');
+      const weightNote = place ? `Цифры ${inBase(value)} и ${inBase(digit)} здесь обозначают ${inBase(value * places[i])} и ${inBase(digit * places[j])}. Веса их разрядов дают ${inBase(places[place])}, поэтому справа оставляем ${offsetWords[place]}. ` : '';
+      if (i === 0) {
+        for (let index = place; index < place + productDigits.length; index += 1) lines[row][index] = digits[index];
+        const changed = [...productDigits].map((_, index) => `${row}:${place + index}`);
+        step('Записываем первое произведение', `${weightNote}Вписываем ${inBase(increment)} в строку результата.`,
+          {formulas: positionedFormulas, focus, lookup, changed, activePlace: place});
+        partial = increment;
+        return;
       }
-      carry = record(product + carry, place, row, formulas, focus, lookup);
+      const spare = {row, place, digits};
+      step('Записываем в запасную строку', `${weightNote}Число ${productDigits} записываем левее пустых клеток. При сложении эти клетки считаются нулями.`,
+        {formulas: positionedFormulas, focus, lookup, spare, activePlace: place,
+          changed: [...productDigits].map((_, index) => `${row}-spare:${place + index}`)});
+      partial = addToPartial(row, partial, increment, j, spare, {focus, lookup});
     });
-    if (carry) {
-      const place = j + a.length;
-      lines[row][place] = alphabet[carry];
-      carryMark = null;
-      const previous = steps.at(-1);
-      step('Дописали последнюю цифру строки', 'Цифры первого числа закончились. Оставшийся перенос становится старшей цифрой этой строки.',
-        {formulas: previous.formulas, focus: previous.focus, lookup: previous.lookup, move: [{row, place, from: `carry:${place}`}]});
-    }
     if (shift) {
       const last = steps.at(-1);
       const rowDigits = [...lines[row]].reverse().join('');
@@ -452,11 +510,13 @@ function addRow(name, label, digits = [], carried = false) {
     line.append(cell);
   }
   board.append(line);
+  return line;
 }
 
 function buildBoard() {
   cells = new Map();
   weightLabels = [];
+  spareRows = new Map();
   board.replaceChildren();
   board.style.setProperty('--columns', model.places.length);
   board.append(element('span', 'board-base', `Основание ${model.base}`));
@@ -482,7 +542,13 @@ function buildBoard() {
   shiftExplanation.id = 'shift-explanation';
   calculation.append(calcLabel, equation, shiftExplanation);
   board.append(calculation, element('div', 'board-rule'));
-  model.rowNames.forEach((name, index) => addRow(name, `Строка ${index + 1}`));
+  model.rowNames.forEach((name, index) => {
+    addRow(name, `Строка ${index + 1}`);
+    const spare = addRow(`${name}-spare`, '+ Запас');
+    spare.classList.add('spare-row');
+    spare.hidden = true;
+    spareRows.set(name, spare);
+  });
   board.append(element('div', 'board-rule'));
   addRow('sum', '+ Сумма');
 
@@ -520,8 +586,8 @@ function renderBench(groups) {
   }
 }
 
-function renderShift(shift) {
-  weightLabels.forEach((label, place) => label.classList.toggle('active-weight', place === shift?.place));
+function renderShift(shift, activePlace) {
+  weightLabels.forEach((label, place) => label.classList.toggle('active-weight', place === (activePlace ?? shift?.place)));
   shiftExplanation.hidden = !shift;
   if (!shift) return;
 
@@ -594,6 +660,17 @@ function render(index, forward = false) {
       cell.textContent = digit;
     });
   }
+  for (const [row, element] of spareRows) element.hidden = step.spare?.row !== row;
+  if (step.spare) {
+    const {row, place, digits} = step.spare;
+    digits.forEach((digit, index) => {
+      const cell = cells.get(`${row}-spare:${index}`);
+      cell.className = index < place ? 'digit implied-zero' : 'digit';
+      cell.textContent = digit;
+      if (index < place) cell.setAttribute('aria-label', 'Неявный ноль');
+      else cell.removeAttribute('aria-label');
+    });
+  }
   [...model.places.keys()].forEach(place => {
     cells.get(`carry:${place}`).replaceChildren();
     cells.get(`top:${place}`).className = 'digit';
@@ -605,6 +682,7 @@ function render(index, forward = false) {
   }
   for (const id of step.focus ?? []) cells.get(id).classList.add('active');
   for (const id of step.mark ?? []) cells.get(id).classList.add('placeholder');
+  for (const id of step.changed ?? []) cells.get(id).classList.add('written');
   if (step.finished) {
     for (let place = 0; place < model.places.length; place += 1) {
       const cell = cells.get(`sum:${place}`);
@@ -619,6 +697,10 @@ function render(index, forward = false) {
     const tokens = formula.map(part => {
       const info = typeof part === 'string' ? {text: part} : part;
       const node = element('span', 'calc-token', info.text);
+      if (info.zeros) {
+        node.textContent = info.text.slice(0, -info.zeros);
+        node.append(element('span', 'shift-zeros', info.text.slice(-info.zeros)));
+      }
       if (info.result) node.classList.add('result');
       if (info.quotient) node.classList.add('quotient');
       if (info.from) node.classList.add(info.from.startsWith('carry:') ? 'carry-input' : 'input');
@@ -631,11 +713,19 @@ function render(index, forward = false) {
   const {group: currentGroup, tokens = []} = groups.at(-1) ?? {};
   calcLabel.textContent = currentGroup ? `Вычисление в основании ${model.base}` : 'Подготовка строки';
   if (!currentGroup) equation.textContent = `…${'0'.repeat(step.mark.length)}`;
-  renderShift(step.shift);
+  renderShift(step.shift, step.activePlace);
   byId('step-title').textContent = step.title;
   status.textContent = step.note;
   renderBench(step.bench ?? []);
   const lookupCell = showLookup(step.lookup);
+
+  if (animate) {
+    for (const [i, id] of (step.changed ?? []).entries()) {
+      const target = cells.get(id);
+      motion.push(target.animate([{opacity: .12, transform: 'translateY(-4px)'}, {opacity: 1, transform: 'none'}],
+        {duration: 270, delay: i * 55, fill: 'backwards'}));
+    }
+  }
 
   if (animate && step.move) {
     const result = currentGroup.querySelector('.result');
@@ -675,6 +765,11 @@ function render(index, forward = false) {
       if (target === resultFromTable) continue;
       motion.push(target.animate([{opacity: 0, transform: 'translateY(-3px)'}, {opacity: 1, transform: 'none'}],
         {duration: 240, delay: wait, fill: 'backwards'}));
+    }
+    if (step.showCarry) {
+      const source = currentGroup.querySelector('.quotient');
+      const target = cells.get(`carry:${carry.place}`).firstElementChild;
+      fly(carry.digit, source.getBoundingClientRect(), target, true, wait + 190);
     }
   }
 
