@@ -42,19 +42,10 @@ details.note summary{padding:0;min-height:0}
 footer{border-top:1px solid var(--line);padding-bottom:25px}
 @media print{header,footer{display:none}figure,.note{break-inside:avoid}}
 
-.school{border-top:1px solid var(--line);margin-top:1.35rem;padding-top:1.1rem}
-.school h3{font-size:1.18rem}
-.school h4{font-size:1.05rem;margin:.1rem 0 .5rem}
-.school-examples{max-width:50rem}
-.country-links{padding-inline:0;gap:.4rem 1.15rem}
-.column .with-carry,.column .with-borrow{position:relative;display:inline-block}
-.column .with-carry small,.column .with-borrow small{position:absolute;color:#174887;font-size:.68em;font-weight:650}
-.column .with-carry small{left:100%;bottom:-.28em}
-.column .with-borrow small{right:100%;top:-.25em}
-.column.thai tbody td:first-child{width:26%}
-.column.thai tbody .op-sign{width:13%}
-.column.thai .number .op-sign{transform:translateY(-.55em)}
-.column.thai .result td{border-bottom:3px double #405574}
+.samples{display:flex;flex-wrap:wrap;gap:.25rem .7rem;margin:.65em 0 0}
+.samples a{display:inline-block}
+.variants{margin:.35rem 0 0;padding-left:1.2rem}
+.variants li+li{margin-top:.2rem}
 </style>
 </head>
 <body>
@@ -71,250 +62,125 @@ footer{border-top:1px solid var(--line);padding-bottom:25px}
 </header>
 <main>
   <h1>Как записывают сложение и вычитание</h1>
-  <p class="lead">В двух столбиках маленькая единица может стоять в разных местах и означать один и тот же перенос. А одинаковая черта под числами может скрывать разные способы вычислить разность.</p>
-  <p>Сначала сравним схемы из материалов Англии, США, Франции и Германии на одинаковых числах. Затем посмотрим, как оформлены примеры в учебниках и пособиях Азии и Австралии. В разных пособиях одной страны встречаются разные записи.</p>
-  <p><a href="#asia-australia">Перейти к примерам из Азии и Австралии</a></p>
+  <p class="lead">По маленьким цифрам в столбике можно понять, где сделали перенос или размен. Сравним записи на одинаковых числах. Ссылки под схемами ведут к примерам из конкретных пособий.</p>
 
-  <h2>Сложение. Где отмечают перенос</h2>
-  <p>Во всех трёх столбиках складываем 187 и 56. Сначала 7 + 6 = 13. Пишем 3 в единицах, а 1 десяток переносим в следующий разряд. Затем 8 + 5 + 1 = 14, поэтому переносим ещё и 1 сотню.</p>
-  <div class="examples">
-    <figure><h3>Перенос над числами</h3>
-<table class="column" aria-label="187 плюс 56 равно 243. Переносы над сотнями и десятками.">
-<thead><tr><td></td><th scope="col">Сотни</th><th scope="col">Десятки</th><th scope="col">Единицы</th></tr></thead>
-<tbody>
-<tr class="carry"><td></td><td>1</td><td>1</td><td></td></tr>
-<tr class="number"><td></td><td>1</td><td>8</td><td>7</td></tr>
-<tr class="number"><td>+</td><td></td><td>5</td><td>6</td></tr>
-<tr class="result"><td></td><td>2</td><td>4</td><td>3</td></tr>
-</tbody>
-</table>
-<figcaption><p>В пособии штата Массачусетс маленькие цифры пишут над разрядами, которые получают перенос.</p><p class="source"><a href="https://www.doe.mass.edu/frameworks/math/2017-06qrg-standardalgorithms.pdf#page=2">США · Massachusetts Department of Elementary and Secondary Education, с. 2</a></p></figcaption></figure>
-    <figure><h3>Перенос под ответом</h3>
-<table class="column" aria-label="187 плюс 56 равно 243. Переносы под сотнями и десятками, ниже ответа.">
-<thead><tr><td></td><th scope="col">Сотни</th><th scope="col">Десятки</th><th scope="col">Единицы</th></tr></thead>
-<tbody>
-<tr class="number"><td></td><td>1</td><td>8</td><td>7</td></tr>
-<tr class="number"><td>+</td><td></td><td>5</td><td>6</td></tr>
-<tr class="result"><td></td><td>2</td><td>4</td><td>3</td></tr>
-<tr class="carry"><td></td><td>1</td><td>1</td><td></td></tr>
-</tbody>
-</table>
-<figcaption><p>В этом примере из английской программы пометки ставят ниже ответа. Их всё равно учитывают в соответствующих разрядах.</p><p class="source"><a href="https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/238967/Mathematics_Appendix_1.pdf#page=1">Англия · приложение к школьной программе, с. 1</a></p></figcaption></figure>
-    <figure><h3>Перенос перед чертой</h3>
-<table class="column" aria-label="187 плюс 56 равно 243. Переносы под вторым слагаемым, выше черты.">
-<thead><tr><td></td><th scope="col">Сотни</th><th scope="col">Десятки</th><th scope="col">Единицы</th></tr></thead>
-<tbody>
-<tr class="number"><td></td><td>1</td><td>8</td><td>7</td></tr>
-<tr class="number"><td>+</td><td></td><td>5</td><td>6</td></tr>
-<tr class="carry"><td></td><td>1</td><td>1</td><td></td></tr>
-<tr class="result"><td></td><td>2</td><td>4</td><td>3</td></tr>
-</tbody>
-</table>
-<figcaption><p>В пособии Технического университета Дортмунда для компактной записи пометки ставят между вторым слагаемым и чертой.</p><p class="source"><a href="https://pikas.dzlm.de/sites/default/files/pikasfiles/uploads/upload/Material/diagnose_und_foerderung/msk_primar/ziffernrechnen/mskgs_n7a_handreichung.pdf#page=6">Германия · Mathe sicher können, с. 136</a></p></figcaption></figure>
+  <div id="asia-australia">
+    <h2 id="addition">Сложение. Где пишут перенос</h2>
+    <p>При сложении 187 и 56 из 7 + 6 получаем 13 единиц. Пишем 3, переносим 1 десяток. Затем 8 + 5 + 1 дают 14 десятков. Пишем 4 в десятках и переносим 1 сотню. Во всех трёх записях эти действия одинаковы.</p>
   </div>
-  <p>При чтении записи сначала найдите разряд, к которому относится пометка. Например, синяя 1 в столбце десятков означает один десяток.</p>
+  <div class="examples">
+    <figure>
+      <h3>Над слагаемыми</h3>
+      <table class="column" aria-label="187 плюс 56 равно 243. Пометки над сотнями и десятками.">
+        <thead><tr><td></td><th scope="col">Сотни</th><th scope="col">Десятки</th><th scope="col">Единицы</th></tr></thead>
+        <tbody>
+        <tr class="carry"><td></td><td>1</td><td>1</td><td></td></tr>
+        <tr class="number"><td></td><td>1</td><td>8</td><td>7</td></tr>
+        <tr class="number"><td>+</td><td></td><td>5</td><td>6</td></tr>
+        <tr class="result"><td></td><td>2</td><td>4</td><td>3</td></tr>
+        </tbody>
+      </table>
+      <figcaption><p>Единицу ставят над разрядом, который получает перенос.</p>
+        <p class="source samples"><a href="https://www.doe.mass.edu/frameworks/math/2017-06qrg-standardalgorithms.pdf#page=2">США, Массачусетс</a>
+        <a href="https://eduscol.education.gouv.fr/sites/default/files/document/2024evaluationdebutcm2mathematiquesficheinterventionposercalculeradditionssoustractionsmultiplicationsdivisionsnombresentierpdf-108102.pdf#page=8">Франция, Éduscol</a>
+        <a href="https://books.ebalbharati.in/pdfs/203030004.pdf#page=59" id="india">Индия, Balbharati</a>
+        <a href="https://faq.tokyo-shoseki.co.jp/fa/customer/web/knowledge8283.html" id="japan">Япония, Tokyo Shoseki</a>
+        <a href="https://dltv.ac.th/utils/files/download/212255#page=13" id="thailand">Таиланд, DLTV</a>
+        <a href="https://k10outline.scsa.wa.edu.au/__data/assets/pdf_file/0006/1229469/Mathematics_Scope-and-sequence_P-6_For-implementation-in2026.PDF#page=46" id="australia">Программа Западной Австралии</a></p></figcaption>
+    </figure>
+    <figure>
+      <h3>У второго слагаемого</h3>
+      <table class="column" aria-label="187 плюс 56 равно 243. Пометки над чертой у второго слагаемого.">
+        <thead><tr><td></td><th scope="col">Сотни</th><th scope="col">Десятки</th><th scope="col">Единицы</th></tr></thead>
+        <tbody>
+        <tr class="number"><td></td><td>1</td><td>8</td><td>7</td></tr>
+        <tr class="number"><td>+</td><td></td><td>5</td><td>6</td></tr>
+        <tr class="carry"><td></td><td>1</td><td>1</td><td></td></tr>
+        <tr class="result"><td></td><td>2</td><td>4</td><td>3</td></tr>
+        </tbody>
+      </table>
+      <figcaption><p>В немецком примере для переноса есть строка перед чертой. В китайском и австралийском примерах маленькая 1 стоит рядом с цифрой второго слагаемого.</p>
+        <p class="source samples"><a href="https://pikas.dzlm.de/sites/default/files/pikasfiles/uploads/upload/Material/diagnose_und_foerderung/msk_primar/ziffernrechnen/mskgs_n7a_handreichung.pdf#page=6">Германия, TU Dortmund</a>
+        <a href="https://fliphtml5.com/cozhh/otec/%E4%B9%89%E5%8A%A1%E6%95%99%E8%82%B2%E6%95%99%E7%A7%91%E4%B9%A6_%C2%B7_%E6%95%B0%E5%AD%A6%E4%BA%8C%E5%B9%B4%E7%BA%A7%E4%B8%8A%E5%86%8C/#p=19" id="china">Китай, учебник PEP</a>
+        <a href="https://amsi.org.au/teacher_modules/pdfs/Addition_and_subtraction.pdf#page=23">Австралия, пособие AMSI</a></p></figcaption>
+    </figure>
+    <figure>
+      <h3>Под ответом</h3>
+      <table class="column" aria-label="187 плюс 56 равно 243. Пометки под сотнями и десятками, ниже ответа.">
+        <thead><tr><td></td><th scope="col">Сотни</th><th scope="col">Десятки</th><th scope="col">Единицы</th></tr></thead>
+        <tbody>
+        <tr class="number"><td></td><td>1</td><td>8</td><td>7</td></tr>
+        <tr class="number"><td>+</td><td></td><td>5</td><td>6</td></tr>
+        <tr class="result"><td></td><td>2</td><td>4</td><td>3</td></tr>
+        <tr class="carry"><td></td><td>1</td><td>1</td><td></td></tr>
+        </tbody>
+      </table>
+      <figcaption><p>Маленькие цифры под ответом стоят в тех же столбцах, где их учитывают при сложении.</p>
+        <p class="source samples"><a href="https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/238967/Mathematics_Appendix_1.pdf#page=1">Англия, приложение к программе</a></p></figcaption>
+    </figure>
+  </div>
+  <p>В тайских слайдах DLTV знак действия ставят справа, а под ответом проводят двойную черту. В сложении и вычитании цифры по-прежнему выровнены по разрядам. <a href="https://dltv.ac.th/utils/files/download/212255#page=13">Сложение</a> · <a href="https://dltv.ac.th/utils/files/download/212271#page=14">Вычитание</a></p>
 
-  <h2>Вычитание. Что означают пометки</h2>
-  <p>Вычтем 29 из 75 тремя способами. В первом меняется разложение числа 75. Во втором оба числа увеличиваются на одну и ту же величину. В третьем подбираем недостающее слагаемое.</p>
+  <h2 id="subtraction">Вычитание. Как получают разность</h2>
+  <p>Разберём 75 − 29 тремя способами. При размене меняем разложение верхнего числа. При компенсации прибавляем поровну к обоим числам. При дополнении ищем недостающее слагаемое.</p>
   <div class="examples">
-    <figure><h3>Размен десятка</h3>
-<table class="column" aria-label="75 минус 29 равно 46. Верхние 7 десятков и 5 единиц заменяем на 6 десятков и 15 единиц.">
-<thead><tr><td></td><th scope="col">Десятки</th><th scope="col">Единицы</th></tr></thead>
-<tbody>
-<tr class="carry"><td></td><td>6</td><td>15</td></tr>
-<tr class="number"><td></td><td><s>7</s></td><td><s>5</s></td></tr>
-<tr class="number"><td>−</td><td>2</td><td>9</td></tr>
-<tr class="result"><td></td><td>4</td><td>6</td></tr>
-</tbody>
-</table>
-<figcaption><p>Размениваем один из 7 десятков. Сверху остаётся 6 десятков и получается 15 единиц. Снизу по-прежнему 29.</p><p class="source"><a href="https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/238967/Mathematics_Appendix_1.pdf#page=1">Англия · приложение к школьной программе, с. 1</a> · <a href="https://www.doe.mass.edu/frameworks/math/2017-06qrg-standardalgorithms.pdf#page=2">США · пособие штата Массачусетс, с. 2</a></p></figcaption></figure>
-    <figure><h3>Компенсация</h3>
-<table class="column" aria-label="75 минус 29 равно 46. Наверху добавляем 10 единиц, внизу добавляем 1 десяток.">
-<thead><tr><td></td><th scope="col">Десятки</th><th scope="col">Единицы</th></tr></thead>
-<tbody>
-<tr class="number"><td></td><td>7</td><td><span class="mark" aria-label="15, увеличено на 10">15</span></td></tr>
-<tr class="number"><td>−</td><td>2</td><td>9</td></tr>
-<tr class="carry"><td></td><td>+1</td><td></td></tr>
-<tr class="result"><td></td><td>4</td><td>6</td></tr>
-</tbody>
-</table>
-<figcaption><p>Наверху прибавляем 10 единиц, внизу — 1 десяток. Вычитаем по разрядам. Сначала 15 − 9 = 6, затем 7 − (2 + 1) = 4.</p><p class="source"><a href="https://eduscol.education.gouv.fr/sites/default/files/document/2024evaluationdebutcm2mathematiquesficheinterventionposercalculeradditionssoustractionsmultiplicationsdivisionsnombresentierpdf-108102.pdf#page=7">Франция · Éduscol, методическая карточка, с. 7</a></p></figcaption></figure>
-    <figure><h3>Дополнение</h3>
-<table class="column" aria-label="29 плюс 46 равно 75. Подбираем 6 единиц и 4 десятка с учётом переноса.">
-<thead><tr><td></td><th scope="col">Десятки</th><th scope="col">Единицы</th></tr></thead>
-<tbody>
-<tr class="carry"><td></td><td>1</td><td></td></tr>
-<tr class="number"><td></td><td>2</td><td>9</td></tr>
-<tr class="number"><td>+</td><td><span class="mark">4</span></td><td><span class="mark">6</span></td></tr>
-<tr class="result"><td></td><td>7</td><td>5</td></tr>
-</tbody>
-</table>
-<figcaption><p>Ищем, сколько нужно прибавить к 29, чтобы получить 75. Справа 9 + 6 = 15. Слева 2 + 1 + 4 = 7. Искомое слагаемое — 46. Здесь показали рассуждение как сложение с пропуском.</p><p class="source"><a href="https://pikas.dzlm.de/sites/default/files/pikasfiles/uploads/upload/Material/Haus_5_-_Individuelles_und_gemeinsames_Lernen/UM/Ich-Du-Wir/Planungen/Basisinfos_Planung_Teil2.pdf#page=6">Германия · PIKAS, пример дополнения по разрядам, с. 6</a></p></figcaption></figure>
+    <figure>
+      <h3>Размен десятка</h3>
+      <table class="column" aria-label="75 минус 29 равно 46. Верхние 7 десятков и 5 единиц заменяем на 6 десятков и 15 единиц.">
+        <thead><tr><td></td><th scope="col">Десятки</th><th scope="col">Единицы</th></tr></thead>
+        <tbody>
+        <tr class="carry"><td></td><td>6</td><td>15</td></tr>
+        <tr class="number"><td></td><td><s>7</s></td><td><s>5</s></td></tr>
+        <tr class="number"><td>−</td><td>2</td><td>9</td></tr>
+        <tr class="result"><td></td><td>4</td><td>6</td></tr>
+        </tbody>
+      </table>
+      <figcaption><p>Верхние 7 десятков и 5 единиц превращаются в 6 десятков и 15 единиц. Внизу остаётся 29.</p></figcaption>
+    </figure>
+    <figure>
+      <h3>Компенсация</h3>
+      <table class="column" aria-label="75 минус 29 равно 46. Прибавляем 10 единиц к верхнему числу и десяток к нижнему.">
+        <thead><tr><td></td><th scope="col">Десятки</th><th scope="col">Единицы</th></tr></thead>
+        <tbody>
+        <tr class="number"><td></td><td>7</td><td><span class="mark" aria-label="15, увеличено на 10">15</span></td></tr>
+        <tr class="number"><td>−</td><td>2</td><td>9</td></tr>
+        <tr class="carry"><td></td><td>+1</td><td></td></tr>
+        <tr class="result"><td></td><td>4</td><td>6</td></tr>
+        </tbody>
+      </table>
+      <figcaption><p>К верхнему числу прибавляем 10 единиц, к нижнему — 1 десяток. Получаем 85 − 39 = 46. Разность сохраняется, потому что оба числа увеличились на 10.</p>
+        <p class="source samples"><a href="https://eduscol.education.gouv.fr/sites/default/files/document/2024evaluationdebutcm2mathematiquesficheinterventionposercalculeradditionssoustractionsmultiplicationsdivisionsnombresentierpdf-108102.pdf#page=7">Франция, Éduscol</a>
+        <a href="https://pikas-mi.dzlm.de/inhalte/ziffernrechnen-das-multiplikative-rechenverfahren-erkunden/einstieg/hintergrund/die-0/das-3">Германия, PIKAS</a>
+        <a href="https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/238967/Mathematics_Appendix_1.pdf#page=1">Англия, приложение к программе</a>
+        <a href="https://amsi.org.au/teacher_modules/pdfs/Addition_and_subtraction.pdf#page=26">Австралия, AMSI</a></p></figcaption>
+    </figure>
+    <figure>
+      <h3>Дополнение до верхнего числа</h3>
+      <table class="column" aria-label="29 плюс 46 равно 75. Подбираем 6 единиц и 4 десятка с учётом переноса.">
+        <thead><tr><td></td><th scope="col">Десятки</th><th scope="col">Единицы</th></tr></thead>
+        <tbody>
+        <tr class="carry"><td></td><td>1</td><td></td></tr>
+        <tr class="number"><td></td><td>2</td><td>9</td></tr>
+        <tr class="number"><td>+</td><td><span class="mark">4</span></td><td><span class="mark">6</span></td></tr>
+        <tr class="result"><td></td><td>7</td><td>5</td></tr>
+        </tbody>
+      </table>
+      <figcaption><p>Ищем слагаемое в записи 29 + ? = 75. Справа 9 + 6 = 15. Слева 2 + 1 + 4 = 7. Получаем 46.</p>
+        <p class="source samples"><a href="https://pikas.dzlm.de/sites/default/files/pikasfiles/uploads/upload/Material/Haus_5_-_Individuelles_und_gemeinsames_Lernen/UM/Ich-Du-Wir/Planungen/Basisinfos_Planung_Teil2.pdf#page=6">Германия, PIKAS</a></p></figcaption>
+    </figure>
   </div>
-  <aside class="note" aria-label="Почему работает компенсация">
-    <h3>Почему при компенсации разность та же</h3>
-    <p class="formula">75 − 29 = (75 + 10) − (29 + 10) = 85 − 39 = 46.</p>
-    <p>Обе величины увеличились на 10. Расстояние между ними сохранилось.</p>
-    <p>Во французской программе предусмотрен выбор между компенсацией и разменом. Немецкий проект PIKAS показывает размен и дополнение. <a href="https://www.education.gouv.fr/bo/2024/Hebdo41/MENE2415135A">Школьная программа Франции, приложение 4</a> · <a href="https://pikas.dzlm.de/unterricht/zahlen-und-operationen/zahlraum-bis-1000/schriftliche-subtraktion">PIKAS · письменное вычитание</a></p>
+  <p>Размен и компенсация объясняют переход через разряд. Дополнение объясняет, как найти цифру разности. Его можно сочетать с разными способами перехода. <a href="https://pikas-mi.dzlm.de/inhalte/ziffernrechnen-das-multiplikative-rechenverfahren-erkunden/einstieg/hintergrund/die-0">Сравнение способов в материалах PIKAS</a></p>
+  <aside class="note" aria-labelledby="exchange-marks">
+    <h3 id="exchange-marks">Как узнать размен в разных записях</h3>
+    <p>Везде действует равенство 75 = 6 · 10 + 15. В пособиях оставляют разные пометки этого шага.</p>
+    <ul class="variants">
+      <li>Две новые величины, 6 десятков и 15 единиц, записывают сверху, как на схеме. <a href="https://books.ebalbharati.in/pdfs/203030004.pdf#page=64">Balbharati</a> · <a href="https://dltv.ac.th/utils/files/download/212271#page=14">DLTV</a></li>
+      <li>Сверху записывают 6 десятков, а 15 единиц держат в уме. <a href="https://faq.tokyo-shoseki.co.jp/fa/customer/web/knowledge8283.html">Tokyo Shoseki</a></li>
+      <li>Маленькую 1 перед цифрой единиц читают вместе с ней, например как 15. <a href="https://amsi.org.au/teacher_modules/pdfs/Addition_and_subtraction.pdf#page=27">AMSI</a></li>
+      <li>Точка над цифрой десятков означает, что из этого разряда взяли десяток. <a href="https://fliphtml5.com/cozhh/otec/%E4%B9%89%E5%8A%A1%E6%95%99%E8%82%B2%E6%95%99%E7%A7%91%E4%B9%A6_%C2%B7_%E6%95%B0%E5%AD%A6%E4%BA%8C%E5%B9%B4%E7%BA%A7%E4%B8%8A%E5%86%8C/#p=24">Китай, учебник PEP</a></li>
+    </ul>
+    <p class="source">Размен встречается и в других пособиях. <a href="https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/238967/Mathematics_Appendix_1.pdf#page=1">Программа Англии</a> · <a href="https://www.doe.mass.edu/frameworks/math/2017-06qrg-standardalgorithms.pdf#page=2">Пособие Массачусетса</a> · <a href="https://pikas.dzlm.de/unterricht/zahlen-und-operationen/zahlraum-bis-1000/schriftliche-subtraktion">PIKAS</a></p>
   </aside>
-
-  <section id="asia-australia" aria-labelledby="asia-australia-title">
-    <h2 id="asia-australia-title">Школьные записи в Азии и Австралии</h2>
-    <p>В этих примерах выравнивают разряды и считают справа налево. Различия особенно заметны по тому, где ставят перенос, как отмечают размен и куда выносят знак действия.</p>
-    <nav class="country-links" aria-label="Сравнение по странам">
-      <a href="#india">Индия</a><a href="#china">Китай</a><a href="#japan">Япония</a><a href="#thailand">Таиланд</a><a href="#australia">Австралия</a>
-    </nav>
-  <section id="india" class="school" aria-labelledby="india-title">
-    <h3 id="india-title">Индия · учебник штата Махараштра</h3>
-    <p>В учебнике Balbharati для 2-го класса рядом с вычислениями показаны бусины. Десять единиц собираются в одну группу, а при размене эту группу раскрывают.</p>
-    <div class="examples school-examples">
-    <figure><h4>23 + 17 = 40</h4>
-      <table class="column " aria-label="Запись столбиком. 23 + 17 = 40">
-        <thead><tr><td></td><th scope="col">Десятки</th><th scope="col">Единицы</th></tr></thead>
-        <tbody>
-          <tr class="carry"><td class="op-sign"></td><td>1</td><td></td></tr>
-          <tr class="number"><td class="op-sign"></td><td>2</td><td>3</td></tr>
-          <tr class="number"><td class="op-sign">+</td><td>1</td><td>7</td></tr>
-          <tr class="result"><td class="op-sign"></td><td>4</td><td>0</td></tr>
-        </tbody>
-      </table>
-      <figcaption><p>В единицах 3 + 7 = 10. Новый десяток записан над слагаемыми в строке переноса. В соседнем примере 15 + 9 этот переход показан пунктирной стрелкой.</p><p class="source"><a href="https://books.ebalbharati.in/pdfs/203030004.pdf#page=59">Balbharati, Mathematics Standard Two, печатная с. 49</a></p></figcaption>
-    </figure>
-    <figure><h4>35 − 17 = 18</h4>
-      <table class="column " aria-label="Запись столбиком. 35 − 17 = 18">
-        <thead><tr><td></td><th scope="col">Десятки</th><th scope="col">Единицы</th></tr></thead>
-        <tbody>
-          <tr class="carry"><td class="op-sign"></td><td>2</td><td>15</td></tr>
-          <tr class="number"><td class="op-sign"></td><td><s>3</s></td><td><s>5</s></td></tr>
-          <tr class="number"><td class="op-sign">−</td><td>1</td><td>7</td></tr>
-          <tr class="result"><td class="op-sign"></td><td>1</td><td>8</td></tr>
-        </tbody>
-      </table>
-      <figcaption><p>При размене 3 десятка и 5 единиц переписывают как 2 десятка и 15 единиц. Новые значения стоят над зачёркнутыми цифрами.</p><p class="source"><a href="https://books.ebalbharati.in/pdfs/203030004.pdf#page=64">Balbharati, Mathematics Standard Two, печатная с. 54</a></p></figcaption>
-    </figure>
-    </div>
-  </section>
-  <section id="china" class="school" aria-labelledby="china-title">
-    <h3 id="china-title">Китай · учебник Народного издательства образования</h3>
-    <p>В учебнике для 2-го класса столбик называют <span lang="zh">竖式</span>. Разряды выравнивают и начинают вычисление с единиц.</p>
-    <div class="examples school-examples">
-    <figure><h4>35 + 37 = 72</h4>
-      <table class="column " aria-label="Запись столбиком. 35 + 37 = 72">
-        <thead><tr><td></td><th scope="col">Десятки</th><th scope="col">Единицы</th></tr></thead>
-        <tbody>
-          <tr class="number"><td class="op-sign"></td><td>3</td><td>5</td></tr>
-          <tr class="number"><td class="op-sign">+</td><td>3</td><td>7</td></tr>
-          <tr class="carry"><td class="op-sign"></td><td>1</td><td></td></tr>
-          <tr class="result"><td class="op-sign"></td><td>7</td><td>2</td></tr>
-        </tbody>
-      </table>
-      <figcaption><p>Из 5 + 7 получаем 12. Пишем 2 в единицах и учитываем один новый десяток. В компактной записи пометка стоит у десятков нижней строки.</p><p class="source"><a href="https://fliphtml5.com/cozhh/otec/%E4%B9%89%E5%8A%A1%E6%95%99%E8%82%B2%E6%95%99%E7%A7%91%E4%B9%A6_%C2%B7_%E6%95%B0%E5%AD%A6%E4%BA%8C%E5%B9%B4%E7%BA%A7%E4%B8%8A%E5%86%8C/#p=19">Учебник, печатная с. 14</a> · <a href="https://v2.ykt.cbern.com.cn/65/document/91e680f16a394b0ca7b900047e8abe3d/pdf.pdf#page=19">PDF образовательной платформы</a></p></figcaption>
-    </figure>
-    <figure><h4>36 − 19 = 17</h4>
-      <table class="column " aria-label="Запись столбиком. 36 − 19 = 17">
-        <thead><tr><td></td><th scope="col">Десятки</th><th scope="col">Единицы</th></tr></thead>
-        <tbody>
-          <tr class="carry"><td class="op-sign"></td><td>2</td><td>16</td></tr>
-          <tr class="number"><td class="op-sign"></td><td>3</td><td>6</td></tr>
-          <tr class="number"><td class="op-sign">−</td><td>1</td><td>9</td></tr>
-          <tr class="result"><td class="op-sign"></td><td>1</td><td>7</td></tr>
-        </tbody>
-      </table>
-      <figcaption><p>После размена остаётся 2 десятка и становится 16 единиц. В расширенной записи эти значения видны над верхними цифрами.</p><p class="source"><a href="https://fliphtml5.com/cozhh/otec/%E4%B9%89%E5%8A%A1%E6%95%99%E8%82%B2%E6%95%99%E7%A7%91%E4%B9%A6_%C2%B7_%E6%95%B0%E5%AD%A6%E4%BA%8C%E5%B9%B4%E7%BA%A7%E4%B8%8A%E5%86%8C/#p=24">Учебник, печатная с. 19</a> · <a href="https://v2.ykt.cbern.com.cn/65/document/91e680f16a394b0ca7b900047e8abe3d/pdf.pdf#page=24">PDF образовательной платформы</a></p></figcaption>
-    </figure>
-    </div>
-  </section>
-  <section id="japan" class="school" aria-labelledby="japan-title">
-    <h3 id="japan-title">Япония · учебник Tokyo Shoseki</h3>
-    <p>Издательство поясняет, как в его учебнике для 2-го класса используют вспомогательные цифры, и приводит варианты записи для сравнения.</p>
-    <div class="examples school-examples">
-    <figure><h4>35 + 29 = 64</h4>
-      <table class="column " aria-label="Запись столбиком. 35 + 29 = 64">
-        <thead><tr><td></td><th scope="col">Десятки</th><th scope="col">Единицы</th></tr></thead>
-        <tbody>
-          <tr class="carry"><td class="op-sign"></td><td>1</td><td></td></tr>
-          <tr class="number"><td class="op-sign"></td><td>3</td><td>5</td></tr>
-          <tr class="number"><td class="op-sign">+</td><td>2</td><td>9</td></tr>
-          <tr class="result"><td class="op-sign"></td><td>6</td><td>4</td></tr>
-        </tbody>
-      </table>
-      <figcaption><p>Маленькая 1 над цифрой 3 напоминает, что к десяткам надо прибавить перенесённый десяток.</p><p class="source"><a href="https://faq.tokyo-shoseki.co.jp/fa/customer/web/knowledge8283.html">Tokyo Shoseki, разбор с. 18</a></p></figcaption>
-    </figure>
-    <figure><h4>47 − 18 = 29</h4>
-      <table class="column " aria-label="Запись столбиком. 47 − 18 = 29">
-        <thead><tr><td></td><th scope="col">Десятки</th><th scope="col">Единицы</th></tr></thead>
-        <tbody>
-          <tr class="carry"><td class="op-sign"></td><td>3</td><td></td></tr>
-          <tr class="number"><td class="op-sign"></td><td><s>4</s></td><td>7</td></tr>
-          <tr class="number"><td class="op-sign">−</td><td>1</td><td>8</td></tr>
-          <tr class="result"><td class="op-sign"></td><td>2</td><td>9</td></tr>
-        </tbody>
-      </table>
-      <figcaption><p>Верхние 4 десятка меняются на 3. Число 17 над единицами в этой записи опущено. При вычислении единиц всё равно берут 17 − 8.</p><p class="source"><a href="https://faq.tokyo-shoseki.co.jp/fa/customer/web/knowledge8283.html">Tokyo Shoseki, разбор с. 30</a></p></figcaption>
-    </figure>
-    </div>
-  </section>
-  <section id="thailand" class="school" aria-labelledby="thailand-title">
-    <h3 id="thailand-title">Таиланд · уроки DLTV</h3>
-    <p>На слайдах для 2-го класса знак действия вынесен вправо между строками. Под ответом видна двойная черта. Разряды читаются в привычном порядке.</p>
-    <div class="examples school-examples">
-    <figure><h4>888 + 88 = 976</h4>
-      <table class="column thai" aria-label="Запись столбиком. 888 + 88 = 976">
-        <thead><tr><th scope="col">Сотни</th><th scope="col">Десятки</th><th scope="col">Единицы</th><td></td></tr></thead>
-        <tbody>
-          <tr class="carry"><td>1</td><td>1</td><td></td><td class="op-sign"></td></tr>
-          <tr class="number"><td>8</td><td>8</td><td>8</td><td class="op-sign"></td></tr>
-          <tr class="number"><td></td><td>8</td><td>8</td><td class="op-sign">+</td></tr>
-          <tr class="result"><td>9</td><td>7</td><td>6</td><td class="op-sign"></td></tr>
-        </tbody>
-      </table>
-      <figcaption><p>Единицы переноса ставят сверху в тех столбцах, которые их получают.</p><p class="source"><a href="https://dltv.ac.th/utils/files/download/212255#page=13">DLTV, слайд 13</a></p></figcaption>
-    </figure>
-    <figure><h4>340 − 225 = 115</h4>
-      <table class="column thai" aria-label="Запись столбиком. 340 − 225 = 115">
-        <thead><tr><th scope="col">Сотни</th><th scope="col">Десятки</th><th scope="col">Единицы</th><td></td></tr></thead>
-        <tbody>
-          <tr class="carry"><td></td><td>3</td><td>10</td><td class="op-sign"></td></tr>
-          <tr class="number"><td>3</td><td><s>4</s></td><td><s>0</s></td><td class="op-sign"></td></tr>
-          <tr class="number"><td>2</td><td>2</td><td>5</td><td class="op-sign">−</td></tr>
-          <tr class="result"><td>1</td><td>1</td><td>5</td><td class="op-sign"></td></tr>
-        </tbody>
-      </table>
-      <figcaption><p>После размена над зачёркнутыми цифрами видны 3 десятка и 10 единиц.</p><p class="source"><a href="https://dltv.ac.th/utils/files/download/212271#page=14">DLTV, слайд 14</a></p></figcaption>
-    </figure>
-    </div>
-  </section>
-  <section id="australia" class="school" aria-labelledby="australia-title">
-    <h3 id="australia-title">Австралия · пособие AMSI и программа Западной Австралии</h3>
-    <p>В пособии Австралийского института математических наук (AMSI) перенос можно увидеть рядом с нижней цифрой. В программе Западной Австралии встречается перенос над первым слагаемым.</p>
-    <div class="examples school-examples">
-    <figure><h4>39 + 45 = 84</h4>
-      <table class="column " aria-label="Запись столбиком. 39 + 45 = 84">
-        <thead><tr><td></td><th scope="col">Десятки</th><th scope="col">Единицы</th></tr></thead>
-        <tbody>
-          <tr class="number"><td class="op-sign"></td><td>3</td><td>9</td></tr>
-          <tr class="number"><td class="op-sign">+</td><td><span class="with-carry">4<small>1</small></span></td><td>5</td></tr>
-          <tr class="result"><td class="op-sign"></td><td>8</td><td>4</td></tr>
-        </tbody>
-      </table>
-      <figcaption><p>После 9 + 5 = 14 маленькая 1 стоит справа внизу от 4. Она относится к десяткам.</p><p class="source"><a href="https://amsi.org.au/teacher_modules/pdfs/Addition_and_subtraction.pdf#page=23">AMSI, с. 23</a> · <a href="https://k10outline.scsa.wa.edu.au/__data/assets/pdf_file/0006/1229469/Mathematics_Scope-and-sequence_P-6_For-implementation-in2026.PDF#page=46">Другой вариант в программе Западной Австралии</a></p></figcaption>
-    </figure>
-    <figure><h4>34 − 16 = 18</h4>
-      <table class="column " aria-label="Запись столбиком. 34 − 16 = 18">
-        <thead><tr><td></td><th scope="col">Десятки</th><th scope="col">Единицы</th></tr></thead>
-        <tbody>
-          <tr class="carry"><td class="op-sign"></td><td>2</td><td></td></tr>
-          <tr class="number"><td class="op-sign"></td><td><s>3</s></td><td><span class="with-borrow"><small>1</small>4</span></td></tr>
-          <tr class="number"><td class="op-sign">−</td><td>1</td><td>6</td></tr>
-          <tr class="result"><td class="op-sign"></td><td>1</td><td>8</td></tr>
-        </tbody>
-      </table>
-      <figcaption><p>В варианте с разменом сверху остаётся 2 десятка. Маленькая 1 возле 4 означает, что теперь в столбце единиц надо считать 14.</p><p class="source"><a href="https://amsi.org.au/teacher_modules/pdfs/Addition_and_subtraction.pdf#page=27">AMSI, с. 27</a> · <a href="https://k10outline.scsa.wa.edu.au/__data/assets/pdf_file/0006/1229469/Mathematics_Scope-and-sequence_P-6_For-implementation-in2026.PDF#page=47">Размен в программе Западной Австралии</a></p></figcaption>
-    </figure>
-    </div>
-    <p>Для тех же 34 − 16 авторы показывают и компенсацию. Если прибавить к обоим числам по 10, получим 44 − 26 = 18. <a href="https://amsi.org.au/teacher_modules/pdfs/Addition_and_subtraction.pdf#page=26">AMSI, с. 26</a></p>
-  </section>
-  </section>
 
   <h2>Как это связано с основаниями</h2>
   <p>В десятичной системе один десяток можно разменять на 10 единиц. В системе с основанием <i>N</i> одна группа следующего разряда равна <i>N</i> группам текущего. Поэтому при компенсации за переход через разряд прибавляем к обоим числам одинаковый вес следующего разряда.</p>
