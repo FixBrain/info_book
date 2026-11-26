@@ -61,7 +61,7 @@ button[aria-disabled="true"] { opacity: .56; cursor: default; }
 #times-table th.table-guide { background: var(--warm-soft); color: var(--warm); }
 #times-table [aria-current="true"] { background: #e0efdf; color: #215638; font-weight: 800; box-shadow: inset 0 0 0 2px #739c82; }
 .place-labels, .board-line {
-  display: grid; grid-template-columns: minmax(2.25rem,1fr) repeat(var(--columns),minmax(0,2.8rem));
+  display: grid; grid-template-columns: minmax(3.1rem,1fr) repeat(var(--columns),minmax(0,2.8rem));
   gap: 2px; align-items: center;
 }
 .place-labels span, .row-name { color: var(--muted); font-size: .7rem; }
@@ -81,11 +81,14 @@ button[aria-disabled="true"] { opacity: .56; cursor: default; }
 .digit.row-start { outline: 2px solid #b67822; outline-offset: -2px; }
 .digit.placeholder { background: var(--blue-soft); border-color: #aac4ee; color: #174384; }
 .digit.done { background: #e7f4eb; border-color: #a2cbb1; color: #215638; }
-.spare-row .digit { background: #f1f6ff; }
-.spare-row .digit.active { background: var(--warm-soft); }
-.spare-row .digit.implied-zero { color: #4e6380; background: #f1f6ff; border-style: dashed; }
-.spare-row .digit.implied-zero.active { background: var(--blue-soft); border-color: #7499cf; }
-.spare-row .row-name { color: #19468b; font-weight: 650; overflow-wrap: anywhere; }
+.partial-work + .partial-work { margin-top: .45rem; padding-top: .28rem; border-top: 1px solid var(--line); }
+.product-row .digit { background: #f1f6ff; }
+.product-row .digit.active { background: var(--warm-soft); }
+.product-row .digit.implied-zero { color: #4e6380; background: #f1f6ff; border-style: dashed; }
+.product-row .digit.implied-zero.active { background: var(--blue-soft); border-color: #7499cf; }
+.product-row .row-name { color: #19468b; font-weight: 650; }
+.partial-result .row-name { color: var(--ink); font-weight: 750; overflow-wrap: anywhere; }
+.partial-result .digit { border-top-color: #849bb9; }
 .board-rule { height: 2px; background: #6d81a0; margin: .33rem 0; }
 .calculation {
   margin: .45rem 0; padding: .35rem .45rem; min-height: 3.65rem;
@@ -176,7 +179,7 @@ footer { display: flex; flex-wrap: wrap; gap: .3rem 1rem; font-size: .88rem; mar
     <summary>Правило умножения столбиком</summary>
     <p>Для каждой цифры второго числа заводим свою строку. Если цифра стоит в разряде номер <i>j</i> (считаем справа с нуля), сразу ставим <i>j</i> нулей справа. Остальные цифры вписываем левее этих нулей.</p>
     <p>Двигаемся справа налево. Сначала смотрим на веса цифр. Если цифры стоят в разрядах <i>i</i> и <i>j</i>, дописываем справа <i>i</i> + <i>j</i> нулей. Затем берём произведение цифр из таблицы и записываем его левее этих нулей.</p>
-    <p>Первое произведение записываем сразу. Каждое следующее кладём в запасную строку, складываем с текущим результатом по столбцам, затем убираем запасную строку.</p>
+    <p>Каждое произведение записываем в свою строку. Первое сразу попадает в результат. Следующие прибавляем к нему по столбцам. Каждую цифру суммы сразу записываем в строку «Результат».</p>
     <p>В конце складываем строки по столбцам и пользуемся тем же правилом переноса. Все вычисления записаны в выбранном основании.</p>
   </details>
   <footer><a href="umnozhenie-i-delenie-chernovik.html#multiply">Черновик об умножении</a><a href="index.html">Оглавление</a></footer>
@@ -214,7 +217,8 @@ let model;
 let current = 0;
 let cells;
 let weightLabels;
-let spareRows;
+let productRows;
+let partialGroups;
 let carryRows;
 let equation;
 let calcLabel;
@@ -238,10 +242,14 @@ function makeModel(first, second, base) {
   const width = Math.max(a.length, b.length, resultRecord.length);
   const places = Array.from({length: width}, (_, index) => base ** index);
   const rowNames = ['first', 'second', 'third', 'fourth'].slice(0, b.length);
-  const lines = Object.fromEntries([...rowNames, 'sum'].map(name => [name, Array(width).fill('')]));
+  const productLines = rowNames.map((row, j) => a.map((digit, i) => ({
+    name: `${row}-product-${i}`, label: `${alphabet[b[j]]} × ${alphabet[digit]}`,
+  })));
+  const names = [...rowNames, ...productLines.flat().map(({name}) => name), 'sum'];
+  const lines = Object.fromEntries(names.map(name => [name, Array(width).fill('')]));
   const steps = [];
   const phases = [{name: 'началу', index: 0}];
-  let carryMark = null;
+  let carryMarks = [];
   let stage = 0;
   const token = (text, from = '') => ({text: String(text), from});
   const take = (row, index, value) => token(alphabet[value], `${row}:${index}`);
@@ -252,7 +260,7 @@ function makeModel(first, second, base) {
     steps.push({
       title, note, stage,
       lines: Object.fromEntries(Object.entries(lines).map(([name, digits]) => [name, [...digits]])),
-      carryMark, ...opts,
+      carryMarks: [...carryMarks], ...opts,
     });
   }
 
@@ -272,9 +280,11 @@ function makeModel(first, second, base) {
         {operation: 'addition', formulas: reasoning, focus, bench: split, lookup});
     }
     lines[row][place] = digit;
-    carryMark = quotient ? {row, place: place + 1, digit: transfer} : null;
     const move = [{row, place}];
-    if (quotient) move.push({row: `${row}-carry`, place: place + 1, carry: true});
+    if (quotient) {
+      carryMarks.push({row, place: place + 1, digit: transfer});
+      move.push({row: `${row}-carry`, place: place + 1, carry: true});
+    }
     let note = quotient
       ? `Вписываем цифру ${digit}. В соседний разряд слева переносим ${transfer}.`
       : `Пишем ${digit} в текущий столбец. Перенос не нужен.`;
@@ -284,21 +294,24 @@ function makeModel(first, second, base) {
     return quotient;
   }
 
-  function addToPartial(row, previous, increment, rightZeros, spare, context) {
+  function addToPartial(row, previous, increment, rightZeros, productRow, shift, firstProduct, context) {
     const total = inBase(previous + increment);
     const original = inBase(previous);
-    const shifted = out(inBase(increment), increment ? spare.place : 0);
-    const heading = [original, '+', shifted];
+    const heading = [original, '+', out(inBase(increment), increment ? shift : 0)];
+    const previousDigits = [...lines[row]];
     const columnFormulas = [];
+    lines[row].fill('', rightZeros);
+    carryMarks = [];
     let carry = 0;
-    for (let place = rightZeros; place < total.length; place += 1) {
-      const left = lines[row][place];
-      const right = place < spare.place ? '0' : spare.digits[place];
+    const limit = Math.max(rightZeros + 1, total.length);
+    for (let place = rightZeros; place < limit; place += 1) {
+      const left = previousDigits[place];
+      const right = lines[productRow][place];
       const a = left ? alphabet.indexOf(left) : 0;
       const b = right ? alphabet.indexOf(right) : 0;
       const terms = [];
-      if (left) terms.push(take(row, place, a));
-      if (right) terms.push(take(`${row}-spare`, place, b));
+      if (left) terms.push(firstProduct ? take(firstProduct, place, a) : left);
+      if (right) terms.push(take(productRow, place, b));
       else if (left) terms.push('0');
       if (carry) terms.push(token(inBase(carry), `${row}-carry:${place}`));
       const column = terms.flatMap((term, index) => index ? ['+', term] : [term]);
@@ -307,26 +320,24 @@ function makeModel(first, second, base) {
       carry = Math.floor(sum / base);
       const digit = inBase(sum % base);
       const transfer = inBase(carry);
-      const focus = [...context.focus, `${row}:${place}`, `${row}-spare:${place}`];
+      const focus = [...context.focus, `${productRow}:${place}`];
+      if (firstProduct && left) focus.push(`${firstProduct}:${place}`);
       column.push('=', out(inBase(sum)));
       if (carry) column.push('→', {text: transfer, quotient: true}, '│', out(digit));
       columnFormulas.push(column);
-      carryMark = carry ? {row, place: place + 1, digit: transfer} : null;
+      const newCarry = carry ? {row, place: place + 1, digit: transfer} : null;
+      if (newCarry) carryMarks.push(newCarry);
+      lines[row][place] = digit;
       const label = inBase(places[place]);
-      const prefix = place < spare.place ? 'Прибавляем дописанный ноль. '
-        : right ? '' : 'Пустая клетка запасной строки считается нулём. ';
+      const prefix = place < shift ? 'Прибавляем дописанный ноль. ' : '';
       const instruction = carry ? `Получили ${inBase(sum)}. Пишем ${digit}, переносим ${transfer} влево.` : `Пишем ${digit} в этом разряде.`;
-      step('Складываем по столбцам', `Разряд веса ${label}. ${prefix}${instruction}`, {
-        ...context, operation: 'addition', formulas: [heading, ...columnFormulas], focus, spare, activePlace: place, showCarry: Boolean(carry),
+      const subtotal = place === limit - 1 ? ` Получаем ${total}.` : '';
+      step('Складываем по столбцам', `Разряд веса ${label}. ${prefix}${instruction}${subtotal}`, {
+        ...context, operation: 'addition', formulas: [heading, ...columnFormulas], focus, activePlace: place,
+        writeDigit: {row, place}, newCarry,
       });
     }
-    carryMark = null;
-    const updated = [...total.padStart(rightZeros + 1, '0')].reverse();
-    updated.forEach((digit, place) => { lines[row][place] = digit; });
-    step('Переносим цифры суммы', `Переносим готовые цифры в строку результата. Получаем ${total}.`, {
-      ...context, operation: 'addition', formulas: [heading, ...columnFormulas],
-      sumTransfer: {row, places: columnFormulas.map((_, index) => rightZeros + index)},
-    });
+    carryMarks = [];
     return previous + increment;
   }
 
@@ -339,7 +350,7 @@ function makeModel(first, second, base) {
     const row = rowNames[j];
     phases.push({name: `строке ${j + 1}`, index: steps.length});
     const focus = [`bottom:${j}`];
-    carryMark = null;
+    carryMarks = [];
     const mark = Array.from({length: j}, (_, place) => `${row}:${place}`);
     if (!digit) {
       lines[row].fill('0', 0, j);
@@ -355,6 +366,7 @@ function makeModel(first, second, base) {
     let partial = 0;
     a.forEach((value, i) => {
       const place = j + i;
+      const productRow = productLines[j][i].name;
       const focus = [`top:${i}`, `bottom:${j}`];
       const lookup = [value, digit];
       const product = value * digit;
@@ -364,32 +376,30 @@ function makeModel(first, second, base) {
       const formulas = [multiplication];
       if (place) {
         const weight = inBase(places[place]);
-        const zeroRow = i === 0 ? row : `${row}-spare`;
-        const destination = i === 0 ? 'в строке результата' : 'в запасной строке';
-        if (i === 0) lines[row].fill('0', 0, j);
+        lines[productRow].fill('0', 0, place);
         step('Дописываем нули справа',
-          `После единицы в записи ${weight} — ${offsetWords[place]}. Столько же нулей дописываем справа ${destination}. Цифры произведения появятся левее.`, {
+          `После единицы в записи ${weight} — ${offsetWords[place]}. Столько же нулей дописываем справа в строке произведения. Цифры появятся левее.`, {
           operation: 'weights',
           formulas: [[inBase(places[i]), '×', inBase(places[j]), '=', out(weight, place)]],
-          focus, weightFactors: [i, j], activePlace: place, zeroRow, startCell: `${zeroRow}:${place}`,
-          ...(i === 0 ? {mark} : {spare: {row, place, digits: Array(width).fill('')}}),
+          focus, weightFactors: [i, j], activePlace: place, zeroRow: productRow, startCell: `${productRow}:${place}`,
         });
       }
-      const digits = Array(width).fill('');
-      [...productDigits].reverse().forEach((digit, index) => { digits[place + index] = digit; });
+      const changed = [...productDigits].reverse().map((digit, index) => {
+        lines[productRow][place + index] = digit;
+        return `${productRow}:${place + index}`;
+      });
       if (i === 0) {
-        for (let index = place; index < place + productDigits.length; index += 1) lines[row][index] = digits[index];
-        const changed = [...productDigits].map((_, index) => `${row}:${place + index}`);
-        step('Умножаем и записываем', `В таблице получаем ${productDigits}. Вписываем ${place ? 'его слева от нулей' : 'его в строку результата'}.`,
-          {operation: 'digits', formulas, focus, lookup, fromTable: true, changed, activePlace: place, mark});
+        lines[row] = [...lines[productRow]];
+        const firstResult = lines[row].flatMap((digit, index) => digit ? [`${row}:${index}`] : []);
+        step('Умножаем и записываем', `В таблице получаем ${productDigits}. Это первое произведение, его сразу записываем и в результат.`,
+          {operation: 'digits', formulas, focus, lookup, fromTable: true, changed: [...changed, ...firstResult], activePlace: place, mark});
         partial = increment;
         return;
       }
-      const spare = {row, place, digits};
-      step('Умножаем и записываем в запасную строку', `В таблице получаем ${productDigits}. Вписываем его слева от нулей.`,
-        {operation: 'digits', formulas, focus, lookup, fromTable: true, spare, activePlace: place,
-          changed: [...productDigits].map((_, index) => `${row}-spare:${place + index}`)});
-      partial = addToPartial(row, partial, increment, j, spare, {focus, lookup});
+      step('Умножаем и записываем', `В таблице получаем ${productDigits}. Вписываем его слева от нулей.`,
+        {operation: 'digits', formulas, focus, lookup, fromTable: true, activePlace: place, changed});
+      const firstProduct = i === 1 ? productLines[j][0].name : null;
+      partial = addToPartial(row, partial, increment, j, productRow, place, firstProduct, {focus, lookup});
     });
     if (shift) {
       const last = steps.at(-1);
@@ -428,7 +438,7 @@ function makeModel(first, second, base) {
       {operation: 'addition', formulas, focus});
     carry = record(total, place, 'sum', formulas, focus, null, place === resultRecord.length - 1);
   }
-  return {first, second, base, places, rowNames, steps, phases};
+  return {first, second, base, places, rowNames, productLines, steps, phases};
 }
 
 function element(tag, css = '', text = '') {
@@ -504,7 +514,7 @@ function showLookup(lookup) {
   return target;
 }
 
-function addRow(name, label, digits = [], carried = false) {
+function addRow(name, label, digits = [], carried = false, parent = board) {
   const line = element('div', 'board-line');
   line.dataset.row = name;
   line.setAttribute('role', 'group');
@@ -517,14 +527,15 @@ function addRow(name, label, digits = [], carried = false) {
     cells.set(`${name}:${place}`, cell);
     line.append(cell);
   }
-  board.append(line);
+  parent.append(line);
   return line;
 }
 
 function buildBoard() {
   cells = new Map();
   weightLabels = [];
-  spareRows = new Map();
+  productRows = new Map();
+  partialGroups = [];
   carryRows = new Map();
   board.replaceChildren();
   board.style.setProperty('--columns', model.places.length);
@@ -551,12 +562,19 @@ function buildBoard() {
   calculation.append(calcLabel, equation, shiftExplanation);
   board.append(calculation, element('div', 'board-rule'));
   model.rowNames.forEach((name, index) => {
-    carryRows.set(name, addRow(`${name}-carry`, 'Перенос', [], true));
-    addRow(name, `Строка ${index + 1}`);
-    const spare = addRow(`${name}-spare`, '+ Запас');
-    spare.classList.add('spare-row');
-    spare.hidden = true;
-    spareRows.set(name, spare);
+    const group = element('div', 'partial-work');
+    group.setAttribute('role', 'group');
+    group.setAttribute('aria-label', `Частичное произведение ${index + 1}`);
+    board.append(group);
+    partialGroups.push(group);
+    model.productLines[index].forEach(({name: key, label}, digitIndex) => {
+      const line = addRow(key, label, [], false, group);
+      line.classList.add('product-row');
+      productRows.set(key, {line, offset: index + digitIndex});
+    });
+    carryRows.set(name, addRow(`${name}-carry`, 'Перенос', [], true, group));
+    const result = addRow(name, 'Результат', [], false, group);
+    result.classList.add('partial-result');
   });
   board.append(element('div', 'board-rule'));
   carryRows.set('sum', addRow('sum-carry', 'Перенос', [], true));
@@ -661,46 +679,36 @@ function render(index, forward = false) {
   locked = false;
   const step = model.steps[index];
   const animate = forward && !reducedMotion.matches && typeof board.animate === 'function';
-  const transfer = animate && step.sumTransfer?.places.length ? step.sumTransfer : null;
   const positions = animate ? new Map([...cells.entries()].map(([id, cell]) => [id, cell.getBoundingClientRect()])) : new Map();
   current = index;
 
+  partialGroups.forEach((group, index) => { group.hidden = index > 0 && step.stage <= index; });
   for (const [name, digits] of Object.entries(step.lines)) {
+    const product = productRows.get(name);
+    if (product) product.line.hidden = !digits.some(Boolean);
     digits.forEach((digit, place) => {
       const cell = cells.get(`${name}:${place}`);
-      cell.className = 'digit';
+      cell.className = product && place < product.offset ? 'digit implied-zero' : 'digit';
       cell.textContent = digit;
-    });
-  }
-  const activeSpareRow = step.spare?.row ?? transfer?.row;
-  for (const [row, element] of spareRows) element.hidden = activeSpareRow !== row;
-  if (step.spare) {
-    const {row, place, digits} = step.spare;
-    digits.forEach((digit, index) => {
-      const cell = cells.get(`${row}-spare:${index}`);
-      const trailing = index < place;
-      cell.className = trailing ? 'digit implied-zero' : 'digit';
-      cell.textContent = trailing ? '0' : digit;
     });
   }
   [...model.places.keys()].forEach(place => {
     cells.get(`top:${place}`).className = 'digit';
     cells.get(`bottom:${place}`).className = 'digit';
   });
-  const carry = step.carryMark;
-  const activeCarryRow = activeSpareRow ?? (step.stage === model.phases.length - 1 ? 'sum' : null);
+  const activeCarryRow = step.writeDigit?.row ?? (step.stage === model.phases.length - 1 ? 'sum' : null);
   for (const [row, element] of carryRows) {
     element.hidden = row !== activeCarryRow;
     for (const place of model.places.keys()) cells.get(`${row}-carry:${place}`).replaceChildren();
   }
-  if (carry) {
+  for (const carry of step.carryMarks) {
     cells.get(`${carry.row}-carry:${carry.place}`).append(element('span', 'move-chip', carry.digit));
   }
   for (const id of step.focus ?? []) cells.get(id).classList.add('active');
   for (const id of step.mark ?? []) cells.get(id).classList.add('placeholder');
   for (const id of step.changed ?? []) cells.get(id).classList.add('written');
-  for (const place of step.sumTransfer?.places ?? []) {
-    cells.get(`${step.sumTransfer.row}:${place}`).classList.add('written');
+  if (step.writeDigit) {
+    cells.get(`${step.writeDigit.row}:${step.writeDigit.place}`).classList.add('written');
   }
   if (step.finished) {
     for (let place = 0; place < model.places.length; place += 1) {
@@ -709,8 +717,7 @@ function render(index, forward = false) {
     }
   }
 
-  // During the transfer, the column results stay in their original positions.
-  const formulas = transfer ? [] : step.formulas ?? [];
+  const formulas = step.formulas ?? [];
   const groups = formulas.map((formula, number) => {
     const group = element('span', 'calc-group');
     if (number > 0) group.append(element('span', 'calc-link', '→'));
@@ -731,11 +738,11 @@ function render(index, forward = false) {
     group.append(...tokens.map(({node}) => node));
     return {group, tokens};
   });
-  if (!transfer) equation.replaceChildren(...groups.map(({group}) => group));
+  equation.replaceChildren(...groups.map(({group}) => group));
   const {group: currentGroup, tokens = []} = groups.at(-1) ?? {};
   const operation = operationLabels[step.operation];
   calcLabel.textContent = `Вычисление в основании ${model.base}${operation ? ` (${operation})` : ''}`;
-  renderShift(transfer ? {} : step);
+  renderShift(step);
   byId('step-title').textContent = step.title;
   status.textContent = step.note;
   renderBench(step.bench ?? []);
@@ -750,14 +757,7 @@ function render(index, forward = false) {
     }
   }
 
-  if (transfer) {
-    const columnGroups = [...equation.children].slice(1);
-    transfer.places.forEach((place, index) => {
-      const source = columnGroups[index].querySelector('.result:last-child');
-      const target = cells.get(`${transfer.row}:${place}`);
-      fly(target.textContent, source.getBoundingClientRect(), target, false, index * 120);
-    });
-  } else if (animate && step.move) {
+  if (animate && step.move) {
     const result = currentGroup.querySelector('.result');
     for (const [number, move] of step.move.entries()) {
       const target = cells.get(`${move.row}:${move.place}`);
@@ -802,34 +802,33 @@ function render(index, forward = false) {
         fly('0', zero.getBoundingClientRect(), cells.get(`${step.zeroRow}:${place}`), true, wait + 250 + index * 90);
       });
     }
-    if (step.showCarry) {
+    if (step.writeDigit) {
+      const {row, place} = step.writeDigit;
+      const target = cells.get(`${row}:${place}`);
+      const source = currentGroup.querySelector('.result:last-child');
+      fly(target.textContent, source.getBoundingClientRect(), target, false, wait + 250);
+    }
+    if (step.newCarry) {
+      const carry = step.newCarry;
       const source = currentGroup.querySelector('.quotient');
       const target = cells.get(`${carry.row}-carry:${carry.place}`).firstElementChild;
-      fly(carry.digit, source.getBoundingClientRect(), target, true, wait + 190);
+      fly(carry.digit, source.getBoundingClientRect(), target, true, wait + 360);
     }
   }
 
-  if (animate && step.shift && !transfer) {
-    const delay = step.move ? 440 : 0;
+  if (animate && step.shift) {
+    const delay = step.writeDigit ? 950 : step.fromTable ? 1080 : 0;
     motion.push(shiftExplanation.animate([{opacity: 0, transform: 'translateY(-3px)'}, {opacity: 1, transform: 'none'}],
       {duration: 220, delay, fill: 'backwards'}));
   }
 
-  const finishTransfer = () => {
-    spareRows.get(transfer.row).hidden = true;
-    carryRows.get(transfer.row).hidden = true;
-    renderShift(step);
-  };
   if (motion.length && !step.finished) {
     locked = true;
     Promise.allSettled(motion.map(animation => animation.finished)).then(() => {
       if (generation !== version) return;
       locked = false;
-      if (transfer) finishTransfer();
       updateControls(step);
     });
-  } else if (transfer) {
-    finishTransfer();
   }
   updateControls(step);
 }
