@@ -205,6 +205,11 @@ const status = byId('step-status');
 const bench = byId('bench');
 const table = byId('times-table');
 const tableScroll = byId('table-scroll');
+const operationLabels = {
+  weights: 'перемножаем веса',
+  digits: 'перемножаем цифры',
+  addition: 'складываем полученные числа',
+};
 let model;
 let current = 0;
 let cells;
@@ -264,7 +269,7 @@ function makeModel(first, second, base) {
     if (quotient) {
       step('Выделяем цифру и перенос',
         `В записи ${inBase(total)} последняя цифра ${digit} идёт в текущий столбец. Слева от неё стоит перенос ${transfer}.`,
-        {formulas: reasoning, focus, bench: split, lookup});
+        {operation: 'addition', formulas: reasoning, focus, bench: split, lookup});
     }
     lines[row][place] = digit;
     carryMark = quotient ? {row, place: place + 1, digit: transfer} : null;
@@ -275,7 +280,7 @@ function makeModel(first, second, base) {
       : `Пишем ${digit} в текущий столбец. Перенос не нужен.`;
     if (finished) note += ` Ответ ${resultRecord} в основании ${base}.`;
     step(quotient ? 'Пишем цифру и переносим' : 'Записываем цифру', note,
-      {formulas: reasoning, focus, bench: split, lookup, move, finished});
+      {operation: 'addition', formulas: reasoning, focus, bench: split, lookup, move, finished});
     return quotient;
   }
 
@@ -312,7 +317,7 @@ function makeModel(first, second, base) {
         : right ? '' : 'Пустая клетка запасной строки считается нулём. ';
       const instruction = carry ? `Получили ${inBase(sum)}. Пишем ${digit}, переносим ${transfer} влево.` : `Пишем ${digit} в этом разряде.`;
       step('Складываем по столбцам', `Разряд веса ${label}. ${prefix}${instruction}`, {
-        ...context, formulas: [heading, ...columnFormulas], focus, spare, activePlace: place, showCarry: Boolean(carry),
+        ...context, operation: 'addition', formulas: [heading, ...columnFormulas], focus, spare, activePlace: place, showCarry: Boolean(carry),
       });
     }
     carryMark = null;
@@ -320,7 +325,7 @@ function makeModel(first, second, base) {
     const changed = updated.flatMap((digit, place) => lines[row][place] === digit ? [] : [`${row}:${place}`]);
     updated.forEach((digit, place) => { lines[row][place] = digit; });
     step('Записываем сумму в строку', `Получили ${total}. Сумма остаётся в строке результата, запасную строку убираем.`, {
-      ...context, formulas: [[...heading, '=', out(total)], ...columnFormulas],
+      ...context, operation: 'addition', formulas: [[...heading, '=', out(total)], ...columnFormulas],
       changed,
     });
     return previous + increment;
@@ -341,6 +346,7 @@ function makeModel(first, second, base) {
       lines[row].fill('0', 0, j);
       lines[row][j] = '0';
       step('Записываем нулевую строку', 'Цифра множителя в этом разряде равна нулю, поэтому вся строка нулевая.', {
+        operation: 'digits',
         formulas: [[first, '×', take('bottom', j, digit), '=', out(0)]],
         focus, mark,
       });
@@ -364,6 +370,7 @@ function makeModel(first, second, base) {
         if (i === 0) lines[row].fill('0', 0, j);
         step('Дописываем нули справа',
           `После единицы в записи ${weight} — ${offsetWords[place]}. Столько же нулей дописываем справа ${destination}. Цифры произведения появятся левее.`, {
+          operation: 'weights',
           formulas: [[inBase(places[i]), '×', inBase(places[j]), '=', out(weight, place)]],
           focus, weightFactors: [i, j], activePlace: place, zeroRow, startCell: `${zeroRow}:${place}`,
           ...(i === 0 ? {mark} : {spare: {row, place, digits: Array(width).fill('')}}),
@@ -375,13 +382,13 @@ function makeModel(first, second, base) {
         for (let index = place; index < place + productDigits.length; index += 1) lines[row][index] = digits[index];
         const changed = [...productDigits].map((_, index) => `${row}:${place + index}`);
         step('Умножаем и записываем', `В таблице получаем ${productDigits}. Вписываем ${place ? 'его слева от нулей' : 'его в строку результата'}.`,
-          {formulas, focus, lookup, fromTable: true, changed, activePlace: place, mark});
+          {operation: 'digits', formulas, focus, lookup, fromTable: true, changed, activePlace: place, mark});
         partial = increment;
         return;
       }
       const spare = {row, place, digits};
       step('Умножаем и записываем в запасную строку', `В таблице получаем ${productDigits}. Вписываем его слева от нулей.`,
-        {formulas, focus, lookup, fromTable: true, spare, activePlace: place,
+        {operation: 'digits', formulas, focus, lookup, fromTable: true, spare, activePlace: place,
           changed: [...productDigits].map((_, index) => `${row}-spare:${place + index}`)});
       partial = addToPartial(row, partial, increment, j, spare, {focus, lookup});
     });
@@ -419,7 +426,7 @@ function makeModel(first, second, base) {
     formula.push('=', out(inBase(total)));
     const formulas = [formula];
     step('Складываем цифры столбца', `Складываем выделенные цифры${carry ? ' и прибавляем входящий перенос' : ''}.`,
-      {formulas, focus});
+      {operation: 'addition', formulas, focus});
     carry = record(total, place, 'sum', formulas, focus, null, place === resultRecord.length - 1);
   }
   return {first, second, base, places, rowNames, steps, phases};
@@ -721,8 +728,8 @@ function render(index, forward = false) {
   });
   equation.replaceChildren(...groups.map(({group}) => group));
   const {group: currentGroup, tokens = []} = groups.at(-1) ?? {};
-  calcLabel.textContent = currentGroup ? `Вычисление в основании ${model.base}` : 'Подготовка строки';
-  if (!currentGroup) equation.textContent = `…${'0'.repeat(step.mark.length)}`;
+  const operation = operationLabels[step.operation];
+  calcLabel.textContent = `Вычисление в основании ${model.base}${operation ? ` (${operation})` : ''}`;
   renderShift(step);
   byId('step-title').textContent = step.title;
   status.textContent = step.note;
