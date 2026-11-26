@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Умножение столбиком в пятеричной системе</title>
+<title>Умножение столбиком · пошаговая анимация</title>
 <style>
 :root {
   color-scheme: light;
@@ -14,398 +14,549 @@
   --line: #d8e2ef;
   --blue: #2458b4;
   --blue-soft: #e8f0ff;
-  --warm: #765019;
+  --warm: #67400b;
   --warm-soft: #fff1cf;
-  --cell: clamp(2.35rem, 8vw, 3.4rem);
 }
 * { box-sizing: border-box; }
-body {
-  margin: 0;
-  color: var(--ink);
-  background: var(--bg);
-  font: 1rem/1.55 system-ui, sans-serif;
-}
-main { width: min(100%, 62rem); margin: auto; padding: clamp(1rem, 4vw, 2.5rem); }
-h1 { margin: 0; font-size: clamp(1.55rem, 5vw, 2.45rem); line-height: 1.18; }
-h2 { margin: 0; font-size: clamp(1.05rem, 3.7vw, 1.3rem); line-height: 1.3; }
-p { margin: .6em 0; }
+body { margin: 0; color: var(--ink); background: var(--bg); font: 1rem/1.5 system-ui, sans-serif; }
+main { width: min(100%, 66rem); margin: auto; padding: clamp(.65rem, 3vw, 2rem); }
+h1 { margin: 0; font-size: clamp(1.55rem, 4.5vw, 2.3rem); line-height: 1.16; }
+h2 { margin: 0; font-size: clamp(1.03rem, 3.5vw, 1.2rem); line-height: 1.3; }
+p { margin: .55em 0; }
 a { color: #15479e; text-underline-offset: .15em; }
 [hidden] { display: none !important; }
-.intro { margin: .65em 0 1rem; color: var(--muted); }
-.controls { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .45rem; margin-block: 1rem .75rem; }
-button {
-  border: 1px solid #c9d8ee;
-  border-radius: .6rem;
-  padding: .42rem .7rem;
-  min-height: 2.7rem;
-  background: #fff;
-  color: var(--blue);
-  font: inherit;
-  font-weight: 650;
-  cursor: pointer;
-}
-button:focus-visible, a:focus-visible, summary:focus-visible { outline: 3px solid #204eab; outline-offset: 2px; }
-button.primary { background: #2458b4; border-color: #2458b4; color: white; }
-button[aria-disabled="true"] { opacity: .57; cursor: default; }
-#step-count { font-size: .88rem; font-weight: 650; color: var(--muted); margin-inline-start: .1rem; }
-.work {
-  display: grid;
-  grid-template-columns: minmax(18rem, .95fr) minmax(0, 1.05fr);
-  gap: .9rem;
-  align-items: start;
-}
-.board, .explanation { min-width: 0; background: #fff; border: 1px solid var(--line); border-radius: 1rem; }
-.board { padding: .7rem clamp(.45rem, 3vw, 1.35rem) .95rem; }
-.explanation { padding: .9rem clamp(.75rem, 2.8vw, 1.3rem); }
+.intro, .form-help { color: var(--muted); }
+.settings { display: flex; align-items: end; flex-wrap: wrap; gap: .45rem .7rem; margin-top: .85rem; }
+.settings label { display: grid; gap: .18rem; font-size: .82rem; font-weight: 650; min-width: 0; }
+.settings input, select, button { font: inherit; min-height: 2.65rem; border: 1px solid #bdcde4; border-radius: .55rem; }
+.settings input, select { padding: .35rem .55rem; color: var(--ink); background: #fff; }
+.settings input { width: 7rem; font-size: 1rem; }
+.settings select { font-size: 1rem; }
+.form-help { margin: .3rem 0 .5rem; font-size: .83rem; }
+#input-error:empty { display: none; }
+#input-error { color: #922e30; }
+.controls { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem .4rem; margin: 1rem 0 .65rem; }
+button { padding: .4rem .65rem; background: #fff; color: var(--blue); font-weight: 650; cursor: pointer; }
+button.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+button[aria-disabled="true"] { opacity: .56; cursor: default; }
+:focus-visible { outline: 3px solid #204eab; outline-offset: 2px; }
+.phase-control { margin-left: auto; font-size: .82rem; }
+.phase-control select { max-width: 100%; }
+#step-count { font-size: .83rem; font-weight: 650; color: var(--muted); }
+.work { display: grid; grid-template-columns: minmax(0,1fr) minmax(15rem,.8fr); gap: .8rem; align-items: start; }
+.board, .explanation { min-width: 0; background: #fff; border: 1px solid var(--line); border-radius: .85rem; }
+.board { padding: .55rem clamp(.32rem, 2vw, 1rem) .8rem; }
+.board-base { display: block; margin: 0 0 .42rem; font-weight: 650; font-size: .85rem; }
+.explanation { padding: .75rem clamp(.6rem, 2vw, 1.05rem); }
 .place-labels, .board-line {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) repeat(3, var(--cell));
-  gap: .23rem;
-  align-items: center;
+  display: grid; grid-template-columns: minmax(2.25rem,1fr) repeat(var(--columns),minmax(0,2.8rem));
+  gap: 2px; align-items: center;
 }
-.place-labels { font-size: .78rem; color: var(--muted); }
-.place-labels span:not(:first-child) { text-align: center; }
-.board-line { margin-top: .22rem; }
-.row-name { font-size: .83rem; line-height: 1.25; color: var(--muted); }
+.place-labels span, .row-name { color: var(--muted); font-size: .7rem; }
+.place-labels span:not(:first-child) { text-align: center; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; line-height: 1.1; }
+.row-name { line-height: 1.2; }
 .row-name b { color: var(--ink); }
-.carry-row { min-height: 1.5rem; }
-.carry-slot { min-height: 1.45rem; display: grid; place-items: center; }
-.move-chip {
-  min-width: 1.65rem; padding: 0 .3rem;
-  font-weight: 750; font-variant-numeric: tabular-nums;
-  background: var(--blue-soft); color: #19468b; border: 1px solid #aac4ee; border-radius: .45rem;
-  text-align: center;
-}
-.digit {
-  display: grid; place-items: center;
-  min-height: clamp(2.18rem, 7vw, 2.85rem);
-  border: 1px solid var(--line); border-radius: .5rem;
-  background: #f8faff; font-size: clamp(1.35rem, 5vw, 1.85rem); font-weight: 680;
-  line-height: 1.05; font-variant-numeric: tabular-nums;
-}
-.move-chip.used { background: #fff; border-style: dashed; color: var(--muted); }
-.digit.active, .digit.written {
-  background: var(--warm-soft); border-color: #d7a956; color: #67400b;
-}
-.digit.shifted { background: var(--blue-soft); border-color: #aac4ee; color: #1a4381; }
+.board-line { margin-top: .22rem; }
+.digit, .carry-slot { display: grid; place-items: center; text-align: center; font-variant-numeric: tabular-nums; min-width: 0; }
+.digit { min-height: clamp(1.68rem,6.5vw,2.45rem); border: 1px solid var(--line); border-radius: .38rem; background: #f8faff; font-size: clamp(1rem, 3vw, 1.42rem); font-weight: 720; }
+.carry-slot { min-height: 1.38rem; }
+.move-chip { width: 100%; font-weight: 750; background: var(--blue-soft); color: #19468b; border: 1px solid #aac4ee; border-radius: .35rem; text-align: center; }
+.digit.active, .digit.written, .calc-token.input { background: var(--warm-soft); border-color: #d7a956; color: var(--warm); }
+.digit.placeholder { background: var(--blue-soft); border-color: #aac4ee; color: #174384; }
 .digit.done { background: #e7f4eb; border-color: #a2cbb1; color: #215638; }
-.board-rule { height: 2px; background: #5f7698; margin: .4rem 0 .35rem auto; width: calc(3 * var(--cell) + .46rem); }
-.equation { font: 700 clamp(1.15rem, 4.25vw, 1.55rem)/1.5 system-ui, sans-serif; margin: .55em 0; }
-.equation sub { font-size: .65em; }
-#step-status { color: #283650; }
-.split {
-  display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .5rem; margin: .75rem 0 .25rem;
+.board-rule { height: 2px; background: #6d81a0; margin: .33rem 0; }
+.calculation {
+  margin: .45rem 0; padding: .35rem .45rem; min-height: 3.65rem;
+  background: #f1f6ff; border: 1px solid #c7d8f1; border-radius: .5rem;
 }
-.split-card {
-  min-width: 0; padding: .5rem .4rem; border-radius: .65rem;
-  border: 1px solid #d8b063; background: var(--warm-soft); color: var(--warm); text-align: center;
+.calc-label { display: block; font-size: .72rem; color: var(--muted); font-weight: 650; }
+#equation { display: flex; flex-wrap: wrap; align-items: baseline; gap: .2rem .3rem; margin: .12rem 0 0; font-size: clamp(1rem,3.2vw,1.28rem); font-weight: 700; }
+.calc-token { display: inline-block; min-width: .8rem; text-align: center; border-radius: .28rem; padding-inline: .16rem; }
+.calc-token.result { background: #e0efdf; color: #235635; padding-inline: .28rem; }
+.calc-token.quotient { background: var(--blue-soft); color: #19468b; }
+sub { font-size: .68em; }
+#step-status { color: #263652; }
+.bench { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .45rem; }
+.bench-group {
+  flex: 1 1 5.15rem; min-width: 0; padding: .32rem; min-height: 4rem; border: 1px solid var(--line);
+  border-radius: .52rem; text-align: center; background: #f5f8fc; font-size: .76rem; color: #344762;
 }
-.split-card.carry { background: var(--blue-soft); border-color: #b3c8eb; color: #1d4889; }
-.split-card strong { display: block; line-height: 1.25; }
-.split-card small { display: block; font-size: .78rem; line-height: 1.3; }
-.pieces { display: flex; justify-content: center; align-items: center; gap: 4px; min-height: 2.55rem; margin: .12rem 0; }
-.pieces img { display: block; width: auto; height: 2.1rem; }
-.pieces img.bundle { height: 2.3rem; }
-.flight {
-  position: fixed; z-index: 3; display: grid; place-items: center;
-  padding: 0; min-width: 0; min-height: 0; margin: 0; pointer-events: none;
+.bench-group.remainder { background: var(--warm-soft); border-color: #d8b063; color: var(--warm); }
+.bench-group.carry { background: var(--blue-soft); border-color: #b3c8eb; color: #1d4889; }
+.bench-group strong { display: block; }
+.pieces { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .14rem; min-height: 2.2rem; margin: .14rem 0; }
+.pieces img { width: auto; max-width: 30%; height: 1.65rem; object-fit: contain; }
+.piece-number { font-size: 1.1rem; line-height: 1.2; font-weight: 750; }
+.source-ghost {
+  position: fixed; z-index: 3; display: grid; place-items: center; padding: 0;
+  margin: 0; pointer-events: none; font-weight: 750; border-radius: .35rem; background: var(--warm-soft); color: var(--warm);
 }
-.read-more { margin-top: .9rem; padding: .55rem .75rem; border: 1px solid var(--line); border-radius: .65rem; background: #fff; }
+.source-ghost.blue { background: var(--blue-soft); color: #19468b; }
+.read-more { margin-top: .8rem; padding: .5rem .7rem; border: 1px solid var(--line); border-radius: .6rem; background: #fff; }
 summary { color: #15479e; cursor: pointer; font-weight: 650; }
-footer { display: flex; flex-wrap: wrap; gap: .3rem 1rem; font-size: .9rem; margin-top: 1rem; }
-@media (max-width: 660px) {
+footer { display: flex; flex-wrap: wrap; gap: .3rem 1rem; font-size: .88rem; margin-top: .9rem; }
+@media(max-width: 670px) {
   .work { grid-template-columns: minmax(0,1fr); }
+  .phase-control { margin-left: 0; }
 }
 </style>
 </head>
 <body>
 <main>
-  <h1>Умножение столбиком в основании 5</h1>
-  <p class="intro">Пошаговая анимация для примера <strong>23<sub>5</sub> × 14<sub>5</sub></strong>.</p>
+  <h1>Умножение столбиком</h1>
+  <p class="intro">Выберите основание и проследите, как получаются цифры каждой строки.</p>
   <div id="preview" hidden>
+    <form id="settings" novalidate>
+      <div class="settings">
+        <label>Основание <select id="base"></select></label>
+        <label>Первое число <input id="multiplicand" type="text" maxlength="4" value="23" autocomplete="off" spellcheck="false" aria-describedby="form-help"></label>
+        <label>Второе число <input id="multiplier" type="text" maxlength="4" value="124" autocomplete="off" spellcheck="false" aria-describedby="form-help"></label>
+        <button type="submit" id="apply">Показать</button>
+      </div>
+      <p class="form-help" id="form-help">До 4 знаков в каждом числе. Допустимые цифры: <span id="allowed-digits">0–4</span>.</p>
+      <p id="input-error" role="alert"></p>
+    </form>
     <div class="controls" role="group" aria-label="Управление шагами">
-      <button type="button" class="primary" id="next">Следующий шаг</button>
-      <button type="button" id="back" aria-disabled="true">Назад</button>
-      <button type="button" id="reset" aria-disabled="true">Сначала</button>
-      <span id="step-count">Шаг 1 из 10</span>
+      <button type="button" id="next" class="primary">Следующий шаг</button>
+      <button type="button" id="back">Назад</button>
+      <button type="button" id="reset">Сначала</button>
+      <span id="step-count"></span>
+      <label class="phase-control">Перейти к <select id="phase"></select></label>
     </div>
     <div class="work">
-      <div class="board" id="board" role="group" aria-label="Умножение столбиком">
-        <div class="place-labels" aria-hidden="true"><span>Вес разряда</span><span>25</span><span>5</span><span>1</span></div>
-        <div class="board-line carry-row" data-row="carry" role="group" aria-label="Перенос">
-          <span class="row-name">Перенос</span><span class="carry-slot"></span><span class="carry-slot"></span><span class="carry-slot"></span>
-        </div>
-        <div class="board-line" data-row="top" role="group" aria-label="Множимое 23 в основании 5">
-          <span class="row-name">Множимое</span><span class="digit" data-digit></span><span class="digit" data-digit>2</span><span class="digit" data-digit>3</span>
-        </div>
-        <div class="board-line" data-row="bottom" role="group" aria-label="Множитель 14 в основании 5">
-          <span class="row-name"><b>×</b> Множитель</span><span class="digit" data-digit></span><span class="digit" data-digit>1</span><span class="digit" data-digit>4</span>
-        </div>
-        <div class="board-rule"></div>
-        <div class="board-line" data-row="first" role="group" aria-label="Умножение на 4">
-          <span class="row-name"><b>× 4</b></span><span class="digit" data-digit></span><span class="digit" data-digit></span><span class="digit" data-digit></span>
-        </div>
-        <div class="board-line" data-row="second" role="group" aria-label="Умножение на одну пятёрку">
-          <span class="row-name"><b>× 5</b> <span class="row-shift">после сдвига</span></span><span class="digit" data-digit></span><span class="digit" data-digit></span><span class="digit" data-digit></span>
-        </div>
-        <div class="board-rule"></div>
-        <div class="board-line" data-row="sum" role="group" aria-label="Сумма строк">
-          <span class="row-name"><b>+</b> Сумма строк</span><span class="digit" data-digit></span><span class="digit" data-digit></span><span class="digit" data-digit></span>
-        </div>
-      </div>
+      <div class="board" id="board" role="group" aria-label="Умножение столбиком"></div>
       <section class="explanation" aria-labelledby="step-title">
-        <h2 id="step-title">Выравниваем разряды</h2>
-        <p class="equation" id="equation"></p>
+        <h2 id="step-title"></h2>
         <p id="step-status" role="status" aria-live="polite" aria-atomic="true"></p>
-        <div class="split" id="split" hidden></div>
+        <div class="bench" id="bench" hidden></div>
       </section>
     </div>
   </div>
-  <noscript><p>Для пошаговой анимации нужен JavaScript. Полный ход вычислений можно прочитать ниже.</p></noscript>
+  <noscript><p>Для пошаговой анимации нужен JavaScript.</p></noscript>
   <details class="read-more">
-    <summary>Ход решения целиком</summary>
-    <p>В первой строке умножаем на 4. В единицах 3 × 4 = 12<sub>10</sub>, то есть две пятёрки и две единицы. Пишем 2 и переносим 2. В пятёрках 2 × 4 + 2 = 10<sub>10</sub>, то есть две группы по 25 и ноль пятёрок. Пишем 0, затем дописываем перенос 2 слева. Получаем 202<sub>5</sub>.</p>
-    <p>Во второй строке цифра 1 означает одну пятёрку. Сначала 23<sub>5</sub> × 1 = 23<sub>5</sub>, затем сдвигаем запись влево на один разряд и ставим 0 справа. Получаем 230<sub>5</sub>.</p>
-    <p>Складываем строки справа налево. 2 + 0 = 2, 0 + 3 = 3, 2 + 2 = 4. Ответ <strong>432<sub>5</sub></strong>.</p>
+    <summary>Правило умножения столбиком</summary>
+    <p>Для каждой цифры второго числа заводим свою строку. Если цифра стоит в разряде номер <i>j</i> (считаем справа с нуля), сразу ставим <i>j</i> нулей справа. Остальные цифры вписываем левее этих нулей.</p>
+    <p>Умножаем цифры справа налево и прибавляем входящий перенос. Делим результат на основание. Остаток пишем в текущий разряд, частное переносим на один разряд влево. В конце складываем строки.</p>
+    <p>В промежуточных формулах количества показаны в десятичной системе. В столбик пишем цифры выбранного основания.</p>
   </details>
   <footer><a href="umnozhenie-i-delenie-chernovik.html#multiply">Черновик об умножении</a><a href="index.html">Оглавление</a></footer>
 </main>
 <script>
 'use strict';
-
-const sub = '<sub>5</sub>';
-const steps = [
-  {
-    title: 'Выравниваем разряды',
-    equation: `23${sub} × 14${sub}`,
-    note: 'Ставим единицы под единицами. В записи 14₅ цифра 4 обозначает четыре единицы, а цифра 1 — одну пятёрку. Для каждой цифры будет своя строка.',
-  },
-  {
-    title: 'Начинаем с единиц',
-    equation: `23${sub} × 4`,
-    note: 'Подсвечены цифра 4 в множителе и цифра 3 в множимом. Первую строку начинаем с их произведения. Входящего переноса пока нет.',
-    highlights: ['bottom:2', 'top:2'],
-  },
-  {
-    title: 'Пишем 2 и переносим 2',
-    equation: `3 × 4 = 12<sub>10</sub> = 2 · 5 + 2 = 22${sub}`,
-    note: 'Делим 12 на 5. Остаток 2 — две отдельные палочки. Пишем 2 в единицах. Частное 2 — два пучка по пять. Переносим 2 в разряд пятёрок.',
-    first: '  2',
-    carry: 1,
-    highlights: ['bottom:2', 'top:2'],
-    split: { remainder: '2 единицы', carry: '2 пятёрки', unitAsset: 'unit', carryAsset: 'five', column: 2 },
-  },
-  {
-    title: 'Пишем 0 пятёрок',
-    equation: `2 × 4 + 2 = 10<sub>10</sub> = 2 · 5 + 0 = 20${sub}`,
-    note: 'Теперь считаем пятёрки. Прибавляем входящий перенос 2. Из десяти пятёрок получаем две группы по 25 и ноль отдельных пятёрок. Пишем 0 в пятёрках, переносим 2 влево.',
-    first: ' 02',
-    carry: 0,
-    highlights: ['bottom:2', 'top:1'],
-    split: { remainder: '0 пятёрок', carry: '2 группы по 25', carryAsset: 'twentyFive', column: 1 },
-  },
-  {
-    title: 'Завершаем первую строку',
-    equation: `23${sub} × 4 = 202${sub}`,
-    note: 'Цифры сверху закончились. Дописываем последний перенос 2 в старший разряд первой строки. Он означает две группы по 25.',
-    first: '202',
-    highlights: ['first:0'],
-  },
-  {
-    title: 'Умножаем на цифру 1',
-    equation: `23${sub} × 1 = 23${sub}`,
-    note: 'Начинаем вторую строку с нулевым переносом. Умножение на цифру 1 даёт 23₅. Сейчас запись ещё не сдвинута.',
-    first: '202',
-    second: ' 23',
-    highlights: ['bottom:1', 'second:1', 'second:2'],
-  },
-  {
-    title: 'Сдвигаем строку для пятёрок',
-    equation: `23${sub} × 10${sub} = 230${sub}`,
-    note: 'Цифра 1 в множителе стоит в разряде пятёрок, поэтому её вклад в пять раз больше. Сдвигаем 23₅ на один разряд влево. Освободившиеся единицы заполняем нулём.',
-    first: '202',
-    second: '230',
-    highlights: ['bottom:1'],
-    shift: true,
-  },
-  {
-    title: 'Складываем единицы',
-    equation: '2 + 0 = 2',
-    note: 'Складываем две строки справа налево. В единицах пишем 2. Переноса нет.',
-    first: '202', second: '230', sum: '  2',
-    highlights: ['first:2', 'second:2', 'sum:2'],
-  },
-  {
-    title: 'Складываем пятёрки',
-    equation: '0 + 3 = 3',
-    note: 'В разряде пятёрок пишем 3. Переноса нет.',
-    first: '202', second: '230', sum: ' 32',
-    highlights: ['first:1', 'second:1', 'sum:1'],
-  },
-  {
-    title: 'Складываем группы по 25',
-    equation: `2 + 2 = 4<br>23${sub} × 14${sub} = 432${sub}`,
-    note: 'Слева пишем 4. Получаем четыре группы по 25, три пятёрки и две единицы. Ответ 432₅.',
-    first: '202', second: '230', sum: '432',
-    highlights: ['first:0', 'second:0'],
-    finished: true,
-  },
-];
-
+const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const artwork = {
   "unit": "data:image/webp;base64,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",
   "five": "data:image/webp;base64,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",
   "twentyFive": "data:image/webp;base64,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"
 };
-const preview = document.getElementById('preview');
-const board = document.getElementById('board');
-const count = document.getElementById('step-count');
-const heading = document.getElementById('step-title');
-const equation = document.getElementById('equation');
-const status = document.getElementById('step-status');
-const split = document.getElementById('split');
-const next = document.getElementById('next');
-const back = document.getElementById('back');
-const reset = document.getElementById('reset');
-const motionSetting = window.matchMedia('(prefers-reduced-motion: reduce)');
-const rows = Object.fromEntries(['top', 'bottom', 'first', 'second', 'sum'].map(name => [
-  name, Array.from(board.querySelectorAll(`[data-row="${name}"] [data-digit]`)),
-]));
-const secondLabel = board.querySelector('[data-row=second] .row-name b');
-const shiftLabel = board.querySelector('.row-shift');
-const carrySlots = [...board.querySelectorAll('.carry-slot')];
+const byId = id => document.getElementById(id);
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+const motion = [];
+const board = byId('board');
+const next = byId('next');
+const back = byId('back');
+const reset = byId('reset');
+const phase = byId('phase');
+const baseField = byId('base');
+const firstField = byId('multiplicand');
+const secondField = byId('multiplier');
+const inputError = byId('input-error');
+const status = byId('step-status');
+const bench = byId('bench');
+let model;
 let current = 0;
-let flights = [];
+let cells;
+let equation;
+let carrying;
+let locked = false;
+let generation = 0;
 
-function clearFlights() {
-  for (const animation of flights) animation.cancel();
-  flights = [];
-}
+function makeModel(first, second, base) {
+  const a = [...first].reverse().map(digit => alphabet.indexOf(digit));
+  const b = [...second].reverse().map(digit => alphabet.indexOf(digit));
+  const result = parseInt(first, base) * parseInt(second, base);
+  const resultRecord = result.toString(base).toUpperCase();
+  const width = Math.max(a.length, b.length, resultRecord.length);
+  const places = Array.from({length: width}, (_, index) => base ** index);
+  const rowNames = ['first', 'second', 'third', 'fourth'].slice(0, b.length);
+  const lines = Object.fromEntries([...rowNames, 'sum'].map(name => [name, Array(width).fill('')]));
+  const steps = [];
+  const phases = [{name: 'началу', index: 0}];
+  let carryMark = null;
+  let stage = 0;
+  const token = (text, from = '') => ({text: String(text), from});
+  const take = (row, index, value) => token(alphabet[value], `${row}:${index}`);
+  const input = (row, index, value) => value >= 10
+    ? [take(row, index, value), token(`(${value}₁₀)`)]
+    : [take(row, index, value)];
+  const out = value => ({text: String(value), result: true});
+  const times = (i, j) => [...input('top', i, a[i]), '×', ...input('bottom', j, b[j])];
+  const valueMark = value => value > 9 || base !== 10 ? `${value}₁₀` : String(value);
+  const carryText = value => value < base ? alphabet[value] : valueMark(value);
 
-function moveNumber(value, source, destination, color) {
-  const target = destination.getBoundingClientRect();
-  if (!source.width || !source.height || !target.width || !target.height) return;
-
-  const label = document.createElement('span');
-  label.className = color === 'carry' ? 'flight move-chip' : 'flight digit ' + color;
-  label.setAttribute('aria-hidden', 'true');
-  label.textContent = value;
-  Object.assign(label.style, {
-    left: `${target.left}px`, top: `${target.top}px`,
-    width: `${target.width}px`, height: `${target.height}px`,
-  });
-  document.body.append(label);
-  const x = source.left + (source.width - target.width) / 2 - target.left;
-  const y = source.top + (source.height - target.height) / 2 - target.top;
-  const animation = label.animate([
-    { transform: `translate(${x}px, ${y}px)`, opacity: 0 },
-    { opacity: 1, offset: .14 },
-    { transform: 'translate(0,0)', opacity: 1 },
-  ], { duration: 640, easing: 'ease-in-out' });
-  const arrival = destination.animate([{opacity: 0}, {opacity: 0, offset: .75}, {opacity: 1}],
-    {duration: 640});
-  flights.push(animation, arrival);
-  animation.finished.then(() => label.remove(), () => label.remove());
-}
-
-function splitCard(name, quantity, asset, part) {
-  const card = document.createElement('div');
-  card.className = part === 'carry' ? 'split-card carry' : 'split-card';
-  const title = document.createElement('strong');
-  title.textContent = name;
-  const pieces = document.createElement('div');
-  pieces.className = 'pieces';
-  pieces.setAttribute('aria-hidden', 'true');
-  if (asset) {
-    for (let i = 0; i < 2; i += 1) {
-      const img = new Image();
-      img.src = artwork[asset];
-      img.alt = '';
-      if (asset !== 'unit') img.className = 'bundle';
-      pieces.append(img);
-    }
-  } else {
-    pieces.textContent = '0';
+  function step(title, note, opts = {}) {
+    steps.push({
+      title, note, stage,
+      lines: Object.fromEntries(Object.entries(lines).map(([name, digits]) => [name, [...digits]])),
+      carryMark, ...opts,
+    });
   }
-  const label = document.createElement('small');
-  label.textContent = quantity;
-  card.append(title, pieces, label);
-  return card;
+
+  function divideParts(total, place) {
+    const quotient = Math.floor(total / base);
+    const remainder = total % base;
+    const split = [
+      {kind: 'remainder', title: 'Остаток · пишем', amount: remainder, weight: places[place]},
+      {kind: 'carry', title: 'Частное · переносим', amount: quotient, weight: places[place + 1]},
+    ];
+    return {quotient, remainder, split};
+  }
+
+  function record(total, place, row, formula, focus, finished = false) {
+    const {remainder, quotient, split} = divideParts(total, place);
+    const splitFormula = [valueMark(total), '=', {text: String(quotient), quotient: true}, '×', String(base), '+', out(remainder)];
+    if (quotient) {
+      step(`Собираем по ${base}`,
+        `Размен даёт ${quotient} групп в соседнем разряде и остаток ${remainder} в текущем.`,
+        {formula: splitFormula, focus, bench: split});
+    }
+    const digit = alphabet[remainder];
+    const writeFormula = [...(quotient ? splitFormula : formula)];
+    if (remainder >= 10) writeFormula.push('→', out(digit));
+    lines[row][place] = digit;
+    carryMark = quotient ? {place: place + 1, digit: carryText(quotient)} : null;
+    const move = [{row, place}];
+    if (quotient) move.push({row: 'carry', place: place + 1});
+    let note = quotient
+      ? `Вписываем цифру ${digit}. В соседний разряд слева переносим ${quotient}.`
+      : `Результат помещается в один разряд. Пишем ${digit} без переноса.`;
+    if (finished) note += ` Ответ ${resultRecord} в основании ${base}.`;
+    step(quotient ? 'Пишем цифру и переносим' : 'Записываем цифру', note,
+      {formula: writeFormula, focus, bench: quotient ? split : [], move, finished});
+    return quotient;
+  }
+
+  step('Записываем числа по разрядам',
+    'Начнём с правой цифры множителя. Для каждой цифры второго числа будет своя строка.',
+    {formula: [`${first} в осн. ${base}`, '×', `${second} в осн. ${base}`]});
+
+  b.forEach((digit, j) => {
+    stage += 1;
+    const row = rowNames[j];
+    phases.push({name: `строке ${j + 1}`, index: steps.length});
+    const focus = [`bottom:${j}`];
+    const zeros = Array.from({length: j}, (_, place) => place);
+    zeros.forEach(place => { lines[row][place] = '0'; });
+    carryMark = null;
+    if (!digit) lines[row][j] = '0';
+    const note = j === 0 ? 'Пишем первую строку начиная с единиц.'
+      : `У этой цифры вес ${places[j]}. Сразу ставим ${j === 1 ? 'один ноль' : j === 2 ? 'два нуля' : 'три нуля'} справа и пишем цифры левее.`;
+    step(`Готовим строку ${j + 1}`, digit ? note : `${note} Умножение на 0 даёт 0.`, {
+      formula: digit ? [...input('bottom', j, digit), '×', String(places[j]), '=', out(digit * places[j])]
+        : [`${first} в осн. ${base}`, '×', take('bottom', j, digit), '=', out(0)],
+      focus, mark: zeros.map(place => `${row}:${place}`),
+    });
+    if (!digit) return;
+
+    let carry = 0;
+    a.forEach((value, i) => {
+      const place = j + i;
+      const focus = [`top:${i}`, `bottom:${j}`];
+      const product = value * digit;
+      let formula = [...times(i, j), '=', out(valueMark(product))];
+      step('Умножаем цифры', `Перемножаем выделенные цифры. Сейчас получаем вклад в разряд веса ${places[place]}.`,
+        {formula, focus, bench: [{kind: 'raw', title: 'Произведение цифр', amount: product, weight: places[place]}]});
+
+      if (carry) {
+        formula = [valueMark(product), '+', token(alphabet[carry], `carry:${place}`),
+          ...(carry >= 10 ? [`(${carry}₁₀)`] : []), '=', out(valueMark(product + carry))];
+        step('Прибавляем входящий перенос', 'Перенос уже относится к текущему разряду. Прибавляем его к произведению цифр.', {
+          formula, focus, bench: [
+            {kind: 'raw', title: 'Из умножения', amount: product, weight: places[place]},
+            {kind: 'carry', title: 'Из переноса', amount: carry, weight: places[place]},
+          ],
+        });
+      }
+      carry = record(product + carry, place, row, formula, focus);
+    });
+    if (carry) {
+      const place = j + a.length;
+      lines[row][place] = alphabet[carry];
+      carryMark = null;
+      step('Дописали последнюю цифру строки', 'Цифры первого числа закончились. Оставшийся перенос становится старшей цифрой этой строки.',
+        {formula: [token(alphabet[carry], `carry:${place}`), '→', out(alphabet[carry])], focus, move: [{row, place, from: `carry:${place}`}]});
+    }
+  });
+
+  stage += 1;
+  phases.push({name: 'сложению строк', index: steps.length});
+  let carry = 0;
+  for (let place = 0; place < resultRecord.length; place += 1) {
+    const terms = rowNames.flatMap(row => lines[row][place] === '' ? [] : [
+      {row, value: alphabet.indexOf(lines[row][place])},
+    ]);
+    const focus = terms.map(({row}) => `${row}:${place}`);
+    const formula = [];
+    let total = carry;
+    for (const {row, value} of terms) {
+      if (formula.length) formula.push('+');
+      formula.push(...input(row, place, value));
+      total += value;
+    }
+    if (carry) {
+      if (formula.length) formula.push('+');
+      formula.push(token(carryText(carry), `carry:${place}`));
+    }
+    if (!formula.length) formula.push('0');
+    formula.push('=', out(valueMark(total)));
+    step('Складываем цифры столбца', `Считаем вклады в разряде веса ${places[place]}${carry ? ' и прибавляем входящий перенос' : ''}.`,
+      {formula, focus, bench: [{kind: 'raw', title: 'Сумма в столбце', amount: total, weight: places[place]}]});
+    carry = record(total, place, 'sum', formula, focus, place === resultRecord.length - 1);
+  }
+  return {first, second, base, places, rowNames, steps, phases};
+}
+
+function element(tag, css = '', text = '') {
+  const node = document.createElement(tag);
+  node.className = css;
+  node.textContent = text;
+  return node;
+}
+
+function addRow(name, label, digits = [], carried = false) {
+  const line = element('div', 'board-line');
+  line.dataset.row = name;
+  line.setAttribute('role', 'group');
+  line.setAttribute('aria-label', label);
+  line.append(element('span', 'row-name', label));
+  const count = model.places.length;
+  for (let place = count - 1; place >= 0; place -= 1) {
+    const cell = element('span', carried ? 'carry-slot' : 'digit', digits[place] ?? '');
+    if (!carried) cell.dataset.digit = '';
+    cells.set(`${name}:${place}`, cell);
+    line.append(cell);
+  }
+  board.append(line);
+}
+
+function buildBoard() {
+  cells = new Map();
+  board.replaceChildren();
+  board.style.setProperty('--columns', model.places.length);
+  board.append(element('span', 'board-base', `Основание ${model.base}`));
+  const labels = element('div', 'place-labels');
+  labels.append(element('span', '', 'Вес'));
+  for (const [place, weight] of [...model.places.entries()].reverse()) {
+    const label = element('span', '', weight < 1000 ? String(weight) : String(model.base));
+    if (weight >= 1000) label.append(element('sup', '', String(place)));
+    label.title = String(weight);
+    labels.append(label);
+  }
+  board.append(labels);
+  addRow('carry', 'Перенос', [], true);
+  addRow('top', 'Первое', [...model.first].reverse());
+  addRow('bottom', '× Второе', [...model.second].reverse());
+
+  const calculation = element('div', 'calculation');
+  const heading = element('span', 'calc-label', 'Вычисление');
+  equation = element('div');
+  equation.id = 'equation';
+  calculation.append(heading, equation);
+  board.append(calculation, element('div', 'board-rule'));
+  model.rowNames.forEach((name, index) => addRow(name, `Строка ${index + 1}`));
+  board.append(element('div', 'board-rule'));
+  addRow('sum', '+ Сумма');
+
+  phase.replaceChildren(...model.phases.map(({name, index}) => new Option(name, String(index))));
+}
+
+function makeExample(first, second, base) {
+  model = makeModel(first, second, base);
+  buildBoard();
+  render(0);
+}
+
+function renderBench(groups) {
+  bench.replaceChildren();
+  bench.hidden = !groups.length;
+  for (const {kind, amount, weight, title} of groups) {
+    const group = element('div', `bench-group ${kind}`);
+    const quantity = element('div', 'pieces');
+    const weightAsset = weight === 1 ? 'unit' : model.base === 5 && weight === 5 ? 'five'
+      : model.base === 5 && weight === 25 ? 'twentyFive' : '';
+    if (weightAsset && amount > 0 && amount <= (weight === 1 ? 12 : 4)) {
+      for (let index = 0; index < amount; index += 1) {
+        const img = new Image();
+        img.src = artwork[weightAsset];
+        img.alt = '';
+        quantity.append(img);
+      }
+    } else {
+      quantity.append(element('b', 'piece-number', String(amount)));
+    }
+    group.append(element('strong', '', title), quantity,
+      element('span', '', kind === 'raw' ? `Количество ${amount} · вес ${weight}` : `${amount} по ${weight}`));
+    bench.append(group);
+  }
+}
+
+function fly(text, origin, target, blue, delay = 0) {
+  if (!origin?.width || !target) return;
+  const rect = target.getBoundingClientRect();
+  if (!rect.width || !rect.height) return;
+  const ghost = element('span', `source-ghost${blue ? ' blue' : ''}`, text);
+  ghost.setAttribute('aria-hidden', 'true');
+  const x = origin.left + (origin.width - rect.width) / 2 - rect.left;
+  const y = origin.top + (origin.height - rect.height) / 2 - rect.top;
+  Object.assign(ghost.style, {
+    left: `${rect.left}px`, top: `${rect.top}px`, width: `${rect.width}px`, height: `${rect.height}px`,
+  });
+  document.body.append(ghost);
+  const flight = ghost.animate([
+    {transform:`translate(${x}px,${y}px)`, opacity: 0},
+    {offset: .15, opacity: 1},
+    {transform:'translate(0,0)', opacity: 1},
+  ], {duration: 420, delay, easing:'ease-in-out', fill:'backwards'});
+  const appearance = target.animate([{opacity: 0}, {opacity: 0, offset: .65}, {opacity: 1}],
+    {duration: 420, delay, fill: 'backwards'});
+  motion.push(flight, appearance);
+  flight.finished.then(() => ghost.remove(), () => ghost.remove());
+}
+
+function updateControls(step) {
+  byId('step-count').textContent = `Шаг ${current + 1} из ${model.steps.length}`;
+  next.textContent = step.finished ? 'Готово' : 'Следующий шаг';
+  next.setAttribute('aria-disabled', String(locked || Boolean(step.finished)));
+  back.setAttribute('aria-disabled', String(current === 0));
+  reset.setAttribute('aria-disabled', String(current === 0));
+  phase.value = String(model.phases[step.stage].index);
 }
 
 function render(index, forward = false) {
-  clearFlights();
-  const step = steps[index];
-  const animate = forward && !motionSetting.matches && typeof board.animate === 'function';
-  const oldCarry = animate && index === 4 ? carrySlots[0].firstElementChild?.getBoundingClientRect() : null;
-  const oldDigits = animate && step.shift ? rows.second.slice(1).map(cell => cell.getBoundingClientRect()) : null;
+  generation += 1;
+  const version = generation;
+  for (const animation of motion.splice(0)) animation.cancel();
+  locked = false;
+  const step = model.steps[index];
+  const animate = forward && !reducedMotion.matches && typeof board.animate === 'function';
+  const positions = animate ? new Map([...cells.entries()].map(([id, cell]) => [id, cell.getBoundingClientRect()])) : new Map();
   current = index;
 
-  for (const [name, cells] of Object.entries(rows)) {
-    cells.forEach((cell, place) => {
-      if (name !== 'top' && name !== 'bottom') cell.textContent = step[name]?.[place]?.trim() ?? '';
+  for (const [name, digits] of Object.entries(step.lines)) {
+    digits.forEach((digit, place) => {
+      const cell = cells.get(`${name}:${place}`);
       cell.className = 'digit';
+      cell.textContent = digit;
     });
   }
-  for (const id of step.highlights ?? []) {
-    const [name, place] = id.split(':');
-    rows[name][Number(place)].classList.add('active');
+  [...model.places.keys()].forEach(place => {
+    cells.get(`carry:${place}`).replaceChildren();
+    cells.get(`top:${place}`).className = 'digit';
+    cells.get(`bottom:${place}`).className = 'digit';
+  });
+  const carry = step.carryMark;
+  if (carry) {
+    cells.get(`carry:${carry.place}`).append(element('span', 'move-chip', carry.digit));
   }
-  carrySlots.forEach(slot => slot.replaceChildren());
-  if (index === 3) {
-    const incoming = document.createElement('span');
-    incoming.className = 'move-chip used';
-    incoming.textContent = '+2';
-    incoming.setAttribute('aria-label', 'Входящий перенос 2 пятёрки');
-    carrySlots[1].append(incoming);
-  }
-  if (step.carry !== undefined) {
-    const chip = document.createElement('span');
-    chip.className = 'move-chip';
-    chip.textContent = '2';
-    chip.setAttribute('aria-label', step.carry === 1 ? 'Перенос 2 пятёрки' : 'Перенос 2 группы по 25');
-    carrySlots[step.carry].append(chip);
-  }
-  rows.second[0].parentElement.setAttribute('aria-label', index === 5 ? 'Строка до сдвига, умножение на 1' : 'Умножение на одну пятёрку');
-  secondLabel.textContent = index >= 6 ? '× 5' : '× 1';
-  shiftLabel.hidden = index !== 5;
-  heading.textContent = step.title;
-  equation.innerHTML = step.equation;
-  status.textContent = step.note;
-  split.hidden = !step.split;
-  split.replaceChildren();
-  if (step.split) {
-    const { remainder, carry, unitAsset, carryAsset, column } = step.split;
-    const remainderCard = splitCard('Остаток · пишем', remainder, unitAsset, 'remainder');
-    const carryCard = splitCard('Частное · переносим', carry, carryAsset, 'carry');
-    split.append(remainderCard, carryCard);
-    rows.first[column].classList.add('written');
-    if (animate) {
-      moveNumber(rows.first[column].textContent, remainderCard.getBoundingClientRect(), rows.first[column], 'written');
-      moveNumber('2', carryCard.getBoundingClientRect(), carrySlots[step.carry].firstElementChild, 'carry');
+  for (const id of step.focus ?? []) cells.get(id).classList.add('active');
+  for (const id of step.mark ?? []) cells.get(id).classList.add('placeholder');
+  if (step.finished) {
+    for (let place = 0; place < model.places.length; place += 1) {
+      const cell = cells.get(`sum:${place}`);
+      if (cell.textContent) cell.classList.add('done');
     }
   }
-  if (oldCarry) moveNumber('2', oldCarry, rows.first[0], 'written');
-  if (step.shift) {
-    rows.second.forEach(cell => cell.classList.add('shifted'));
-    if (oldDigits) oldDigits.forEach((source, place) => moveNumber(step.second[place], source, rows.second[place], 'shifted'));
-  }
-  if (step.finished) rows.sum.forEach(cell => cell.classList.add('done'));
-  const added = step.shift ? rows.second[2] : index >= 7 ? rows.sum[steps.length - 1 - index] : null;
-  if (animate && added) {
-    flights.push(added.animate([{opacity: .25, transform: 'translateY(-4px)'}, {opacity: 1, transform: 'none'}],
-      {duration: 400, delay: step.shift ? 350 : 0, fill: 'backwards', easing: 'ease-out'}));
+
+  const tokens = (step.formula ?? []).map(part => {
+    const info = typeof part === 'string' ? {text: part} : part;
+    const style = info.result ? ' result' : info.quotient ? ' quotient' : info.from ? ' input' : '';
+    return {node: element('span', `calc-token${style}`, info.text), info};
+  });
+  equation.replaceChildren(...tokens.map(({node}) => node));
+  byId('step-title').textContent = step.title;
+  status.textContent = step.note;
+  renderBench(step.bench ?? []);
+
+  if (animate && step.move) {
+    const result = equation.querySelector('.result:last-child');
+    for (const [number, move] of step.move.entries()) {
+      const target = cells.get(`${move.row}:${move.place}`);
+      const carried = move.row === 'carry';
+      if (carried) {
+        const source = equation.querySelector('.quotient');
+        fly(target.textContent, source?.getBoundingClientRect(), target.firstElementChild, true, number * 180);
+      } else {
+        target.classList.add('written');
+        fly(target.textContent, move.from ? positions.get(move.from) : result?.getBoundingClientRect(), target, false);
+      }
+    }
+  } else if (animate) {
+    for (const id of step.mark ?? []) {
+      const target = cells.get(id);
+      motion.push(target.animate([{opacity: 0, transform: 'scale(.85)'}, {opacity: 1, transform: 'none'}], {duration: 300, fill: 'backwards'}));
+    }
+    let inputIndex = 0;
+    for (const {node, info} of tokens) {
+      if (info.from) {
+        fly(info.text, positions.get(info.from), node, info.from.startsWith('carry'), inputIndex * 90);
+        inputIndex += 1;
+      }
+    }
+    const wait = inputIndex ? 390 + (inputIndex - 1) * 90 : 40;
+    for (const target of [...equation.querySelectorAll('.result'), ...bench.children]) {
+      motion.push(target.animate([{opacity: 0, transform: 'translateY(-3px)'}, {opacity: 1, transform: 'none'}],
+        {duration: 240, delay: wait, fill: 'backwards'}));
+    }
   }
 
-  count.textContent = `Шаг ${index + 1} из ${steps.length}`;
-  next.textContent = step.finished ? 'Готово' : 'Следующий шаг';
-  next.setAttribute('aria-disabled', String(Boolean(step.finished)));
-  back.setAttribute('aria-disabled', String(index === 0));
-  reset.setAttribute('aria-disabled', String(index === 0));
+  if (motion.length && !step.finished) {
+    locked = true;
+    Promise.allSettled(motion.map(animation => animation.finished)).then(() => {
+      if (generation !== version) return;
+      locked = false;
+      updateControls(step);
+    });
+  }
+  updateControls(step);
 }
 
+function readInput(field, base) {
+  const entered = field.value.trim();
+  if (!/^[0-9a-z]{1,4}$/i.test(entered)) return null;
+  const text = entered.toUpperCase();
+  if ([...text].some(char => !alphabet.slice(0, base).includes(char))) return null;
+  return text.replace(/^0+(?=.)/, '');
+}
+
+function showAlphabet() {
+  const base = Number(baseField.value);
+  byId('allowed-digits').textContent = base <= 10 ? `0–${base - 1}` : base === 11 ? '0–9 и A' : `0–9 и A–${alphabet[base - 1]}`;
+}
+
+for (let base = 2; base <= 36; base += 1) baseField.add(new Option(String(base), String(base)));
+baseField.value = '5';
+showAlphabet();
+baseField.addEventListener('change', showAlphabet);
+byId('settings').addEventListener('submit', event => {
+  event.preventDefault();
+  const base = Number(baseField.value);
+  const first = readInput(firstField, base);
+  const second = readInput(secondField, base);
+  firstField.setAttribute('aria-invalid', String(first === null));
+  secondField.setAttribute('aria-invalid', String(second === null));
+  if (first === null || second === null) {
+    inputError.textContent = `Введите от 1 до 4 допустимых знаков. В основании ${base} используются ${byId('allowed-digits').textContent}.`;
+    (first === null ? firstField : secondField).focus();
+    return;
+  }
+  inputError.textContent = '';
+  firstField.value = first;
+  secondField.value = second;
+  makeExample(first, second, base);
+});
+
 next.addEventListener('click', () => {
-  if (current < steps.length - 1) render(current + 1, true);
+  if (!locked && current < model.steps.length - 1) render(current + 1, true);
 });
 back.addEventListener('click', () => {
   if (current > 0) render(current - 1);
@@ -413,9 +564,10 @@ back.addEventListener('click', () => {
 reset.addEventListener('click', () => {
   if (current > 0) render(0);
 });
+phase.addEventListener('change', () => render(Number(phase.value)));
 
-preview.hidden = false;
-render(0);
+byId('preview').hidden = false;
+makeExample(firstField.value, secondField.value, Number(baseField.value));
 </script>
 </body>
 </html>
