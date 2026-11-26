@@ -71,11 +71,6 @@ figure h4{font-size:1.05rem;margin:0 0 .5rem}
 .steps caption{font-size:.85rem;color:var(--muted);white-space:normal}
 .steps :is(th,td){border:1px solid var(--line);padding:.15rem .5rem;text-align:center;min-width:2rem}
 .steps th{background:#eef4ff;font-weight:550}
-.steps .picked{background:#e7f2ea;color:#254a35;font-weight:600}
-.lattice td{position:relative;min-width:3.5rem;height:3rem;background:linear-gradient(135deg,transparent 49%,#a9bad4 50%,transparent 52%)}
-.lattice td span{position:absolute}
-.lattice td span:first-child{top:2px;left:.55rem}
-.lattice td span:last-child{bottom:2px;right:.55rem}
 
 .soroban{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));max-width:15rem;margin:.7rem auto;gap:.35rem;background:#fcf4e4;border:1px solid #eed8b2;border-radius:10px;text-align:center}
 .rod>b{display:block;padding:.12rem .2rem;font-size:.86rem}
@@ -96,6 +91,61 @@ figure h4{font-size:1.05rem;margin:0 0 .5rem}
 .right-quotient span:nth-child(2){border-bottom:1.5px solid;border-left:1.5px solid}
 .right-quotient b{grid-column:2;border-left:1.5px solid}
 
+.multiplication-steps{display:grid;gap:16px;margin-block:14px}
+.multiplication-steps figure{padding:clamp(14px,3vw,24px)}
+.scheme-layout{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(16px,3vw,32px);align-items:start}
+.scheme-layout>div{min-width:0}
+.scheme-equation{font-size:clamp(1.22rem,4vw,1.55rem);font-weight:700;font-variant-numeric:tabular-nums}
+.area-scheme{display:grid;grid-template-columns:2.25rem 1.6fr 1fr;grid-template-rows:auto minmax(4.5rem,auto) minmax(4rem,auto);max-width:30rem;font-variant-numeric:tabular-nums}
+.area-scheme>span{display:grid;place-items:center;padding:2px;font-weight:650}
+.area-piece{display:grid;place-content:center;justify-items:center;text-align:center;line-height:1.3}
+.area-piece:nth-child(5),.area-piece:nth-child(8){border-right:1px solid #fff}
+.area-piece:nth-child(n+7){border-top:1px solid #fff}
+.for-tens{background:#e5eeff;color:#174181}
+.for-units{background:#fff0d1;color:#694108}
+.area-piece span{font-size:.92rem}
+.area-piece strong{font-size:clamp(1.3rem,4vw,1.65rem)}
+.written-product{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:.8rem;align-items:center;max-width:23rem;margin:0}
+.product-number{padding:.22rem .55rem;text-align:right;font-size:1.5rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.25;white-space:nowrap}
+.product-line{border-bottom:2px solid #445570}
+.written-product .product-number{grid-column:1}
+.product-label{grid-column:2;margin:0;font-size:.93rem}
+.product-total{border-top:2px solid #445570;padding-top:.35rem}
+.written-product .product-label:last-child{font-weight:650}
+.lattice-scheme{display:grid;grid-template-columns:repeat(2,minmax(0,1fr)) 2.25rem;grid-template-rows:2rem repeat(2,minmax(4.5rem,1fr));width:min(100%,24rem);margin:0 auto 1rem}
+.lattice-factor,.lattice-times{display:grid;place-items:center;font-size:1.3rem;font-weight:700}
+.lattice-cell{position:relative;display:block;min-height:5rem;font-size:clamp(1.4rem,5vw,2rem);line-height:1.1;border:1px solid #7385a1}
+.lattice-cell::before,.lattice-cell::after{position:absolute;inset:0;content:"";pointer-events:none}
+.lattice-cell::before{background:var(--upper);clip-path:polygon(0 0,100% 0,0 100%)}
+.lattice-cell::after{background:var(--lower);clip-path:polygon(100% 0,100% 100%,0 100%)}
+.lattice-cell span{position:absolute;z-index:1;font-weight:700}
+.lattice-cell span:first-child{top:14%;left:16%}
+.lattice-cell span:last-child{bottom:12%;right:16%}
+.band-higher{--band:#eef1f6}
+.band-hundreds{--band:#e5eeff}
+.band-tens{--band:#fff0d1}
+.band-units{--band:#e0f0e6}
+.lattice-cell:nth-child(4){--upper:#eef1f6;--lower:#e5eeff}
+.lattice-cell:nth-child(5),.lattice-cell:nth-child(7){--upper:#e5eeff;--lower:#fff0d1}
+.lattice-cell:nth-child(8){--upper:#fff0d1;--lower:#e0f0e6}
+.diagonal-steps{display:grid;gap:.45rem;list-style:none;margin:0;padding:0}
+.diagonal-steps li{padding:.46rem .65rem;border-radius:8px;background:var(--band)}
+.diagonal-steps strong{font-size:1.12rem}
+.diagonal-steps small{display:block;font-size:.92rem}
+.doubling-flow,.factor-flow{display:flex;align-items:stretch;gap:.45rem;list-style:none;margin:.7rem 0;padding:0}
+.doubling-flow>div,.factor-flow li{flex:1 1 0;min-width:0;padding:.5rem .25rem;text-align:center;background:#f1f4f8;border:1px solid #dce3f0;border-radius:9px}
+.doubling-flow>div.selected{background:#e0f0e6;border-color:#96bea6}
+.doubling-flow span,.factor-flow span{display:block;font-size:.92rem}
+.doubling-flow strong,.factor-flow strong{display:block;font-size:clamp(1.12rem,4vw,1.55rem);line-height:1.4}
+.flow-arrow{align-self:center;font-size:1.1rem;color:#425b7f}
+.factor-flow{max-width:31rem}
+.factor-flow li.for-units{background:#fff0d1}
+.factor-flow li.for-tens{background:#e5eeff}
+.rod-progress{display:grid;gap:.4rem;list-style:none;margin:.6rem 0;padding:0}
+.rod-progress li{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;padding:.3rem .55rem;background:#eef4ff;border-radius:7px}
+.rod-progress b{font-size:1.12rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+@media(max-width:660px){.scheme-layout{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:390px){.doubling-flow{gap:.2rem}.doubling-flow .flow-arrow{font-size:.87rem}}
 </style>
 </head>
 <body>
@@ -114,13 +164,14 @@ figure h4{font-size:1.05rem;margin:0 0 .5rem}
     <div class="examples">
       <figure>
         <h4>81 × 81</h4>
-        <dl class="board" aria-label="Начальная раскладка для умножения в современной записи">
-          <dt>Верхний ряд</dt><dd>81</dd>
-          <dt>Средний ряд</dt><dd>Пусто</dd>
-          <dt>Нижний ряд</dt><dd>81 · 10</dd>
-        </dl>
-        <p>Нижний ряд сначала сдвинут на разряд влево. Верхние 8 десятков дают в середине 6400 и 80. Затем сдвигаем нижний ряд вправо и убираем верхние 8 десятков. Оставшаяся единица даёт ещё 80 и 1.</p>
-        <p class="formula">6400 → 6480 → 6560 → <strong>6561</strong></p>
+        <p>На доске сверху стоит 81, снизу — 81 со сдвигом влево на один разряд. Сначала используем 8 десятков верхнего числа. Затем сдвигаем нижнее число вправо и используем верхнюю единицу.</p>
+        <p><strong>Как растёт число в среднем ряду</strong></p>
+        <ol class="rod-progress">
+          <li><span>80 × 80</span><b>6400</b></li>
+          <li><span>+ 80 × 1</span><b>6480</b></li>
+          <li><span>+ 1 × 80</span><b>6560</b></li>
+          <li><span>+ 1 × 1</span><b>6561</b></li>
+        </ol>
         <figcaption class="source">Числа в среднем ряду после каждого действия. <a href="https://yawnoc.github.io/sun-tzu/i/13">Оригинал и перевод § 13</a></figcaption>
       </figure>
       <figure>
@@ -141,7 +192,11 @@ figure h4{font-size:1.05rem;margin:0 0 .5rem}
   <article class="region">
     <h3>Индия. Умножение и обратное деление в «Лилавати»</h3>
     <p>Бхаскара II предлагает умножить 135 на 12 и разделить результат на тот же множитель. В современной записи один из способов даёт два частичных произведения.</p>
-    <p class="formula">135 × 12 = 1350 + 270 = <strong>1620</strong></p>
+    <ul class="factor-flow" aria-label="Умножаем на единицы и десятки">
+      <li class="for-units"><span>135 × 2</span><strong>270</strong></li>
+      <li class="for-tens"><span>135 × 10</span><strong>1350</strong></li>
+    </ul>
+    <p class="scheme-equation">270 + 1350 = 1620</p>
     <p>При делении 1620 на 12 сначала можно убрать 1200, затем 360 и 60. Это 100, 30 и 5 групп по 12, поэтому частное равно 135.</p>
     <p class="source">Вычитания при делении здесь даны как современная проверка на тех же числах. <a href="https://assets.super.so/e745dfd7-232e-47c1-a806-753f45b941ba/files/9b336695-0368-44c9-97bc-cb392265f4d2.pdf#page=22">Бхаскара II, «Лилавати», перевод и комментарии, с. 15</a></p>
   </article>
@@ -152,7 +207,11 @@ figure h4{font-size:1.05rem;margin:0 0 .5rem}
     <div class="examples two">
       <figure>
         <h4>34 × 2 = 68</h4>
-        <p>Сначала по таблице умножения получаем 4 × 2 = 8 единиц. Затем 3 × 2 = 6 десятков. Обе цифры набираются на своих спицах в области результата.</p>
+        <p>Сначала набираем результат для единиц, затем для десятков.</p>
+        <ul class="factor-flow" aria-label="Две цифры результата">
+          <li class="for-units"><span>4 × 2</span><strong>8 единиц</strong></li>
+          <li class="for-tens"><span>3 × 2</span><strong>6 десятков</strong></li>
+        </ul>
         <div class="soroban" role="img" aria-label="Число 68 на соробане. В десятках к перекладине сдвинуты косточка пять и одна единичная, в единицах косточка пять и три единичных.">
           <div class="rod" aria-hidden="true">
             <b>Десятки</b><div class="beads">
@@ -181,36 +240,70 @@ figure h4{font-size:1.05rem;margin:0 0 .5rem}
 
 <section id="multiply" aria-labelledby="multiply-title">
   <h2 id="multiply-title">Три способа получить 23 × 14</h2>
-  <div class="examples">
-    <figure>
-      <h3>Прямоугольник и столбик</h3>
-      <table class="steps">
-        <caption>Произведения частей</caption>
-        <thead><tr><th></th><th scope="col">20</th><th scope="col">3</th></tr></thead>
-        <tbody><tr><th scope="row">10</th><td>200</td><td>30</td></tr><tr><th scope="row">4</th><td>80</td><td>12</td></tr></tbody>
-      </table>
-      <p>В столбике части объединяются в две строки. От 4 получаем 92, от 10 получаем 230. Складываем и получаем 322.</p>
+  <div class="multiplication-steps">
+    <figure aria-labelledby="area-product-title">
+      <h3 id="area-product-title">Прямоугольник и столбик</h3>
+      <p>Разбиваем 23 на 20 и 3, а 14 — на 10 и 4. Синие части дают строку для 10, жёлтые — строку для 4.</p>
+      <div class="scheme-layout">
+        <div>
+          <h4>Четыре части прямоугольника</h4>
+          <div class="area-scheme" role="img" aria-label="Прямоугольник. Длины сверху 20 и 3, слева 10 и 4. В верхней полосе 10 умножить на 20 равно 200 и 10 умножить на 3 равно 30. В нижней полосе 4 умножить на 20 равно 80 и 4 умножить на 3 равно 12.">
+            <span></span><span>20</span><span>3</span>
+            <span>10</span><div class="area-piece for-tens"><span>10 × 20</span><strong>200</strong></div><div class="area-piece for-tens"><span>10 × 3</span><strong>30</strong></div>
+            <span>4</span><div class="area-piece for-units"><span>4 × 20</span><strong>80</strong></div><div class="area-piece for-units"><span>4 × 3</span><strong>12</strong></div>
+          </div>
+        </div>
+        <div>
+          <h4>Две строки столбика</h4>
+          <div class="written-product" role="img" aria-label="Столбик 23 умножить на 14. Сначала 80 плюс 12 равно 92. Затем 200 плюс 30 равно 230. Складываем 92 и 230, получаем 322.">
+            <div class="product-number">23</div>
+            <div class="product-number product-line">× 14</div>
+            <div class="product-number for-units">92</div><span class="product-label">80 + 12</span>
+            <div class="product-number for-tens">+ 230</div><span class="product-label">200 + 30</span>
+            <div class="product-number product-total">322</div><span class="product-label">Ответ</span>
+          </div>
+          <p>230 — это 23 десятка. Поэтому в этой строке справа стоит 0.</p>
+        </div>
+      </div>
       <figcaption class="source"><a href="https://www.ncetm.org.uk/media/p22ldwpi/ncetm_spine2_segment23_y6.pdf">NCETM, Англия, § 2.23</a></figcaption>
     </figure>
-    <figure>
-      <h3>Решётка</h3>
-      <table class="steps lattice">
-        <caption>Произведения отдельных цифр</caption>
-        <thead><tr><th></th><th scope="col">2</th><th scope="col">3</th></tr></thead>
-        <tbody><tr><th scope="row">1</th><td><span>0</span><span>2</span></td><td><span>0</span><span>3</span></td></tr>
-        <tr><th scope="row">4</th><td><span>0</span><span>8</span></td><td><span>1</span><span>2</span></td></tr></tbody>
-      </table>
-      <p>Читаем диагонали с правого нижнего угла. У единиц сумма 2. У десятков 3 + 8 + 1 = 12, пишем 2 и переносим 1. В сотнях 2 + 0 + 0 + 1 = 3.</p>
+
+    <figure aria-labelledby="lattice-title">
+      <h3 id="lattice-title">Решётка</h3>
+      <p>В каждой клетке записываем произведение двух цифр. Десятки идут в верхний треугольник, единицы — в нижний. Одинаковый цвет показывает, какие цифры складывать вдоль одной диагонали.</p>
+      <div class="scheme-layout">
+        <div class="lattice-scheme" role="img" aria-label="Решётка для 23 умножить на 14. Цифры 2 и 3 сверху, 1 и 4 справа. В верхнем ряду произведения 02 и 03, в нижнем 08 и 12. Каждая клетка разделена диагональю.">
+          <span class="lattice-factor">2</span><span class="lattice-factor">3</span><span class="lattice-times">×</span>
+          <div class="lattice-cell"><span>0</span><span>2</span></div><div class="lattice-cell"><span>0</span><span>3</span></div><span class="lattice-factor">1</span>
+          <div class="lattice-cell"><span>0</span><span>8</span></div><div class="lattice-cell"><span>1</span><span>2</span></div><span class="lattice-factor">4</span>
+        </div>
+        <div>
+          <h4>Складываем от правого нижнего угла</h4>
+          <ol class="diagonal-steps">
+            <li class="band-units">Единицы <strong>2</strong></li>
+            <li class="band-tens">Десятки <strong>3 + 1 + 8 = 12</strong><small>Пишем 2 десятка, переносим 1 сотню.</small></li>
+            <li class="band-hundreds">Сотни <strong>0 + 2 + 0 + 1 = 3</strong><small>Последняя 1 — перенос.</small></li>
+            <li class="band-higher">Тысячи <strong>0</strong><small>Ведущий ноль опускаем.</small></li>
+          </ol>
+        </div>
+      </div>
+      <p class="scheme-equation">23 × 14 = 322</p>
       <figcaption class="source"><a href="https://en.wikisource.org/wiki/A_Source_Book_in_Mathematics/The_First_Printed_Arithmetic">«Арифметика Тревизо», 1478</a></figcaption>
     </figure>
-    <figure>
-      <h3>Удвоения</h3>
-      <table class="steps">
-        <caption>Кратные числа 23</caption>
-        <thead><tr><th scope="col">Множитель</th><th scope="col">Произведение</th></tr></thead>
-        <tbody><tr><td>1</td><td>23</td></tr><tr class="picked"><td>2</td><td>46</td></tr><tr class="picked"><td>4</td><td>92</td></tr><tr class="picked"><td>8</td><td>184</td></tr></tbody>
-      </table>
-      <p>Разлагаем 14 как 8 + 4 + 2 и складываем выделенные числа. 184 + 92 + 46 = 322.</p>
+
+    <figure aria-labelledby="doubling-title">
+      <h3 id="doubling-title">Удвоения</h3>
+      <p>В каждой группе по 23. На каждом шаге удваиваем число групп и общую сумму. Выделяем 2, 4 и 8 групп, потому что 2 + 4 + 8 = 14.</p>
+      <div class="doubling-flow" role="img" aria-label="Одна группа по 23 даёт 23, две дают 46, четыре дают 92 и восемь дают 184. Выбираем значения для двух, четырёх и восьми групп.">
+        <div><span>× 1</span><strong>23</strong></div>
+        <span class="flow-arrow" aria-hidden="true">→</span>
+        <div class="selected"><span>× 2</span><strong>46</strong></div>
+        <span class="flow-arrow" aria-hidden="true">→</span>
+        <div class="selected"><span>× 4</span><strong>92</strong></div>
+        <span class="flow-arrow" aria-hidden="true">→</span>
+        <div class="selected"><span>× 8</span><strong>184</strong></div>
+      </div>
+      <p class="scheme-equation">184 + 92 + 46 = 322</p>
       <figcaption class="source">Современный пример приёма из Древнего Египта. <a href="https://en.wikisource.org/wiki/Page:The_Rhind_Mathematical_Papyrus,_Volume_I.pdf/20">Папирус Ринда, комментарий к задаче 79</a></figcaption>
     </figure>
   </div>
@@ -251,7 +344,12 @@ figure h4{font-size:1.05rem;margin:0 0 .5rem}
 <section id="bases" aria-labelledby="bases-title">
   <h2 id="bases-title">Пример в пятеричной системе</h2>
   <div class="note">
-    <p>При умножении 23<sub>5</sub> × 14<sub>5</sub> четыре клетки прямоугольника дают вклады того же веса, что и диагонали решётки. Переносим пятёрками и получаем 432<sub>5</sub>.</p>
+    <p>При умножении 23<sub>5</sub> × 14<sub>5</sub> разбиваем 14<sub>5</sub> на 4<sub>5</sub> и 10<sub>5</sub>. В каждой строке и в сумме перенос считаем пятёрками.</p>
+    <ul class="factor-flow" aria-label="Частичные произведения в основании 5">
+      <li class="for-units"><span>23<sub>5</sub> × 4<sub>5</sub></span><strong>202<sub>5</sub></strong></li>
+      <li class="for-tens"><span>23<sub>5</sub> × 10<sub>5</sub></span><strong>230<sub>5</sub></strong></li>
+    </ul>
+    <p class="scheme-equation">202<sub>5</sub> + 230<sub>5</sub> = 432<sub>5</sub></p>
     <p>При делении 433<sub>5</sub> на 14<sub>5</sub> сначала убираем 14<sub>5</sub> · 20<sub>5</sub> = 330<sub>5</sub>. Из оставшегося 103<sub>5</sub> убираем 14<sub>5</sub> · 3<sub>5</sub> = 102<sub>5</sub>. Частное равно <strong>23<sub>5</sub></strong>, остаток равен <strong>1<sub>5</sub></strong>.</p>
   </div>
 </section>
