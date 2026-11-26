@@ -44,16 +44,29 @@ button[aria-disabled="true"] { opacity: .56; cursor: default; }
 .phase-control select { max-width: 100%; }
 #step-count { font-size: .83rem; font-weight: 650; color: var(--muted); }
 .work { display: grid; grid-template-columns: minmax(0,1fr) minmax(15rem,.8fr); gap: .8rem; align-items: start; }
-.board, .explanation { min-width: 0; background: #fff; border: 1px solid var(--line); border-radius: .85rem; }
+.board, .explanation, .table-panel { min-width: 0; background: #fff; border: 1px solid var(--line); border-radius: .85rem; }
 .board { padding: .55rem clamp(.32rem, 2vw, 1rem) .8rem; }
 .board-base { display: block; margin: 0 0 .42rem; font-weight: 650; font-size: .85rem; }
-.explanation { padding: .75rem clamp(.6rem, 2vw, 1.05rem); }
+.side { display: grid; gap: .6rem; min-width: 0; }
+.explanation, .table-panel { padding: .75rem clamp(.6rem, 2vw, 1.05rem); }
+.table-panel p { margin: .32rem 0 .5rem; font-size: .85rem; color: var(--muted); }
+#table-scroll { overflow: auto; max-height: 13rem; border: 1px solid var(--line); border-radius: .45rem; }
+#times-table { width: 100%; border-spacing: 0; text-align: center; font-variant-numeric: tabular-nums; font-size: .9rem; }
+#times-table th, #times-table td { min-width: 2.18rem; height: 1.95rem; padding: .18rem .28rem; border: solid var(--line); border-width: 0 1px 1px 0; }
+#times-table th { position: sticky; background: #eaf1fb; color: #1d4889; }
+#times-table thead th { top: 0; z-index: 2; }
+#times-table th:first-child { left: 0; z-index: 1; }
+#times-table thead th:first-child { z-index: 3; }
+#times-table .table-guide { background: #fff7e1; }
+#times-table th.table-guide { background: var(--warm-soft); color: var(--warm); }
+#times-table [aria-current="true"] { background: #e0efdf; color: #215638; font-weight: 800; box-shadow: inset 0 0 0 2px #739c82; }
 .place-labels, .board-line {
   display: grid; grid-template-columns: minmax(2.25rem,1fr) repeat(var(--columns),minmax(0,2.8rem));
   gap: 2px; align-items: center;
 }
 .place-labels span, .row-name { color: var(--muted); font-size: .7rem; }
 .place-labels span:not(:first-child) { text-align: center; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; line-height: 1.1; }
+.place-labels .long-weight { font-size: .59rem; }
 .row-name { line-height: 1.2; }
 .row-name b { color: var(--ink); }
 .board-line { margin-top: .22rem; }
@@ -74,7 +87,6 @@ button[aria-disabled="true"] { opacity: .56; cursor: default; }
 .calc-token { display: inline-block; min-width: .8rem; text-align: center; border-radius: .28rem; padding-inline: .16rem; }
 .calc-token.result { background: #e0efdf; color: #235635; padding-inline: .28rem; }
 .calc-token.quotient { background: var(--blue-soft); color: #19468b; }
-sub { font-size: .68em; }
 #step-status { color: #263652; }
 .bench { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .45rem; }
 .bench-group {
@@ -97,6 +109,7 @@ summary { color: #15479e; cursor: pointer; font-weight: 650; }
 footer { display: flex; flex-wrap: wrap; gap: .3rem 1rem; font-size: .88rem; margin-top: .9rem; }
 @media(max-width: 670px) {
   .work { grid-template-columns: minmax(0,1fr); }
+  .controls { position: sticky; top: 0; z-index: 5; padding-block: .28rem; background: var(--bg); }
   .phase-control { margin-left: 0; }
 }
 </style>
@@ -125,19 +138,28 @@ footer { display: flex; flex-wrap: wrap; gap: .3rem 1rem; font-size: .88rem; mar
     </div>
     <div class="work">
       <div class="board" id="board" role="group" aria-label="Умножение столбиком"></div>
-      <section class="explanation" aria-labelledby="step-title">
-        <h2 id="step-title"></h2>
-        <p id="step-status" role="status" aria-live="polite" aria-atomic="true"></p>
-        <div class="bench" id="bench" hidden></div>
-      </section>
+      <div class="side">
+        <section class="table-panel" aria-labelledby="table-heading">
+          <h2 id="table-heading">Таблица умножения</h2>
+          <p id="table-note"></p>
+          <div id="table-scroll" role="region" aria-labelledby="table-heading" tabindex="0">
+            <table id="times-table" aria-labelledby="table-heading" aria-describedby="table-note"></table>
+          </div>
+        </section>
+        <section class="explanation" aria-labelledby="step-title">
+          <h2 id="step-title"></h2>
+          <p id="step-status" role="status" aria-live="polite" aria-atomic="true"></p>
+          <div class="bench" id="bench" hidden></div>
+        </section>
+      </div>
     </div>
   </div>
   <noscript><p>Для пошаговой анимации нужен JavaScript.</p></noscript>
   <details class="read-more">
     <summary>Правило умножения столбиком</summary>
     <p>Для каждой цифры второго числа заводим свою строку. Если цифра стоит в разряде номер <i>j</i> (считаем справа с нуля), сразу ставим <i>j</i> нулей справа. Остальные цифры вписываем левее этих нулей.</p>
-    <p>Умножаем цифры справа налево и прибавляем входящий перенос. Делим результат на основание. Остаток пишем в текущий разряд, частное переносим на один разряд влево. В конце складываем строки.</p>
-    <p>В промежуточных формулах количества показаны в десятичной системе. В столбик пишем цифры выбранного основания.</p>
+    <p>Двигаемся справа налево. Произведение двух цифр берём из таблицы и прибавляем входящий перенос. Последнюю цифру результата пишем в текущий столбец, а всю часть слева переносим в соседний разряд.</p>
+    <p>В конце складываем строки по столбцам и пользуемся тем же правилом переноса. Все вычисления записаны в выбранном основании.</p>
   </details>
   <footer><a href="umnozhenie-i-delenie-chernovik.html#multiply">Черновик об умножении</a><a href="index.html">Оглавление</a></footer>
 </main>
@@ -163,19 +185,28 @@ const secondField = byId('multiplier');
 const inputError = byId('input-error');
 const status = byId('step-status');
 const bench = byId('bench');
+const table = byId('times-table');
+const tableScroll = byId('table-scroll');
 let model;
 let current = 0;
 let cells;
 let equation;
-let carrying;
+let tableBase;
+let tableGuides = [];
+let tableHit;
 let locked = false;
 let generation = 0;
+
+function numeral(value, base) {
+  return value.toString(base).toUpperCase();
+}
 
 function makeModel(first, second, base) {
   const a = [...first].reverse().map(digit => alphabet.indexOf(digit));
   const b = [...second].reverse().map(digit => alphabet.indexOf(digit));
   const result = parseInt(first, base) * parseInt(second, base);
-  const resultRecord = result.toString(base).toUpperCase();
+  const inBase = value => numeral(value, base);
+  const resultRecord = inBase(result);
   const width = Math.max(a.length, b.length, resultRecord.length);
   const places = Array.from({length: width}, (_, index) => base ** index);
   const rowNames = ['first', 'second', 'third', 'fourth'].slice(0, b.length);
@@ -186,13 +217,7 @@ function makeModel(first, second, base) {
   let stage = 0;
   const token = (text, from = '') => ({text: String(text), from});
   const take = (row, index, value) => token(alphabet[value], `${row}:${index}`);
-  const input = (row, index, value) => value >= 10
-    ? [take(row, index, value), token(`(${value}₁₀)`)]
-    : [take(row, index, value)];
   const out = value => ({text: String(value), result: true});
-  const times = (i, j) => [...input('top', i, a[i]), '×', ...input('bottom', j, b[j])];
-  const valueMark = value => value > 9 || base !== 10 ? `${value}₁₀` : String(value);
-  const carryText = value => value < base ? alphabet[value] : valueMark(value);
 
   function step(title, note, opts = {}) {
     steps.push({
@@ -202,43 +227,37 @@ function makeModel(first, second, base) {
     });
   }
 
-  function divideParts(total, place) {
+  function record(total, place, row, formula, focus, lookup = null, finished = false) {
     const quotient = Math.floor(total / base);
     const remainder = total % base;
-    const split = [
-      {kind: 'remainder', title: 'Остаток · пишем', amount: remainder, weight: places[place]},
-      {kind: 'carry', title: 'Частное · переносим', amount: quotient, weight: places[place + 1]},
-    ];
-    return {quotient, remainder, split};
-  }
-
-  function record(total, place, row, formula, focus, finished = false) {
-    const {remainder, quotient, split} = divideParts(total, place);
-    const splitFormula = [valueMark(total), '=', {text: String(quotient), quotient: true}, '×', String(base), '+', out(remainder)];
+    const digit = inBase(remainder);
+    const transfer = inBase(quotient);
+    const splitFormula = [inBase(total), '→', {text: transfer, quotient: true}, '│', out(digit)];
+    const split = quotient ? [
+      {kind: 'carry', title: 'Переносим влево', amount: quotient, weight: places[place + 1]},
+      {kind: 'remainder', title: 'Пишем в столбец', amount: remainder, weight: places[place]},
+    ] : [];
     if (quotient) {
-      step(`Собираем по ${base}`,
-        `Размен даёт ${quotient} групп в соседнем разряде и остаток ${remainder} в текущем.`,
-        {formula: splitFormula, focus, bench: split});
+      step('Выделяем цифру и перенос',
+        `В записи ${inBase(total)} последняя цифра ${digit} идёт в текущий столбец. Слева от неё стоит перенос ${transfer}.`,
+        {formula: splitFormula, focus, bench: split, lookup});
     }
-    const digit = alphabet[remainder];
-    const writeFormula = [...(quotient ? splitFormula : formula)];
-    if (remainder >= 10) writeFormula.push('→', out(digit));
     lines[row][place] = digit;
-    carryMark = quotient ? {place: place + 1, digit: carryText(quotient)} : null;
+    carryMark = quotient ? {place: place + 1, digit: transfer} : null;
     const move = [{row, place}];
     if (quotient) move.push({row: 'carry', place: place + 1});
     let note = quotient
-      ? `Вписываем цифру ${digit}. В соседний разряд слева переносим ${quotient}.`
-      : `Результат помещается в один разряд. Пишем ${digit} без переноса.`;
+      ? `Вписываем цифру ${digit}. В соседний разряд слева переносим ${transfer}.`
+      : `Пишем ${digit} в текущий столбец. Перенос не нужен.`;
     if (finished) note += ` Ответ ${resultRecord} в основании ${base}.`;
     step(quotient ? 'Пишем цифру и переносим' : 'Записываем цифру', note,
-      {formula: writeFormula, focus, bench: quotient ? split : [], move, finished});
+      {formula: quotient ? splitFormula : formula, focus, bench: split, lookup, move, finished});
     return quotient;
   }
 
   step('Записываем числа по разрядам',
     'Начнём с правой цифры множителя. Для каждой цифры второго числа будет своя строка.',
-    {formula: [`${first} в осн. ${base}`, '×', `${second} в осн. ${base}`]});
+    {formula: [first, '×', second]});
 
   b.forEach((digit, j) => {
     stage += 1;
@@ -250,10 +269,10 @@ function makeModel(first, second, base) {
     carryMark = null;
     if (!digit) lines[row][j] = '0';
     const note = j === 0 ? 'Пишем первую строку начиная с единиц.'
-      : `У этой цифры вес ${places[j]}. Сразу ставим ${j === 1 ? 'один ноль' : j === 2 ? 'два нуля' : 'три нуля'} справа и пишем цифры левее.`;
+      : `У этого разряда вес ${inBase(places[j])}. Сразу ставим ${j === 1 ? 'один ноль' : j === 2 ? 'два нуля' : 'три нуля'} справа и пишем цифры левее.`;
     step(`Готовим строку ${j + 1}`, digit ? note : `${note} Умножение на 0 даёт 0.`, {
-      formula: digit ? [...input('bottom', j, digit), '×', String(places[j]), '=', out(digit * places[j])]
-        : [`${first} в осн. ${base}`, '×', take('bottom', j, digit), '=', out(0)],
+      formula: digit ? [take('bottom', j, digit), '×', inBase(places[j]), '=', out(inBase(digit * places[j]))]
+        : [first, '×', take('bottom', j, digit), '=', out(0)],
       focus, mark: zeros.map(place => `${row}:${place}`),
     });
     if (!digit) return;
@@ -262,22 +281,19 @@ function makeModel(first, second, base) {
     a.forEach((value, i) => {
       const place = j + i;
       const focus = [`top:${i}`, `bottom:${j}`];
+      const lookup = [value, digit];
       const product = value * digit;
-      let formula = [...times(i, j), '=', out(valueMark(product))];
-      step('Умножаем цифры', `Перемножаем выделенные цифры. Сейчас получаем вклад в разряд веса ${places[place]}.`,
-        {formula, focus, bench: [{kind: 'raw', title: 'Произведение цифр', amount: product, weight: places[place]}]});
+      let formula = [take('top', i, value), '×', take('bottom', j, digit), '=', out(inBase(product))];
+      step('Умножаем цифры', `В таблице берём строку ${inBase(value)} и столбец ${inBase(digit)}. На пересечении получаем ${inBase(product)}.`,
+        {formula, focus, lookup, fromTable: true});
 
       if (carry) {
-        formula = [valueMark(product), '+', token(alphabet[carry], `carry:${place}`),
-          ...(carry >= 10 ? [`(${carry}₁₀)`] : []), '=', out(valueMark(product + carry))];
+        formula = [inBase(product), '+', token(inBase(carry), `carry:${place}`), '=', out(inBase(product + carry))];
         step('Прибавляем входящий перенос', 'Перенос уже относится к текущему разряду. Прибавляем его к произведению цифр.', {
-          formula, focus, bench: [
-            {kind: 'raw', title: 'Из умножения', amount: product, weight: places[place]},
-            {kind: 'carry', title: 'Из переноса', amount: carry, weight: places[place]},
-          ],
+          formula, focus, lookup,
         });
       }
-      carry = record(product + carry, place, row, formula, focus);
+      carry = record(product + carry, place, row, formula, focus, lookup);
     });
     if (carry) {
       const place = j + a.length;
@@ -300,18 +316,18 @@ function makeModel(first, second, base) {
     let total = carry;
     for (const {row, value} of terms) {
       if (formula.length) formula.push('+');
-      formula.push(...input(row, place, value));
+      formula.push(take(row, place, value));
       total += value;
     }
     if (carry) {
       if (formula.length) formula.push('+');
-      formula.push(token(carryText(carry), `carry:${place}`));
+      formula.push(token(inBase(carry), `carry:${place}`));
     }
     if (!formula.length) formula.push('0');
-    formula.push('=', out(valueMark(total)));
-    step('Складываем цифры столбца', `Считаем вклады в разряде веса ${places[place]}${carry ? ' и прибавляем входящий перенос' : ''}.`,
-      {formula, focus, bench: [{kind: 'raw', title: 'Сумма в столбце', amount: total, weight: places[place]}]});
-    carry = record(total, place, 'sum', formula, focus, place === resultRecord.length - 1);
+    formula.push('=', out(inBase(total)));
+    step('Складываем цифры столбца', `Складываем выделенные цифры${carry ? ' и прибавляем входящий перенос' : ''}.`,
+      {formula, focus});
+    carry = record(total, place, 'sum', formula, focus, null, place === resultRecord.length - 1);
   }
   return {first, second, base, places, rowNames, steps, phases};
 }
@@ -321,6 +337,72 @@ function element(tag, css = '', text = '') {
   node.className = css;
   node.textContent = text;
   return node;
+}
+
+function buildTable(base) {
+  if (tableBase === base) return;
+  const digits = [...alphabet.slice(0, base)];
+  const header = element('thead');
+  const headings = header.insertRow();
+  headings.append(element('th', '', '×'));
+  for (const digit of digits) {
+    const col = element('th', '', digit);
+    col.scope = 'col';
+    headings.append(col);
+  }
+  const body = element('tbody');
+  for (const [left, digit] of digits.entries()) {
+    const row = body.insertRow();
+    const label = element('th', '', digit);
+    label.scope = 'row';
+    row.append(label);
+    for (let right = 0; right < base; right += 1) {
+      row.append(element('td', '', numeral(left * right, base)));
+    }
+  }
+  table.replaceChildren(header, body);
+  tableScroll.scrollTo(0, 0);
+  tableBase = base;
+}
+
+function showLookup(lookup) {
+  const description = byId('table-note');
+  const prefix = `Основание ${model.base}`;
+  const header = table.rows[0];
+  const target = lookup ? table.rows[lookup[0] + 1].cells[lookup[1] + 1] : null;
+  if (target !== tableHit) {
+    for (const cell of tableGuides) cell.classList.remove('table-guide');
+    tableHit?.removeAttribute('aria-current');
+    tableGuides = [];
+    tableHit = target;
+    if (target) {
+      const column = target.cellIndex;
+      tableGuides = [...target.parentElement.cells, ...Array.from(table.rows, row => row.cells[column])];
+      for (const cell of tableGuides) cell.classList.add('table-guide');
+      target.setAttribute('aria-current', 'true');
+    }
+  }
+  if (!target) {
+    description.textContent = `${prefix}. Результаты записаны в этом же основании.`;
+    return null;
+  }
+  description.textContent = `${prefix}. ${alphabet[lookup[0]]} × ${alphabet[lookup[1]]} = ${target.textContent}`;
+  // Only the table moves. Keep the page and step controls in place.
+  const bounds = tableScroll.getBoundingClientRect();
+  const cell = target.getBoundingClientRect();
+  const headHeight = header.getBoundingClientRect().height;
+  const headWidth = header.cells[0].getBoundingClientRect().width;
+  const top = bounds.top + tableScroll.clientTop;
+  const left = bounds.left + tableScroll.clientLeft;
+  const bottom = top + tableScroll.clientHeight;
+  const right = left + tableScroll.clientWidth;
+  if (cell.left < left + headWidth - 1 || cell.right > right + 1) {
+    tableScroll.scrollLeft += (cell.left + cell.right - left - headWidth - right) / 2;
+  }
+  if (cell.top < top + headHeight - 1 || cell.bottom > bottom + 1) {
+    tableScroll.scrollTop += (cell.top + cell.bottom - top - headHeight - bottom) / 2;
+  }
+  return target;
 }
 
 function addRow(name, label, digits = [], carried = false) {
@@ -346,11 +428,9 @@ function buildBoard() {
   board.append(element('span', 'board-base', `Основание ${model.base}`));
   const labels = element('div', 'place-labels');
   labels.append(element('span', '', 'Вес'));
-  for (const [place, weight] of [...model.places.entries()].reverse()) {
-    const label = element('span', '', weight < 1000 ? String(weight) : String(model.base));
-    if (weight >= 1000) label.append(element('sup', '', String(place)));
-    label.title = String(weight);
-    labels.append(label);
+  for (const weight of [...model.places].reverse()) {
+    const record = numeral(weight, model.base);
+    labels.append(element('span', record.length > 4 ? 'long-weight' : '', record));
   }
   board.append(labels);
   addRow('carry', 'Перенос', [], true);
@@ -358,7 +438,7 @@ function buildBoard() {
   addRow('bottom', '× Второе', [...model.second].reverse());
 
   const calculation = element('div', 'calculation');
-  const heading = element('span', 'calc-label', 'Вычисление');
+  const heading = element('span', 'calc-label', `Вычисление в основании ${model.base}`);
   equation = element('div');
   equation.id = 'equation';
   calculation.append(heading, equation);
@@ -373,6 +453,7 @@ function buildBoard() {
 function makeExample(first, second, base) {
   model = makeModel(first, second, base);
   buildBoard();
+  buildTable(base);
   render(0);
 }
 
@@ -392,10 +473,10 @@ function renderBench(groups) {
         quantity.append(img);
       }
     } else {
-      quantity.append(element('b', 'piece-number', String(amount)));
+      quantity.append(element('b', 'piece-number', numeral(amount, model.base)));
     }
     group.append(element('strong', '', title), quantity,
-      element('span', '', kind === 'raw' ? `Количество ${amount} · вес ${weight}` : `${amount} по ${weight}`));
+      element('span', '', `${numeral(amount, model.base)} по ${numeral(weight, model.base)}`));
     bench.append(group);
   }
 }
@@ -476,6 +557,7 @@ function render(index, forward = false) {
   byId('step-title').textContent = step.title;
   status.textContent = step.note;
   renderBench(step.bench ?? []);
+  const lookupCell = showLookup(step.lookup);
 
   if (animate && step.move) {
     const result = equation.querySelector('.result:last-child');
@@ -503,7 +585,15 @@ function render(index, forward = false) {
       }
     }
     const wait = inputIndex ? 390 + (inputIndex - 1) * 90 : 40;
-    for (const target of [...equation.querySelectorAll('.result'), ...bench.children]) {
+    let resultFromTable = null;
+    const origin = step.fromTable && lookupCell?.getBoundingClientRect();
+    if (origin && origin.top >= 0 && origin.bottom <= innerHeight && innerWidth > 670) {
+      resultFromTable = equation.querySelector('.result');
+      fly(lookupCell.textContent, origin, resultFromTable, false, wait);
+    }
+    const animatedParts = [...equation.querySelectorAll('.result'), ...bench.children];
+    for (const target of animatedParts) {
+      if (target === resultFromTable) continue;
       motion.push(target.animate([{opacity: 0, transform: 'translateY(-3px)'}, {opacity: 1, transform: 'none'}],
         {duration: 240, delay: wait, fill: 'backwards'}));
     }
