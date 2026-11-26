@@ -67,6 +67,7 @@ button[aria-disabled="true"] { opacity: .56; cursor: default; }
 .place-labels span, .row-name { color: var(--muted); font-size: .7rem; }
 .place-labels span:not(:first-child) { text-align: center; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; line-height: 1.1; }
 .place-labels .long-weight { font-size: .59rem; }
+.place-labels .active-weight { color: var(--warm); background: var(--warm-soft); border-radius: .25rem; font-weight: 800; }
 .row-name { line-height: 1.2; }
 .row-name b { color: var(--ink); }
 .board-line { margin-top: .22rem; }
@@ -75,6 +76,7 @@ button[aria-disabled="true"] { opacity: .56; cursor: default; }
 .carry-slot { min-height: 1.38rem; }
 .move-chip { width: 100%; font-weight: 750; background: var(--blue-soft); color: #19468b; border: 1px solid #aac4ee; border-radius: .35rem; text-align: center; }
 .digit.active, .digit.written, .calc-token.input { background: var(--warm-soft); border-color: #d7a956; color: var(--warm); }
+.digit.row-start { outline: 2px solid #b67822; outline-offset: -2px; }
 .digit.placeholder { background: var(--blue-soft); border-color: #aac4ee; color: #174384; }
 .digit.done { background: #e7f4eb; border-color: #a2cbb1; color: #215638; }
 .board-rule { height: 2px; background: #6d81a0; margin: .33rem 0; }
@@ -89,6 +91,12 @@ button[aria-disabled="true"] { opacity: .56; cursor: default; }
 .calc-token { display: inline-block; min-width: .8rem; text-align: center; border-radius: .28rem; padding-inline: .16rem; }
 .calc-token.result { background: #e0efdf; color: #235635; padding-inline: .28rem; }
 .calc-token.quotient, .calc-token.carry-input { background: var(--blue-soft); color: #19468b; }
+.shift-explanation { display: flex; flex-wrap: wrap; align-items: center; gap: .28rem .48rem; margin-top: .4rem; padding-top: .4rem; border-top: 1px solid #c7d8f1; }
+.shift-part { display: grid; justify-items: center; align-self: start; padding: .18rem .34rem; border-radius: .3rem; background: #fff; }
+.shift-part b { font-variant-numeric: tabular-nums; }
+.shift-part small { color: var(--muted); font-size: .66rem; }
+.shift-part.weight { background: var(--warm-soft); color: var(--warm); }
+.shift-zeros { color: #19468b; background: var(--blue-soft); border-radius: .18rem; }
 #step-status { color: #263652; }
 .bench { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .45rem; }
 .bench-group {
@@ -192,8 +200,10 @@ const tableScroll = byId('table-scroll');
 let model;
 let current = 0;
 let cells;
+let weightLabels;
 let equation;
 let calcLabel;
+let shiftExplanation;
 let tableBase;
 let tableGuides = [];
 let tableHit;
@@ -279,9 +289,12 @@ function makeModel(first, second, base) {
       });
       return;
     }
-    if (j > 0) {
+    const shift = j > 0 ? {row, place: j, digit: inBase(digit), weight: inBase(places[j])} : null;
+    if (shift) {
       const suffix = ['', 'один ноль', 'два нуля', 'три нуля'][j];
-      step('Ставим нули справа', `Сразу ставим ${suffix} справа. Цифры произведения будем вписывать левее.`, {focus, mark});
+      step('Ставим нули справа',
+        `Цифра ${shift.digit} в множителе показывает количество групп веса ${shift.weight}. В этой строке считаем целые группы такого веса. Запись начинаем под весом ${shift.weight}, поэтому в младших разрядах ставим ${suffix} справа.`,
+        {focus, mark, shift});
     }
 
     let carry = 0;
@@ -311,6 +324,15 @@ function makeModel(first, second, base) {
       const previous = steps.at(-1);
       step('Дописали последнюю цифру строки', 'Цифры первого числа закончились. Оставшийся перенос становится старшей цифрой этой строки.',
         {formulas: previous.formulas, focus: previous.focus, lookup: previous.lookup, move: [{row, place, from: `carry:${place}`}]});
+    }
+    if (shift) {
+      const last = steps.at(-1);
+      const rowDigits = [...lines[row]].reverse().join('');
+      const groups = rowDigits.slice(0, -j);
+      const units = groups === '0' ? '0' : rowDigits;
+      last.shift = {...shift, groups, units};
+      last.mark = mark;
+      last.note += ' Строка готова. Чтобы узнать число единиц, умножаем количество групп на вес одной группы.';
     }
   });
 
@@ -434,14 +456,18 @@ function addRow(name, label, digits = [], carried = false) {
 
 function buildBoard() {
   cells = new Map();
+  weightLabels = [];
   board.replaceChildren();
   board.style.setProperty('--columns', model.places.length);
   board.append(element('span', 'board-base', `Основание ${model.base}`));
   const labels = element('div', 'place-labels');
   labels.append(element('span', '', 'Вес'));
-  for (const weight of [...model.places].reverse()) {
+  for (const [place, weight] of [...model.places.entries()].reverse()) {
     const record = numeral(weight, model.base);
-    labels.append(element('span', record.length > 4 ? 'long-weight' : '', record));
+    const label = element('span', record.length > 4 ? 'long-weight' : '', record);
+    label.dataset.weightPlace = place;
+    weightLabels[place] = label;
+    labels.append(label);
   }
   board.append(labels);
   addRow('carry', 'Перенос', [], true);
@@ -452,7 +478,9 @@ function buildBoard() {
   calcLabel = element('span', 'calc-label');
   equation = element('div');
   equation.id = 'equation';
-  calculation.append(calcLabel, equation);
+  shiftExplanation = element('div', 'shift-explanation');
+  shiftExplanation.id = 'shift-explanation';
+  calculation.append(calcLabel, equation, shiftExplanation);
   board.append(calculation, element('div', 'board-rule'));
   model.rowNames.forEach((name, index) => addRow(name, `Строка ${index + 1}`));
   board.append(element('div', 'board-rule'));
@@ -490,6 +518,31 @@ function renderBench(groups) {
       element('span', '', `${numeral(amount, model.base)} по ${numeral(weight, model.base)}`));
     bench.append(group);
   }
+}
+
+function renderShift(shift) {
+  weightLabels.forEach((label, place) => label.classList.toggle('active-weight', place === shift?.place));
+  shiftExplanation.hidden = !shift;
+  if (!shift) return;
+
+  const {row, place, digit, weight, groups, units} = shift;
+  cells.get(`bottom:${place}`).classList.add('active');
+  if (groups === undefined) cells.get(`${row}:${place}`).classList.add('row-start');
+
+  const part = (value, description, style = '') => {
+    const node = element('span', `shift-part ${style}`);
+    node.append(element('b', '', value), element('small', '', description));
+    return node;
+  };
+  const weightPart = part(weight, 'Вес группы', 'weight');
+  if (groups === undefined) {
+    shiftExplanation.replaceChildren(part(digit, 'Групп в разряде'), weightPart);
+    return;
+  }
+  const total = part(units === '0' ? units : units.slice(0, -place), 'Всего единиц');
+  if (units !== '0') total.firstChild.append(element('span', 'shift-zeros', units.slice(-place)));
+  shiftExplanation.replaceChildren(part(groups, 'Количество групп'), element('span', '', '×'), weightPart,
+    element('span', '', '='), total);
 }
 
 function fly(text, origin, target, blue, delay = 0) {
@@ -578,6 +631,7 @@ function render(index, forward = false) {
   const {group: currentGroup, tokens = []} = groups.at(-1) ?? {};
   calcLabel.textContent = currentGroup ? `Вычисление в основании ${model.base}` : 'Подготовка строки';
   if (!currentGroup) equation.textContent = `…${'0'.repeat(step.mark.length)}`;
+  renderShift(step.shift);
   byId('step-title').textContent = step.title;
   status.textContent = step.note;
   renderBench(step.bench ?? []);
@@ -599,7 +653,8 @@ function render(index, forward = false) {
   } else if (animate) {
     for (const id of step.mark ?? []) {
       const target = cells.get(id);
-      motion.push(target.animate([{opacity: 0, transform: 'scale(.85)'}, {opacity: 1, transform: 'none'}], {duration: 300, fill: 'backwards'}));
+      motion.push(target.animate([{opacity: 0, transform: 'scale(.85)'}, {opacity: 1, transform: 'none'}],
+        {duration: 300, delay: step.shift ? 250 : 0, fill: 'backwards'}));
     }
     let inputIndex = 0;
     for (const {node, info} of tokens) {
@@ -621,6 +676,12 @@ function render(index, forward = false) {
       motion.push(target.animate([{opacity: 0, transform: 'translateY(-3px)'}, {opacity: 1, transform: 'none'}],
         {duration: 240, delay: wait, fill: 'backwards'}));
     }
+  }
+
+  if (animate && step.shift) {
+    const delay = step.move ? 440 : 0;
+    motion.push(shiftExplanation.animate([{opacity: 0, transform: 'translateY(-3px)'}, {opacity: 1, transform: 'none'}],
+      {duration: 220, delay, fill: 'backwards'}));
   }
 
   if (motion.length && !step.finished) {
