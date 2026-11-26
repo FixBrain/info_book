@@ -322,11 +322,10 @@ function makeModel(first, second, base) {
     }
     carryMark = null;
     const updated = [...total.padStart(rightZeros + 1, '0')].reverse();
-    const changed = updated.flatMap((digit, place) => lines[row][place] === digit ? [] : [`${row}:${place}`]);
     updated.forEach((digit, place) => { lines[row][place] = digit; });
-    step('Записываем сумму в строку', `Получили ${total}. Сумма остаётся в строке результата, запасную строку убираем.`, {
-      ...context, operation: 'addition', formulas: [[...heading, '=', out(total)], ...columnFormulas],
-      changed,
+    step('Переносим цифры суммы', `Переносим готовые цифры в строку результата. Получаем ${total}.`, {
+      ...context, operation: 'addition', formulas: [heading, ...columnFormulas],
+      sumTransfer: {row, places: columnFormulas.map((_, index) => rightZeros + index)},
     });
     return previous + increment;
   }
@@ -662,6 +661,7 @@ function render(index, forward = false) {
   locked = false;
   const step = model.steps[index];
   const animate = forward && !reducedMotion.matches && typeof board.animate === 'function';
+  const transfer = animate && step.sumTransfer?.places.length ? step.sumTransfer : null;
   const positions = animate ? new Map([...cells.entries()].map(([id, cell]) => [id, cell.getBoundingClientRect()])) : new Map();
   current = index;
 
@@ -672,7 +672,8 @@ function render(index, forward = false) {
       cell.textContent = digit;
     });
   }
-  for (const [row, element] of spareRows) element.hidden = step.spare?.row !== row;
+  const activeSpareRow = step.spare?.row ?? transfer?.row;
+  for (const [row, element] of spareRows) element.hidden = activeSpareRow !== row;
   if (step.spare) {
     const {row, place, digits} = step.spare;
     digits.forEach((digit, index) => {
@@ -687,7 +688,7 @@ function render(index, forward = false) {
     cells.get(`bottom:${place}`).className = 'digit';
   });
   const carry = step.carryMark;
-  const activeCarryRow = step.spare?.row ?? (step.stage === model.phases.length - 1 ? 'sum' : null);
+  const activeCarryRow = activeSpareRow ?? (step.stage === model.phases.length - 1 ? 'sum' : null);
   for (const [row, element] of carryRows) {
     element.hidden = row !== activeCarryRow;
     for (const place of model.places.keys()) cells.get(`${row}-carry:${place}`).replaceChildren();
@@ -698,6 +699,9 @@ function render(index, forward = false) {
   for (const id of step.focus ?? []) cells.get(id).classList.add('active');
   for (const id of step.mark ?? []) cells.get(id).classList.add('placeholder');
   for (const id of step.changed ?? []) cells.get(id).classList.add('written');
+  for (const place of step.sumTransfer?.places ?? []) {
+    cells.get(`${step.sumTransfer.row}:${place}`).classList.add('written');
+  }
   if (step.finished) {
     for (let place = 0; place < model.places.length; place += 1) {
       const cell = cells.get(`sum:${place}`);
@@ -705,7 +709,8 @@ function render(index, forward = false) {
     }
   }
 
-  const formulas = step.formulas ?? [];
+  // During the transfer, the column results stay in their original positions.
+  const formulas = transfer ? [] : step.formulas ?? [];
   const groups = formulas.map((formula, number) => {
     const group = element('span', 'calc-group');
     if (number > 0) group.append(element('span', 'calc-link', '→'));
@@ -726,11 +731,11 @@ function render(index, forward = false) {
     group.append(...tokens.map(({node}) => node));
     return {group, tokens};
   });
-  equation.replaceChildren(...groups.map(({group}) => group));
+  if (!transfer) equation.replaceChildren(...groups.map(({group}) => group));
   const {group: currentGroup, tokens = []} = groups.at(-1) ?? {};
   const operation = operationLabels[step.operation];
   calcLabel.textContent = `Вычисление в основании ${model.base}${operation ? ` (${operation})` : ''}`;
-  renderShift(step);
+  renderShift(transfer ? {} : step);
   byId('step-title').textContent = step.title;
   status.textContent = step.note;
   renderBench(step.bench ?? []);
@@ -745,7 +750,14 @@ function render(index, forward = false) {
     }
   }
 
-  if (animate && step.move) {
+  if (transfer) {
+    const columnGroups = [...equation.children].slice(1);
+    transfer.places.forEach((place, index) => {
+      const source = columnGroups[index].querySelector('.result:last-child');
+      const target = cells.get(`${transfer.row}:${place}`);
+      fly(target.textContent, source.getBoundingClientRect(), target, false, index * 120);
+    });
+  } else if (animate && step.move) {
     const result = currentGroup.querySelector('.result');
     for (const [number, move] of step.move.entries()) {
       const target = cells.get(`${move.row}:${move.place}`);
@@ -797,19 +809,27 @@ function render(index, forward = false) {
     }
   }
 
-  if (animate && step.shift) {
+  if (animate && step.shift && !transfer) {
     const delay = step.move ? 440 : 0;
     motion.push(shiftExplanation.animate([{opacity: 0, transform: 'translateY(-3px)'}, {opacity: 1, transform: 'none'}],
       {duration: 220, delay, fill: 'backwards'}));
   }
 
+  const finishTransfer = () => {
+    spareRows.get(transfer.row).hidden = true;
+    carryRows.get(transfer.row).hidden = true;
+    renderShift(step);
+  };
   if (motion.length && !step.finished) {
     locked = true;
     Promise.allSettled(motion.map(animation => animation.finished)).then(() => {
       if (generation !== version) return;
       locked = false;
+      if (transfer) finishTransfer();
       updateControls(step);
     });
+  } else if (transfer) {
+    finishTransfer();
   }
   updateControls(step);
 }
