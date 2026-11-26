@@ -68,7 +68,9 @@ button[aria-disabled="true"] { opacity: .56; cursor: default; }
 .place-labels span:not(:first-child) { text-align: center; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; line-height: 1.1; }
 .place-labels .long-weight { font-size: .59rem; }
 .place-labels .active-weight { color: var(--warm); background: var(--warm-soft); border-radius: .25rem; font-weight: 800; }
+.place-labels .weight-factor { color: #19468b; background: var(--blue-soft); border-radius: .25rem; font-weight: 800; }
 .row-name { line-height: 1.2; }
+.board-line[data-row$="-carry"] .row-name { color: #19468b; overflow-wrap: anywhere; }
 .row-name b { color: var(--ink); }
 .board-line { margin-top: .22rem; }
 .digit, .carry-slot { display: grid; place-items: center; text-align: center; font-variant-numeric: tabular-nums; min-width: 0; }
@@ -173,7 +175,7 @@ footer { display: flex; flex-wrap: wrap; gap: .3rem 1rem; font-size: .88rem; mar
   <details class="read-more">
     <summary>Правило умножения столбиком</summary>
     <p>Для каждой цифры второго числа заводим свою строку. Если цифра стоит в разряде номер <i>j</i> (считаем справа с нуля), сразу ставим <i>j</i> нулей справа. Остальные цифры вписываем левее этих нулей.</p>
-    <p>Двигаемся справа налево. Произведение двух цифр берём из таблицы. Если цифры стоят в разрядах <i>i</i> и <i>j</i>, оставляем <i>i</i> + <i>j</i> мест справа. В запасной строке эти места можно оставить пустыми. При сложении они считаются нулями.</p>
+    <p>Двигаемся справа налево. Сначала смотрим на веса цифр. Если цифры стоят в разрядах <i>i</i> и <i>j</i>, в произведении оставляем <i>i</i> + <i>j</i> мест справа. Затем берём произведение цифр из таблицы. В запасной строке пустые клетки справа при сложении считаются нулями.</p>
     <p>Первое произведение записываем сразу. Каждое следующее кладём в запасную строку, складываем с текущим результатом по столбцам, затем убираем запасную строку.</p>
     <p>В конце складываем строки по столбцам и пользуемся тем же правилом переноса. Все вычисления записаны в выбранном основании.</p>
   </details>
@@ -208,6 +210,7 @@ let current = 0;
 let cells;
 let weightLabels;
 let spareRows;
+let carryRows;
 let equation;
 let calcLabel;
 let shiftExplanation;
@@ -264,9 +267,9 @@ function makeModel(first, second, base) {
         {formulas: reasoning, focus, bench: split, lookup});
     }
     lines[row][place] = digit;
-    carryMark = quotient ? {place: place + 1, digit: transfer} : null;
+    carryMark = quotient ? {row, place: place + 1, digit: transfer} : null;
     const move = [{row, place}];
-    if (quotient) move.push({row: 'carry', place: place + 1});
+    if (quotient) move.push({row: `${row}-carry`, place: place + 1, carry: true});
     let note = quotient
       ? `Вписываем цифру ${digit}. В соседний разряд слева переносим ${transfer}.`
       : `Пишем ${digit} в текущий столбец. Перенос не нужен.`;
@@ -292,7 +295,7 @@ function makeModel(first, second, base) {
       if (left) terms.push(take(row, place, a));
       if (right) terms.push(take(`${row}-spare`, place, b));
       else if (left) terms.push('0');
-      if (carry) terms.push(token(inBase(carry), `carry:${place}`));
+      if (carry) terms.push(token(inBase(carry), `${row}-carry:${place}`));
       const column = terms.flatMap((term, index) => index ? ['+', term] : [term]);
       if (!column.length) column.push('0');
       const sum = a + b + carry;
@@ -303,7 +306,7 @@ function makeModel(first, second, base) {
       column.push('=', out(inBase(sum)));
       if (carry) column.push('→', {text: transfer, quotient: true}, '│', out(digit));
       columnFormulas.push(column);
-      carryMark = carry ? {place: place + 1, digit: transfer} : null;
+      carryMark = carry ? {row, place: place + 1, digit: transfer} : null;
       const label = inBase(places[place]);
       const prefix = right ? '' : 'Пустая клетка запасной строки считается нулём. ';
       const instruction = carry ? `Получили ${inBase(sum)}. Пишем ${digit}, переносим ${transfer} влево.` : `Пишем ${digit} в этом разряде.`;
@@ -331,11 +334,10 @@ function makeModel(first, second, base) {
     const row = rowNames[j];
     phases.push({name: `строке ${j + 1}`, index: steps.length});
     const focus = [`bottom:${j}`];
-    const zeros = Array.from({length: j}, (_, place) => place);
-    zeros.forEach(place => { lines[row][place] = '0'; });
     carryMark = null;
-    const mark = zeros.map(place => `${row}:${place}`);
+    const mark = Array.from({length: j}, (_, place) => `${row}:${place}`);
     if (!digit) {
+      lines[row].fill('0', 0, j);
       lines[row][j] = '0';
       step('Записываем нулевую строку', 'Цифра множителя в этом разряде равна нулю, поэтому вся строка нулевая.', {
         formulas: [[first, '×', take('bottom', j, digit), '=', out(0)]],
@@ -343,14 +345,7 @@ function makeModel(first, second, base) {
       });
       return;
     }
-    const shift = j > 0 ? {row, place: j, digit: inBase(digit), weight: inBase(places[j])} : null;
-    if (shift) {
-      const suffix = ['', 'один ноль', 'два нуля', 'три нуля'][j];
-      step('Ставим нули справа',
-        `Цифра ${shift.digit} в множителе показывает количество групп веса ${shift.weight}. В этой строке считаем целые группы такого веса. Запись начинаем под весом ${shift.weight}, поэтому в младших разрядах ставим ${suffix} справа.`,
-        {focus, mark, shift});
-    }
-
+    const shift = j > 0 ? {place: j, weight: inBase(places[j])} : null;
     let partial = 0;
     a.forEach((value, i) => {
       const place = j + i;
@@ -361,25 +356,29 @@ function makeModel(first, second, base) {
       const increment = product * places[place];
       const multiplication = [take('top', i, value), '×', take('bottom', j, digit), '=', out(productDigits)];
       const formulas = [multiplication];
-      step('Умножаем цифры', `В таблице берём строку ${inBase(value)} и столбец ${inBase(digit)}. На пересечении получаем ${inBase(product)}.`,
-        {formulas, focus, lookup, fromTable: true});
-      const positioned = productDigits + '0'.repeat(place);
-      const shifted = out(inBase(increment), increment ? place : 0);
-      const positionedFormulas = place ? [...formulas, [productDigits, '×', inBase(places[place]), '=', shifted]] : formulas;
-      const digits = [...positioned].reverse().map((digit, index) => index < place ? '' : digit);
-      while (digits.length < width) digits.push('');
-      const weightNote = place ? `Цифры ${inBase(value)} и ${inBase(digit)} здесь обозначают ${inBase(value * places[i])} и ${inBase(digit * places[j])}. Веса их разрядов дают ${inBase(places[place])}, поэтому справа оставляем ${offsetWords[place]}. ` : '';
+      if (place) {
+        const weight = inBase(places[place]);
+        const weightNote = `Веса разрядов дают ${weight}, поэтому справа оставляем ${offsetWords[place]}.`;
+        if (i === 0) lines[row].fill('0', 0, j);
+        step('Определяем число нулей справа', weightNote, {
+          formulas: [[inBase(places[i]), '×', inBase(places[j]), '=', out(weight, place)]],
+          focus, weightFactors: [i, j], activePlace: place,
+          ...(i === 0 ? {mark, startCell: `${row}:${place}`} : {}),
+        });
+      }
+      const digits = Array(width).fill('');
+      [...productDigits].reverse().forEach((digit, index) => { digits[place + index] = digit; });
       if (i === 0) {
         for (let index = place; index < place + productDigits.length; index += 1) lines[row][index] = digits[index];
         const changed = [...productDigits].map((_, index) => `${row}:${place + index}`);
-        step('Записываем первое произведение', `${weightNote}Вписываем ${inBase(increment)} в строку результата.`,
-          {formulas: positionedFormulas, focus, lookup, changed, activePlace: place});
+        step('Умножаем и записываем', `В таблице получаем ${productDigits}. Вписываем ${place ? 'его слева от нулей' : 'его в строку результата'}.`,
+          {formulas, focus, lookup, fromTable: true, changed, activePlace: place, mark});
         partial = increment;
         return;
       }
       const spare = {row, place, digits};
-      step('Записываем в запасную строку', `${weightNote}Число ${productDigits} записываем левее пустых клеток. При сложении эти клетки считаются нулями.`,
-        {formulas: positionedFormulas, focus, lookup, spare, activePlace: place,
+      step('Умножаем и записываем в запасную строку', `В таблице получаем ${productDigits}. Вписываем его слева от пустых клеток. При сложении эти клетки считаются нулями.`,
+        {formulas, focus, lookup, fromTable: true, spare, activePlace: place,
           changed: [...productDigits].map((_, index) => `${row}-spare:${place + index}`)});
       partial = addToPartial(row, partial, increment, j, spare, {focus, lookup});
     });
@@ -411,7 +410,7 @@ function makeModel(first, second, base) {
     }
     if (carry) {
       if (formula.length) formula.push('+');
-      formula.push(token(inBase(carry), `carry:${place}`));
+      formula.push(token(inBase(carry), `sum-carry:${place}`));
     }
     if (!formula.length) formula.push('0');
     formula.push('=', out(inBase(total)));
@@ -517,6 +516,7 @@ function buildBoard() {
   cells = new Map();
   weightLabels = [];
   spareRows = new Map();
+  carryRows = new Map();
   board.replaceChildren();
   board.style.setProperty('--columns', model.places.length);
   board.append(element('span', 'board-base', `Основание ${model.base}`));
@@ -530,7 +530,6 @@ function buildBoard() {
     labels.append(label);
   }
   board.append(labels);
-  addRow('carry', 'Перенос', [], true);
   addRow('top', 'Первое', [...model.first].reverse());
   addRow('bottom', '× Второе', [...model.second].reverse());
 
@@ -543,6 +542,7 @@ function buildBoard() {
   calculation.append(calcLabel, equation, shiftExplanation);
   board.append(calculation, element('div', 'board-rule'));
   model.rowNames.forEach((name, index) => {
+    carryRows.set(name, addRow(`${name}-carry`, 'Перенос', [], true));
     addRow(name, `Строка ${index + 1}`);
     const spare = addRow(`${name}-spare`, '+ Запас');
     spare.classList.add('spare-row');
@@ -550,6 +550,8 @@ function buildBoard() {
     spareRows.set(name, spare);
   });
   board.append(element('div', 'board-rule'));
+  carryRows.set('sum', addRow('sum-carry', 'Перенос', [], true));
+  for (const row of carryRows.values()) row.hidden = true;
   addRow('sum', '+ Сумма');
 
   phase.replaceChildren(...model.phases.map(({name, index}) => new Option(name, String(index))));
@@ -586,14 +588,18 @@ function renderBench(groups) {
   }
 }
 
-function renderShift(shift, activePlace) {
-  weightLabels.forEach((label, place) => label.classList.toggle('active-weight', place === (activePlace ?? shift?.place)));
+function renderShift(step) {
+  const {shift, activePlace, weightFactors, startCell} = step;
+  weightLabels.forEach((label, place) => {
+    label.classList.toggle('active-weight', place === (activePlace ?? shift?.place));
+    label.classList.toggle('weight-factor', Boolean(weightFactors?.includes(place)));
+  });
+  if (startCell) cells.get(startCell).classList.add('row-start');
   shiftExplanation.hidden = !shift;
   if (!shift) return;
 
-  const {row, place, digit, weight, groups, units} = shift;
+  const {place, weight, groups, units} = shift;
   cells.get(`bottom:${place}`).classList.add('active');
-  if (groups === undefined) cells.get(`${row}:${place}`).classList.add('row-start');
 
   const part = (value, description, style = '') => {
     const node = element('span', `shift-part ${style}`);
@@ -601,10 +607,6 @@ function renderShift(shift, activePlace) {
     return node;
   };
   const weightPart = part(weight, 'Вес группы', 'weight');
-  if (groups === undefined) {
-    shiftExplanation.replaceChildren(part(digit, 'Групп в разряде'), weightPart);
-    return;
-  }
   const total = part(units === '0' ? units : units.slice(0, -place), 'Всего единиц');
   if (units !== '0') total.firstChild.append(element('span', 'shift-zeros', units.slice(-place)));
   shiftExplanation.replaceChildren(part(groups, 'Количество групп'), element('span', '', '×'), weightPart,
@@ -672,13 +674,17 @@ function render(index, forward = false) {
     });
   }
   [...model.places.keys()].forEach(place => {
-    cells.get(`carry:${place}`).replaceChildren();
     cells.get(`top:${place}`).className = 'digit';
     cells.get(`bottom:${place}`).className = 'digit';
   });
   const carry = step.carryMark;
+  const activeCarryRow = step.spare?.row ?? (step.stage === model.phases.length - 1 ? 'sum' : null);
+  for (const [row, element] of carryRows) {
+    element.hidden = row !== activeCarryRow;
+    for (const place of model.places.keys()) cells.get(`${row}-carry:${place}`).replaceChildren();
+  }
   if (carry) {
-    cells.get(`carry:${carry.place}`).append(element('span', 'move-chip', carry.digit));
+    cells.get(`${carry.row}-carry:${carry.place}`).append(element('span', 'move-chip', carry.digit));
   }
   for (const id of step.focus ?? []) cells.get(id).classList.add('active');
   for (const id of step.mark ?? []) cells.get(id).classList.add('placeholder');
@@ -703,7 +709,7 @@ function render(index, forward = false) {
       }
       if (info.result) node.classList.add('result');
       if (info.quotient) node.classList.add('quotient');
-      if (info.from) node.classList.add(info.from.startsWith('carry:') ? 'carry-input' : 'input');
+      if (info.from) node.classList.add(info.from.includes('-carry:') ? 'carry-input' : 'input');
       return {node, info};
     });
     group.append(...tokens.map(({node}) => node));
@@ -713,7 +719,7 @@ function render(index, forward = false) {
   const {group: currentGroup, tokens = []} = groups.at(-1) ?? {};
   calcLabel.textContent = currentGroup ? `Вычисление в основании ${model.base}` : 'Подготовка строки';
   if (!currentGroup) equation.textContent = `…${'0'.repeat(step.mark.length)}`;
-  renderShift(step.shift, step.activePlace);
+  renderShift(step);
   byId('step-title').textContent = step.title;
   status.textContent = step.note;
   renderBench(step.bench ?? []);
@@ -722,8 +728,9 @@ function render(index, forward = false) {
   if (animate) {
     for (const [i, id] of (step.changed ?? []).entries()) {
       const target = cells.get(id);
-      motion.push(target.animate([{opacity: .12, transform: 'translateY(-4px)'}, {opacity: 1, transform: 'none'}],
-        {duration: 270, delay: i * 55, fill: 'backwards'}));
+      const delay = step.fromTable ? 825 : 0;
+      motion.push(target.animate([{opacity: 0, transform: 'translateY(-4px)'}, {opacity: 1, transform: 'none'}],
+        {duration: 270, delay: delay + i * 55, fill: 'backwards'}));
     }
   }
 
@@ -731,8 +738,7 @@ function render(index, forward = false) {
     const result = currentGroup.querySelector('.result');
     for (const [number, move] of step.move.entries()) {
       const target = cells.get(`${move.row}:${move.place}`);
-      const carried = move.row === 'carry';
-      if (carried) {
+      if (move.carry) {
         const source = currentGroup.querySelector('.quotient');
         fly(target.textContent, source?.getBoundingClientRect(), target.firstElementChild, true, number * 180);
       } else {
@@ -741,15 +747,15 @@ function render(index, forward = false) {
       }
     }
   } else if (animate) {
-    for (const id of step.mark ?? []) {
+    for (const id of step.fromTable ? [] : step.mark ?? []) {
       const target = cells.get(id);
       motion.push(target.animate([{opacity: 0, transform: 'scale(.85)'}, {opacity: 1, transform: 'none'}],
-        {duration: 300, delay: step.shift ? 250 : 0, fill: 'backwards'}));
+        {duration: 300, delay: step.weightFactors ? 250 : 0, fill: 'backwards'}));
     }
     let inputIndex = 0;
     for (const {node, info} of tokens) {
       if (info.from) {
-        fly(info.text, positions.get(info.from), node, info.from.startsWith('carry'), inputIndex * 90);
+        fly(info.text, positions.get(info.from), node, info.from.includes('-carry:'), inputIndex * 90);
         inputIndex += 1;
       }
     }
@@ -768,7 +774,7 @@ function render(index, forward = false) {
     }
     if (step.showCarry) {
       const source = currentGroup.querySelector('.quotient');
-      const target = cells.get(`carry:${carry.place}`).firstElementChild;
+      const target = cells.get(`${carry.row}-carry:${carry.place}`).firstElementChild;
       fly(carry.digit, source.getBoundingClientRect(), target, true, wait + 190);
     }
   }
