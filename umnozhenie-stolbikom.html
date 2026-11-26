@@ -82,6 +82,7 @@ button[aria-disabled="true"] { opacity: .56; cursor: default; }
 .digit.placeholder { background: var(--blue-soft); border-color: #aac4ee; color: #174384; }
 .digit.done { background: #e7f4eb; border-color: #a2cbb1; color: #215638; }
 .partial-work + .partial-work { margin-top: .45rem; padding-top: .28rem; border-top: 1px solid var(--line); }
+.partial-work.complete .product-row, .partial-work.complete [data-row$="-carry"] { display: none; }
 .product-row .digit { background: #f1f6ff; }
 .product-row .digit.active { background: var(--warm-soft); }
 .product-row .digit.implied-zero { color: #4e6380; background: #f1f6ff; border-style: dashed; }
@@ -179,7 +180,7 @@ footer { display: flex; flex-wrap: wrap; gap: .3rem 1rem; font-size: .88rem; mar
     <summary>Правило умножения столбиком</summary>
     <p>Для каждой цифры второго числа заводим свою строку. Если цифра стоит в разряде номер <i>j</i> (считаем справа с нуля), сразу ставим <i>j</i> нулей справа. Остальные цифры вписываем левее этих нулей.</p>
     <p>Двигаемся справа налево. Сначала смотрим на веса цифр. Если цифры стоят в разрядах <i>i</i> и <i>j</i>, дописываем справа <i>i</i> + <i>j</i> нулей. Затем берём произведение цифр из таблицы и записываем его левее этих нулей.</p>
-    <p>Каждое произведение записываем в свою строку. Первое сразу попадает в результат. Следующие прибавляем к нему по столбцам. Каждую цифру суммы сразу записываем в строку «Результат».</p>
+    <p>Каждое произведение записываем в свою строку. Первое сразу попадает в результат. Следующие прибавляем к нему по столбцам. Каждую цифру суммы сразу записываем в строку «Результат». Когда строка готова, сворачиваем промежуточные произведения.</p>
     <p>В конце складываем строки по столбцам и пользуемся тем же правилом переноса. Все вычисления записаны в выбранном основании.</p>
   </details>
   <footer><a href="umnozhenie-i-delenie-chernovik.html#multiply">Черновик об умножении</a><a href="index.html">Оглавление</a></footer>
@@ -356,7 +357,7 @@ function makeModel(first, second, base) {
       lines[row].fill('0', 0, j);
       lines[row][j] = '0';
       step('Записываем нулевую строку', 'Цифра множителя в этом разряде равна нулю, поэтому вся строка нулевая.', {
-        operation: 'digits',
+        operation: 'digits', partialComplete: true,
         formulas: [[first, '×', take('bottom', j, digit), '=', out(0)]],
         focus, mark,
       });
@@ -401,8 +402,9 @@ function makeModel(first, second, base) {
       const firstProduct = i === 1 ? productLines[j][0].name : null;
       partial = addToPartial(row, partial, increment, j, productRow, place, firstProduct, {focus, lookup});
     });
+    const last = steps.at(-1);
+    last.partialComplete = true;
     if (shift) {
-      const last = steps.at(-1);
       const rowDigits = [...lines[row]].reverse().join('');
       const groups = rowDigits.slice(0, -j);
       const units = groups === '0' ? '0' : rowDigits;
@@ -682,7 +684,11 @@ function render(index, forward = false) {
   const positions = animate ? new Map([...cells.entries()].map(([id, cell]) => [id, cell.getBoundingClientRect()])) : new Map();
   current = index;
 
-  partialGroups.forEach((group, index) => { group.hidden = index > 0 && step.stage <= index; });
+  const finishingGroup = step.partialComplete ? partialGroups[step.stage - 1] : null;
+  partialGroups.forEach((group, index) => {
+    group.hidden = index > 0 && step.stage <= index;
+    group.classList.toggle('complete', step.stage > index + 1 || (group === finishingGroup && !animate));
+  });
   for (const [name, digits] of Object.entries(step.lines)) {
     const product = productRows.get(name);
     if (product) product.line.hidden = !digits.some(Boolean);
@@ -827,8 +833,11 @@ function render(index, forward = false) {
     Promise.allSettled(motion.map(animation => animation.finished)).then(() => {
       if (generation !== version) return;
       locked = false;
+      finishingGroup?.classList.add('complete');
       updateControls(step);
     });
+  } else {
+    finishingGroup?.classList.add('complete');
   }
   updateControls(step);
 }
