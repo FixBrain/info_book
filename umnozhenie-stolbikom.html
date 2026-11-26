@@ -83,7 +83,7 @@ button[aria-disabled="true"] { opacity: .56; cursor: default; }
 .digit.done { background: #e7f4eb; border-color: #a2cbb1; color: #215638; }
 .spare-row .digit { background: #f1f6ff; }
 .spare-row .digit.active { background: var(--warm-soft); }
-.spare-row .digit.implied-zero { background: #fff; border-style: dashed; }
+.spare-row .digit.implied-zero { color: #4e6380; background: #f1f6ff; border-style: dashed; }
 .spare-row .digit.implied-zero.active { background: var(--blue-soft); border-color: #7499cf; }
 .spare-row .row-name { color: #19468b; font-weight: 650; overflow-wrap: anywhere; }
 .board-rule { height: 2px; background: #6d81a0; margin: .33rem 0; }
@@ -175,7 +175,7 @@ footer { display: flex; flex-wrap: wrap; gap: .3rem 1rem; font-size: .88rem; mar
   <details class="read-more">
     <summary>Правило умножения столбиком</summary>
     <p>Для каждой цифры второго числа заводим свою строку. Если цифра стоит в разряде номер <i>j</i> (считаем справа с нуля), сразу ставим <i>j</i> нулей справа. Остальные цифры вписываем левее этих нулей.</p>
-    <p>Двигаемся справа налево. Сначала смотрим на веса цифр. Если цифры стоят в разрядах <i>i</i> и <i>j</i>, в произведении оставляем <i>i</i> + <i>j</i> мест справа. Затем берём произведение цифр из таблицы. В запасной строке пустые клетки справа при сложении считаются нулями.</p>
+    <p>Двигаемся справа налево. Сначала смотрим на веса цифр. Если цифры стоят в разрядах <i>i</i> и <i>j</i>, дописываем справа <i>i</i> + <i>j</i> нулей. Затем берём произведение цифр из таблицы и записываем его левее этих нулей.</p>
     <p>Первое произведение записываем сразу. Каждое следующее кладём в запасную строку, складываем с текущим результатом по столбцам, затем убираем запасную строку.</p>
     <p>В конце складываем строки по столбцам и пользуемся тем же правилом переноса. Все вычисления записаны в выбранном основании.</p>
   </details>
@@ -288,7 +288,7 @@ function makeModel(first, second, base) {
     let carry = 0;
     for (let place = rightZeros; place < total.length; place += 1) {
       const left = lines[row][place];
-      const right = spare.digits[place];
+      const right = place < spare.place ? '0' : spare.digits[place];
       const a = left ? alphabet.indexOf(left) : 0;
       const b = right ? alphabet.indexOf(right) : 0;
       const terms = [];
@@ -308,7 +308,8 @@ function makeModel(first, second, base) {
       columnFormulas.push(column);
       carryMark = carry ? {row, place: place + 1, digit: transfer} : null;
       const label = inBase(places[place]);
-      const prefix = right ? '' : 'Пустая клетка запасной строки считается нулём. ';
+      const prefix = place < spare.place ? 'Прибавляем дописанный ноль. '
+        : right ? '' : 'Пустая клетка запасной строки считается нулём. ';
       const instruction = carry ? `Получили ${inBase(sum)}. Пишем ${digit}, переносим ${transfer} влево.` : `Пишем ${digit} в этом разряде.`;
       step('Складываем по столбцам', `Разряд веса ${label}. ${prefix}${instruction}`, {
         ...context, formulas: [heading, ...columnFormulas], focus, spare, activePlace: place, showCarry: Boolean(carry),
@@ -358,12 +359,14 @@ function makeModel(first, second, base) {
       const formulas = [multiplication];
       if (place) {
         const weight = inBase(places[place]);
-        const weightNote = `Веса разрядов дают ${weight}, поэтому справа оставляем ${offsetWords[place]}.`;
+        const zeroRow = i === 0 ? row : `${row}-spare`;
+        const destination = i === 0 ? 'в строке результата' : 'в запасной строке';
         if (i === 0) lines[row].fill('0', 0, j);
-        step('Определяем число нулей справа', weightNote, {
+        step('Дописываем нули справа',
+          `После единицы в записи ${weight} — ${offsetWords[place]}. Столько же нулей дописываем справа ${destination}. Цифры произведения появятся левее.`, {
           formulas: [[inBase(places[i]), '×', inBase(places[j]), '=', out(weight, place)]],
-          focus, weightFactors: [i, j], activePlace: place,
-          ...(i === 0 ? {mark, startCell: `${row}:${place}`} : {}),
+          focus, weightFactors: [i, j], activePlace: place, zeroRow, startCell: `${zeroRow}:${place}`,
+          ...(i === 0 ? {mark} : {spare: {row, place, digits: Array(width).fill('')}}),
         });
       }
       const digits = Array(width).fill('');
@@ -377,7 +380,7 @@ function makeModel(first, second, base) {
         return;
       }
       const spare = {row, place, digits};
-      step('Умножаем и записываем в запасную строку', `В таблице получаем ${productDigits}. Вписываем его слева от пустых клеток. При сложении эти клетки считаются нулями.`,
+      step('Умножаем и записываем в запасную строку', `В таблице получаем ${productDigits}. Вписываем его слева от нулей.`,
         {formulas, focus, lookup, fromTable: true, spare, activePlace: place,
           changed: [...productDigits].map((_, index) => `${row}-spare:${place + index}`)});
       partial = addToPartial(row, partial, increment, j, spare, {focus, lookup});
@@ -667,10 +670,9 @@ function render(index, forward = false) {
     const {row, place, digits} = step.spare;
     digits.forEach((digit, index) => {
       const cell = cells.get(`${row}-spare:${index}`);
-      cell.className = index < place ? 'digit implied-zero' : 'digit';
-      cell.textContent = digit;
-      if (index < place) cell.setAttribute('aria-label', 'Неявный ноль');
-      else cell.removeAttribute('aria-label');
+      const trailing = index < place;
+      cell.className = trailing ? 'digit implied-zero' : 'digit';
+      cell.textContent = trailing ? '0' : digit;
     });
   }
   [...model.places.keys()].forEach(place => {
@@ -705,7 +707,9 @@ function render(index, forward = false) {
       const node = element('span', 'calc-token', info.text);
       if (info.zeros) {
         node.textContent = info.text.slice(0, -info.zeros);
-        node.append(element('span', 'shift-zeros', info.text.slice(-info.zeros)));
+        const suffix = element('span', 'shift-zeros');
+        suffix.append(...[...info.text.slice(-info.zeros)].map(digit => element('span', 'shift-zero-digit', digit)));
+        node.append(suffix);
       }
       if (info.result) node.classList.add('result');
       if (info.quotient) node.classList.add('quotient');
@@ -747,7 +751,7 @@ function render(index, forward = false) {
       }
     }
   } else if (animate) {
-    for (const id of step.fromTable ? [] : step.mark ?? []) {
+    for (const id of step.fromTable || step.zeroRow ? [] : step.mark ?? []) {
       const target = cells.get(id);
       motion.push(target.animate([{opacity: 0, transform: 'scale(.85)'}, {opacity: 1, transform: 'none'}],
         {duration: 300, delay: step.weightFactors ? 250 : 0, fill: 'backwards'}));
@@ -771,6 +775,13 @@ function render(index, forward = false) {
       if (target === resultFromTable) continue;
       motion.push(target.animate([{opacity: 0, transform: 'translateY(-3px)'}, {opacity: 1, transform: 'none'}],
         {duration: 240, delay: wait, fill: 'backwards'}));
+    }
+    if (step.zeroRow) {
+      const zeros = currentGroup.querySelectorAll('.shift-zero-digit');
+      zeros.forEach((zero, index) => {
+        const place = zeros.length - 1 - index;
+        fly('0', zero.getBoundingClientRect(), cells.get(`${step.zeroRow}:${place}`), true, wait + 250 + index * 90);
+      });
     }
     if (step.showCarry) {
       const source = currentGroup.querySelector('.quotient');
