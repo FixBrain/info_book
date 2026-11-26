@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Черновик. Как записывают умножение и деление</title>
+<style>
+:root{--accent:#2563eb;--ink:#1f2430;--muted:#535d6f;--line:#dce3f0;--bg:#f7f8fa}
+*{box-sizing:border-box}
+html{scroll-padding-top:4rem}
+body{margin:0;background:var(--bg);color:var(--ink);font:1rem/1.6 -apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header{position:sticky;top:0;z-index:2;background:#fff;border-bottom:1px solid var(--line)}
+main,footer,summary,nav{width:min(100%,1048px);margin:auto;padding-inline:16px}
+summary{min-height:3rem;display:list-item;list-style-position:inside;padding-block:.6rem;color:#1647a8;cursor:pointer;font-weight:650}
+summary span{float:right;color:var(--muted);font-size:.9rem;font-weight:400}
+nav,footer{display:flex;flex-wrap:wrap;gap:6px 24px;padding-block:12px}
+a{color:#1647a8;text-underline-offset:.15em}
+main{padding-block:28px}
+h1{font-size:clamp(1.65rem,4vw,2.2rem);line-height:1.18;margin:0 0 .5em}
+h2{border-left:4px solid var(--accent);padding-left:10px;margin:1.5em 0 .5em;font-size:1.45rem;line-height:1.25}
+h3{margin:0 0 .55em;font-size:1.12rem;line-height:1.3}
+p{margin:.6em 0}
+.lead{font-size:1.1rem;color:var(--muted)}
+.examples{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px;margin:14px 0}
+figure,.note{margin:0;border:1px solid var(--line);padding:15px;border-radius:12px;background:#fff;min-width:0}
+.note{background:#eef4ff}
+figcaption{margin-top:.8em}
+.source{color:var(--muted);font-size:.875rem;margin-top:.65em;margin-bottom:0}
+.column{margin:.6em auto 0;width:min(100%,17rem);border-collapse:collapse;text-align:center;font-variant-numeric:tabular-nums}
+.column :is(th,td){padding:0 3px}
+.column th{font-size:.78rem;font-weight:500;color:var(--muted);border-bottom:1px solid var(--line)}
+.column tbody td{font-size:1.35rem;line-height:1.2;width:26%;font-weight:600}
+.column tbody td:first-child{width:13%}
+.column .carry td{color:#174887;font-size:.98rem;line-height:1.15;height:1.2em}
+.column .number td,.column .result td{height:1.4em}
+.column .result td{border-top:2px solid #405574}
+.column .mark{background:#e5eeff;color:#173f84;border-radius:4px;padding-inline:4px}
+.column s{color:#637083;text-decoration-thickness:1px}
+.formula{font:1.2rem/1.5 Cambria, Georgia, serif;overflow-wrap:anywhere}
+details.note{margin-top:1rem}
+details.note summary{padding:0;min-height:0}
+footer{border-top:1px solid var(--line);padding-bottom:25px}
+@media print{header,footer{display:none}figure,.note{break-inside:avoid}}
+
+.school{border-top:1px solid var(--line);margin-top:1.35rem;padding-top:1.1rem}
+.school h3{font-size:1.18rem}
+.school h4{font-size:1.05rem;margin:.1rem 0 .5rem}
+.school-examples{max-width:50rem}
+.country-links{padding-inline:0;gap:.4rem 1.15rem}
+.column .with-carry,.column .with-borrow{position:relative;display:inline-block}
+.column .with-carry small,.column .with-borrow small{position:absolute;color:#174887;font-size:.68em;font-weight:650}
+.column .with-carry small{left:100%;bottom:-.28em}
+.column .with-borrow small{right:100%;top:-.25em}
+.column.thai tbody td:first-child{width:26%}
+.column.thai tbody .op-sign{width:13%}
+.column.thai .number .op-sign{transform:translateY(-.55em)}
+.column.thai .result td{border-bottom:3px double #405574}
+
+
+.jump{padding-inline:0;display:flex;gap:.35rem 1.25rem}
+.region{margin:1rem 0}
+.region+.region{margin-top:1.6rem}
+.region>h3{font-size:1.27rem}
+.examples.two{grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr))}
+figure h4{font-size:1.05rem;margin:0 0 .5rem}
+.board{display:grid;grid-template-columns:1fr minmax(4.8rem,auto);gap:2px;margin:.65rem 0}
+.board dt,.board dd{padding:.25rem .5rem;background:#eef4ff;margin:0}
+.board dd{text-align:center;font-variant-numeric:tabular-nums;font-weight:650}
+.steps{margin:.6rem auto;border-collapse:collapse;max-width:100%;font-variant-numeric:tabular-nums}
+.steps caption{font-size:.85rem;color:var(--muted);white-space:normal}
+.steps :is(th,td){border:1px solid var(--line);padding:.15rem .5rem;text-align:center;min-width:2rem}
+.steps th{background:#eef4ff;font-weight:550}
+.steps .picked{background:#e7f2ea;color:#254a35;font-weight:600}
+.lattice td{position:relative;min-width:3.5rem;height:3rem;background:linear-gradient(135deg,transparent 49%,#a9bad4 50%,transparent 52%)}
+.lattice td span{position:absolute}
+.lattice td span:first-child{top:2px;left:.55rem}
+.lattice td span:last-child{bottom:2px;right:.55rem}
+
+.soroban{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));max-width:15rem;margin:.7rem auto;gap:.35rem;background:#fcf4e4;border:1px solid #eed8b2;border-radius:10px;text-align:center}
+.rod>b{display:block;padding:.12rem .2rem;font-size:.86rem}
+.beads{position:relative;display:flex;flex-direction:column;align-items:center;padding:.1rem 0;min-height:6.65rem}
+.beads::before{content:"";position:absolute;inset:0 auto 0 50%;border-left:2px solid #9a724f}
+.bead,.soroban .bar{position:relative;display:block}
+.bead{width:1.55rem;height:.9rem;border:1px solid #8d694d;border-radius:45%;background:#e3c9a6}
+.bead.counted{color:#194a7f;background:#71a5db;border-color:#38668f}
+.bead.spaced{margin-top:.65rem}
+.soroban .bar{width:calc(100% + .35rem);height:4px;background:#634a36}
+
+.division{display:grid;justify-content:center;margin:.6rem auto;font-weight:650;font-variant-numeric:tabular-nums;line-height:1.25}
+.division :is(span,b){padding:.1em .32em}
+.top-quotient{grid-template-columns:auto auto}
+.top-quotient b{grid-column:2;border-bottom:1.5px solid}
+.top-quotient span:last-child{border-left:1.5px solid;border-top-left-radius:5px}
+.right-quotient{grid-template-columns:auto auto}
+.right-quotient span:nth-child(2){border-bottom:1.5px solid;border-left:1.5px solid}
+.right-quotient b{grid-column:2;border-left:1.5px solid}
+
+</style>
+</head>
+<body>
+<main>
+<h1>Как записывают умножение и деление</h1>
+<p class="lead">Черновик к учебнику. Сравним, где записывают промежуточные числа, как собирают ответ и что дают счётные инструменты.</p>
+<nav class="jump" aria-label="На этой странице">
+  <a href="#asia">Китай, Индия и Япония</a><a href="#multiply">Три способа умножения</a><a href="#divide">Три записи деления</a><a href="#bases">Пример в основании 5</a>
+</nav>
+
+<section id="asia" aria-labelledby="asia-title">
+  <h2 id="asia-title">Китай, Индия и Япония</h2>
+  <article class="region">
+    <h3>Китай. Счётные палочки на доске</h3>
+    <p>В трактате «Сунь-цзы суань цзин» числа раскладывают по разрядам в трёх рядах. При умножении ответ растёт в среднем ряду, при делении — в верхнем.</p>
+    <div class="examples">
+      <figure>
+        <h4>81 × 81</h4>
+        <dl class="board" aria-label="Начальная раскладка для умножения в современной записи">
+          <dt>Верхний ряд</dt><dd>81</dd>
+          <dt>Средний ряд</dt><dd>Пусто</dd>
+          <dt>Нижний ряд</dt><dd>81 · 10</dd>
+        </dl>
+        <p>Нижний ряд сначала сдвинут на разряд влево. Верхние 8 десятков дают в середине 6400 и 80. Затем сдвигаем нижний ряд вправо и убираем верхние 8 десятков. Оставшаяся единица даёт ещё 80 и 1.</p>
+        <p class="formula">6400 → 6480 → 6560 → <strong>6561</strong></p>
+        <figcaption class="source">Числа в среднем ряду после каждого действия. <a href="https://yawnoc.github.io/sun-tzu/i/13">Оригинал и перевод § 13</a></figcaption>
+      </figure>
+      <figure>
+        <h4>6561 ÷ 9</h4>
+        <dl class="board" aria-label="Начальная раскладка для деления в современной записи">
+          <dt>Верхний ряд</dt><dd>Пусто</dd>
+          <dt>Средний ряд</dt><dd>6561</dd>
+          <dt>Нижний ряд</dt><dd>9 · 100</dd>
+        </dl>
+        <p>Ставим в верхний ряд 700 и вычитаем из середины 6300. Сдвигаем нижнюю 9 к десяткам, затем к единицам. Верхний ряд получает ещё 20 и 9.</p>
+        <p class="formula">6561 → 261 → 81 → <strong>0</strong></p>
+        <figcaption class="source">В середине ничего не осталось. Сверху получаем 700 + 20 + 9 = 729. <a href="https://yawnoc.github.io/sun-tzu/i/14">Оригинал и перевод § 14</a></figcaption>
+      </figure>
+    </div>
+    <p class="source">Ряды показаны современными цифрами. Древний текст задаёт ход вычисления, а расположение и движения отдельных палочек историки реконструируют. <a href="https://www.cambridge.org/core/journals/science-in-context/article/interplay-between-textual-procedures-and-material-operations-from-the-viewpoint-of-chinese-mathematical-texts/7E654BC8863452F26F2E0C43892699F4">Ивэнь Чжу, исследование счёта палочками</a></p>
+  </article>
+
+  <article class="region">
+    <h3>Индия. Умножение и обратное деление в «Лилавати»</h3>
+    <p>Бхаскара II предлагает умножить 135 на 12 и разделить результат на тот же множитель. В современной записи один из способов даёт два частичных произведения.</p>
+    <p class="formula">135 × 12 = 1350 + 270 = <strong>1620</strong></p>
+    <p>При делении 1620 на 12 сначала можно убрать 1200, затем 360 и 60. Это 100, 30 и 5 групп по 12, поэтому частное равно 135.</p>
+    <p class="source">Вычитания при делении здесь даны как современная проверка на тех же числах. <a href="https://assets.super.so/e745dfd7-232e-47c1-a806-753f45b941ba/files/9b336695-0368-44c9-97bc-cb392265f4d2.pdf#page=22">Бхаскара II, «Лилавати», перевод и комментарии, с. 15</a></p>
+  </article>
+
+  <article class="region">
+    <h3>Япония. Вычисления на соробане</h3>
+    <p>Соробан — счёты, где каждая спица отвечает за разряд. Косточка над перекладиной имеет вес пяти, косточки под ней — по одной. Считаются косточки, подвинутые к перекладине.</p>
+    <div class="examples two">
+      <figure>
+        <h4>34 × 2 = 68</h4>
+        <p>Сначала по таблице умножения получаем 4 × 2 = 8 единиц. Затем 3 × 2 = 6 десятков. Обе цифры набираются на своих спицах в области результата.</p>
+        <div class="soroban" role="img" aria-label="Число 68 на соробане. В десятках к перекладине сдвинуты косточка пять и одна единичная, в единицах косточка пять и три единичных.">
+          <div class="rod" aria-hidden="true">
+            <b>Десятки</b><div class="beads">
+              <span class="bead upper counted"></span><span class="bar"></span>
+              <span class="bead lower counted"></span><span class="bead lower spaced"></span><span class="bead lower"></span><span class="bead lower"></span>
+            </div><b>6</b>
+          </div>
+          <div class="rod" aria-hidden="true">
+            <b>Единицы</b><div class="beads">
+              <span class="bead upper counted"></span><span class="bar"></span>
+              <span class="bead lower counted"></span><span class="bead lower counted"></span><span class="bead lower counted"></span><span class="bead lower spaced"></span>
+            </div><b>8</b>
+          </div>
+        </div>
+        <figcaption class="source"><a href="https://www.mext.go.jp/content/20240327-mxt_tokubetu01-000034750_19.pdf#page=37">MEXT, схема 3-4, с. 37 PDF</a></figcaption>
+      </figure>
+      <figure>
+        <h4>14 ÷ 3 = 4, остаток 2</h4>
+        <p>Набираем цифру частного 4. Затем убираем из делимого 4 × 3 = 12. Остаётся 2, это меньше 3, поэтому следующей полной группы нет.</p>
+        <figcaption class="source"><a href="https://www.mext.go.jp/content/20240327-mxt_tokubetu01-000034750_19.pdf#page=56">MEXT, раздел 4.1, с. 56 PDF</a></figcaption>
+      </figure>
+    </div>
+    <p class="source">Оба примера из японского учебного пособия для учащихся, осваивающих Брайль. <a href="https://www.mext.go.jp/content/20240327-mxt_tokubetu01-000034750_19.pdf">MEXT, «参考資料2 珠算編», разделы 3–4</a></p>
+  </article>
+</section>
+
+<section id="multiply" aria-labelledby="multiply-title">
+  <h2 id="multiply-title">Три способа получить 23 × 14</h2>
+  <div class="examples">
+    <figure>
+      <h3>Прямоугольник и столбик</h3>
+      <table class="steps">
+        <caption>Произведения частей</caption>
+        <thead><tr><th></th><th scope="col">20</th><th scope="col">3</th></tr></thead>
+        <tbody><tr><th scope="row">10</th><td>200</td><td>30</td></tr><tr><th scope="row">4</th><td>80</td><td>12</td></tr></tbody>
+      </table>
+      <p>В столбике части объединяются в две строки. От 4 получаем 92, от 10 получаем 230. Складываем и получаем 322.</p>
+      <figcaption class="source"><a href="https://www.ncetm.org.uk/media/p22ldwpi/ncetm_spine2_segment23_y6.pdf">NCETM, Англия, § 2.23</a></figcaption>
+    </figure>
+    <figure>
+      <h3>Решётка</h3>
+      <table class="steps lattice">
+        <caption>Произведения отдельных цифр</caption>
+        <thead><tr><th></th><th scope="col">2</th><th scope="col">3</th></tr></thead>
+        <tbody><tr><th scope="row">1</th><td><span>0</span><span>2</span></td><td><span>0</span><span>3</span></td></tr>
+        <tr><th scope="row">4</th><td><span>0</span><span>8</span></td><td><span>1</span><span>2</span></td></tr></tbody>
+      </table>
+      <p>Читаем диагонали с правого нижнего угла. У единиц сумма 2. У десятков 3 + 8 + 1 = 12, пишем 2 и переносим 1. В сотнях 2 + 0 + 0 + 1 = 3.</p>
+      <figcaption class="source"><a href="https://en.wikisource.org/wiki/A_Source_Book_in_Mathematics/The_First_Printed_Arithmetic">«Арифметика Тревизо», 1478</a></figcaption>
+    </figure>
+    <figure>
+      <h3>Удвоения</h3>
+      <table class="steps">
+        <caption>Кратные числа 23</caption>
+        <thead><tr><th scope="col">Множитель</th><th scope="col">Произведение</th></tr></thead>
+        <tbody><tr><td>1</td><td>23</td></tr><tr class="picked"><td>2</td><td>46</td></tr><tr class="picked"><td>4</td><td>92</td></tr><tr class="picked"><td>8</td><td>184</td></tr></tbody>
+      </table>
+      <p>Разлагаем 14 как 8 + 4 + 2 и складываем выделенные числа. 184 + 92 + 46 = 322.</p>
+      <figcaption class="source">Современный пример приёма из Древнего Египта. <a href="https://en.wikisource.org/wiki/Page:The_Rhind_Mathematical_Papyrus,_Volume_I.pdf/20">Папирус Ринда, комментарий к задаче 79</a></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="divide" aria-labelledby="divide-title">
+  <h2 id="divide-title">Три записи для 527 ÷ 4</h2>
+  <p>Частное равно 131, остаток равен 3. Проверка даёт 527 = 4 · 131 + 3, причём 3 &lt; 4.</p>
+  <div class="examples">
+    <figure>
+      <h3>Частное сверху</h3>
+      <div class="division top-quotient" role="img" aria-label="В английском столбике делитель 4 слева, делимое 527 справа, частное 131 над делимым">
+        <b>131</b><span>4</span><span>527</span>
+      </div>
+      <p>В длинной записи под делимым выписывают промежуточные вычитания. В короткой рядом со следующей цифрой отмечают переносимый остаток.</p>
+      <figcaption class="source"><a href="https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/238967/Mathematics_Appendix_1.pdf#page=2">Программа Англии, приложение 1, с. 2</a></figcaption>
+    </figure>
+    <figure>
+      <h3>Частное справа</h3>
+      <div class="division right-quotient" role="img" aria-label="Во французской записи делимое 527 слева, делитель 4 справа, частное 131 под делителем">
+        <span>527</span><span>4</span><b>131</b>
+      </div>
+      <p>Делитель справа, частное под ним. Как и в предыдущей записи, цифры 1, 3 и 1 получаем по очереди, ведя вычисления под делимым.</p>
+      <figcaption class="source"><a href="https://eduscol.education.gouv.fr/sites/default/files/document/2024evaluationdebutcm2mathematiquesficheinterventionposercalculeradditionssoustractionsmultiplicationsdivisionsnombresentierpdf-108102.pdf#page=11">Éduscol, Франция, с. 11–12</a></figcaption>
+    </figure>
+    <figure>
+      <h3>Частичными частными</h3>
+      <table class="steps">
+        <thead><tr><th scope="col">Убираем</th><th scope="col">Остаётся</th></tr></thead>
+        <tbody><tr><td>4 · 100</td><td>127</td></tr><tr><td>4 · 25</td><td>27</td></tr><tr><td>4 · 6</td><td>3</td></tr></tbody>
+      </table>
+      <p>Всего убрали 100 + 25 + 6 = 131 группу по 4. На одном шаге можно взять, например, сразу 25 групп.</p>
+      <figcaption class="source"><a href="https://cms-assets.illustrativemathematics.org/acsx26n028az7jtg8yumirv12qtz">Illustrative Mathematics, США, урок о частичных частных</a></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="bases" aria-labelledby="bases-title">
+  <h2 id="bases-title">Пример в пятеричной системе</h2>
+  <div class="note">
+    <p>При умножении 23<sub>5</sub> × 14<sub>5</sub> четыре клетки прямоугольника дают вклады того же веса, что и диагонали решётки. Переносим пятёрками и получаем 432<sub>5</sub>.</p>
+    <p>При делении 433<sub>5</sub> на 14<sub>5</sub> сначала убираем 14<sub>5</sub> · 20<sub>5</sub> = 330<sub>5</sub>. Из оставшегося 103<sub>5</sub> убираем 14<sub>5</sub> · 3<sub>5</sub> = 102<sub>5</sub>. Частное равно <strong>23<sub>5</sub></strong>, остаток равен <strong>1<sub>5</sub></strong>.</p>
+  </div>
+</section>
+</main>
+</body>
+</html>
