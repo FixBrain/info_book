@@ -191,6 +191,7 @@ let model;
 let current = 0;
 let cells;
 let equation;
+let calcLabel;
 let tableBase;
 let tableGuides = [];
 let tableHit;
@@ -267,15 +268,19 @@ function makeModel(first, second, base) {
     const zeros = Array.from({length: j}, (_, place) => place);
     zeros.forEach(place => { lines[row][place] = '0'; });
     carryMark = null;
-    if (!digit) lines[row][j] = '0';
-    const note = j === 0 ? 'Пишем первую строку начиная с единиц.'
-      : `У этого разряда вес ${inBase(places[j])}. Сразу ставим ${j === 1 ? 'один ноль' : j === 2 ? 'два нуля' : 'три нуля'} справа и пишем цифры левее.`;
-    step(`Готовим строку ${j + 1}`, digit ? note : `${note} Умножение на 0 даёт 0.`, {
-      formula: digit ? [take('bottom', j, digit), '×', inBase(places[j]), '=', out(inBase(digit * places[j]))]
-        : [first, '×', take('bottom', j, digit), '=', out(0)],
-      focus, mark: zeros.map(place => `${row}:${place}`),
-    });
-    if (!digit) return;
+    const mark = zeros.map(place => `${row}:${place}`);
+    if (!digit) {
+      lines[row][j] = '0';
+      step('Записываем нулевую строку', 'Цифра множителя в этом разряде равна нулю, поэтому вся строка нулевая.', {
+        formula: [first, '×', take('bottom', j, digit), '=', out(0)],
+        focus, mark,
+      });
+      return;
+    }
+    if (j > 0) {
+      const suffix = ['', 'один ноль', 'два нуля', 'три нуля'][j];
+      step('Ставим нули справа', `Сразу ставим ${suffix} справа. Цифры произведения будем вписывать левее.`, {focus, mark});
+    }
 
     let carry = 0;
     a.forEach((value, i) => {
@@ -438,10 +443,10 @@ function buildBoard() {
   addRow('bottom', '× Второе', [...model.second].reverse());
 
   const calculation = element('div', 'calculation');
-  const heading = element('span', 'calc-label', `Вычисление в основании ${model.base}`);
+  calcLabel = element('span', 'calc-label');
   equation = element('div');
   equation.id = 'equation';
-  calculation.append(heading, equation);
+  calculation.append(calcLabel, equation);
   board.append(calculation, element('div', 'board-rule'));
   model.rowNames.forEach((name, index) => addRow(name, `Строка ${index + 1}`));
   board.append(element('div', 'board-rule'));
@@ -554,6 +559,8 @@ function render(index, forward = false) {
     return {node: element('span', `calc-token${style}`, info.text), info};
   });
   equation.replaceChildren(...tokens.map(({node}) => node));
+  calcLabel.textContent = step.formula ? `Вычисление в основании ${model.base}` : 'Подготовка строки';
+  if (!step.formula) equation.textContent = `…${'0'.repeat(step.mark.length)}`;
   byId('step-title').textContent = step.title;
   status.textContent = step.note;
   renderBench(step.bench ?? []);
