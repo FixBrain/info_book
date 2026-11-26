@@ -132,12 +132,21 @@ figure h4{font-size:1.05rem;margin:0 0 .5rem}
 .diagonal-steps li{padding:.46rem .65rem;border-radius:8px;background:var(--band)}
 .diagonal-steps strong{font-size:1.12rem}
 .diagonal-steps small{display:block;font-size:.92rem}
-.doubling-flow,.factor-flow{display:flex;align-items:stretch;gap:.45rem;list-style:none;margin:.7rem 0;padding:0}
-.doubling-flow>div,.factor-flow li{flex:1 1 0;min-width:0;padding:.5rem .25rem;text-align:center;background:#f1f4f8;border:1px solid #dce3f0;border-radius:9px}
-.doubling-flow>div.selected{background:#e0f0e6;border-color:#96bea6}
-.doubling-flow span,.factor-flow span{display:block;font-size:.92rem}
-.doubling-flow strong,.factor-flow strong{display:block;font-size:clamp(1.12rem,4vw,1.55rem);line-height:1.4}
-.flow-arrow{align-self:center;font-size:1.1rem;color:#425b7f}
+.factor-flow{display:flex;align-items:stretch;gap:.45rem;list-style:none;margin:.7rem 0;padding:0}
+.factor-flow li{flex:1 1 0;min-width:0;padding:.5rem .25rem;text-align:center;background:#f1f4f8;border:1px solid var(--line);border-radius:9px}
+.factor-flow span{display:block;font-size:.92rem}
+.factor-flow strong{display:block;font-size:clamp(1.12rem,4vw,1.55rem);line-height:1.4}
+.binary-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(4px,1.25vw,12px);list-style:none;margin:.8rem 0;padding:0;max-width:36rem}
+.binary-cards li{display:grid;justify-items:center;gap:.08rem;min-width:0;padding:.42rem .1rem;border:1px solid var(--line);border-radius:9px;background:#f1f4f8;text-align:center;line-height:1.45;font-variant-numeric:tabular-nums}
+.binary-cards .selected{color:#19472d;background:#e0f0e6;border-color:#96bea6}
+.binary-cards .bit{font-weight:750;font-size:clamp(1.18rem,4vw,1.55rem)}
+.binary-cards small{max-width:100%;font-size:.78rem;overflow-wrap:anywhere}
+.binary-cards strong{font-size:clamp(1.02rem,3.4vw,1.3rem)}
+.binary-cards .bit-weight{padding-bottom:.25rem;width:100%;border-bottom:1px solid #52607640}
+.formula-result{white-space:nowrap}
+.binary-stage{margin-top:1rem}
+.binary-trace{padding-inline-start:1.4rem;margin:.5em 0 0}
+.binary-trace li+li{margin-top:.3rem}
 .factor-flow{max-width:31rem}
 .factor-flow li.for-units{background:#fff0d1}
 .factor-flow li.for-tens{background:#e5eeff}
@@ -145,7 +154,6 @@ figure h4{font-size:1.05rem;margin:0 0 .5rem}
 .rod-progress li{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;padding:.3rem .55rem;background:#eef4ff;border-radius:7px}
 .rod-progress b{font-size:1.12rem;font-variant-numeric:tabular-nums;white-space:nowrap}
 @media(max-width:660px){.scheme-layout{grid-template-columns:minmax(0,1fr)}}
-@media(max-width:390px){.doubling-flow{gap:.2rem}.doubling-flow .flow-arrow{font-size:.87rem}}
 </style>
 </head>
 <body>
@@ -153,7 +161,7 @@ figure h4{font-size:1.05rem;margin:0 0 .5rem}
 <h1>Как записывают умножение и деление</h1>
 <p class="lead">Черновик к учебнику. Сравним, где записывают промежуточные числа, как собирают ответ и что дают счётные инструменты.</p>
 <nav class="jump" aria-label="На этой странице">
-  <a href="#asia">Китай, Индия и Япония</a><a href="#multiply">Три способа умножения</a><a href="#divide">Три записи деления</a><a href="#bases">Пример в основании 5</a>
+  <a href="#asia">Китай, Индия и Япония</a><a href="#multiply">Три способа умножения</a><a href="#binary-multiplication">Умножение через двоичную запись</a><a href="#divide">Три записи деления</a><a href="#bases">Пример в основании 5</a>
 </nav>
 
 <section id="asia" aria-labelledby="asia-title">
@@ -291,21 +299,56 @@ figure h4{font-size:1.05rem;margin:0 0 .5rem}
       <figcaption class="source"><a href="https://en.wikisource.org/wiki/A_Source_Book_in_Mathematics/The_First_Printed_Arithmetic">«Арифметика Тревизо», 1478</a></figcaption>
     </figure>
 
-    <figure aria-labelledby="doubling-title">
-      <h3 id="doubling-title">Удвоения</h3>
-      <p>В каждой группе по 23. На каждом шаге удваиваем число групп и общую сумму. Выделяем 2, 4 и 8 групп, потому что 2 + 4 + 8 = 14.</p>
-      <div class="doubling-flow" role="img" aria-label="Одна группа по 23 даёт 23, две дают 46, четыре дают 92 и восемь дают 184. Выбираем значения для двух, четырёх и восьми групп.">
-        <div><span>× 1</span><strong>23</strong></div>
-        <span class="flow-arrow" aria-hidden="true">→</span>
-        <div class="selected"><span>× 2</span><strong>46</strong></div>
-        <span class="flow-arrow" aria-hidden="true">→</span>
-        <div class="selected"><span>× 4</span><strong>92</strong></div>
-        <span class="flow-arrow" aria-hidden="true">→</span>
-        <div class="selected"><span>× 8</span><strong>184</strong></div>
-      </div>
-      <p class="scheme-equation">184 + 92 + 46 = 322</p>
-      <figcaption class="source">Современный пример приёма из Древнего Египта. <a href="https://en.wikisource.org/wiki/Page:The_Rhind_Mathematical_Papyrus,_Volume_I.pdf/20">Папирус Ринда, комментарий к задаче 79</a></figcaption>
+    <figure id="binary-multiplication" aria-labelledby="doubling-title">
+      <h3 id="doubling-title">Удвоения и двоичная запись</h3>
+      <p>Умножить 23 на 14 — значит взять 14 групп по 23. Разложим число групп по весам двоичных разрядов.</p>
+      <p class="scheme-equation">14<sub>10</sub> = 1110<sub>2</sub> = 8 + 4 + 2</p>
+      <p>Сначала строим цепочку удвоений справа налево. Одна группа — 23, две — 46, четыре — 92, восемь — 184. Двоичная цифра <strong>1</strong> говорит взять полученное число, а <strong>0</strong> — пропустить его.</p>
+      <ul class="binary-cards" role="list" aria-label="Цифры 1110 и вклады при умножении 23 на 14">
+        <li class="selected"><span class="bit" aria-label="Цифра 1">1</span><small class="bit-weight">Вес 8</small><strong>184</strong><small>Берём</small></li>
+        <li class="selected"><span class="bit" aria-label="Цифра 1">1</span><small class="bit-weight">Вес 4</small><strong>92</strong><small>Берём</small></li>
+        <li class="selected"><span class="bit" aria-label="Цифра 1">1</span><small class="bit-weight">Вес 2</small><strong>46</strong><small>Берём</small></li>
+        <li><span class="bit" aria-label="Цифра 0">0</span><small class="bit-weight">Вес 1</small><strong>23</strong><small>Пропуск</small></li>
+      </ul>
+      <p class="scheme-equation">23 × (8 + 4 + 2) = 184 + 92 + 46 <span class="formula-result">= 322</span></p>
+      <p>Для 14 групп хватило трёх удвоений и двух сложений выбранных чисел. Если бы мы начали с 23 и каждый раз прибавляли ещё по 23, понадобилось бы 13 сложений.</p>
+
+      <details class="note binary-stage">
+        <summary>Как находить двоичные цифры по ходу умножения</summary>
+        <p>Делим множитель на 2 с остатком, как при <a href="05-perevod-iz-desyatichnoy.html">переводе в двоичную систему</a>. Каждый остаток сразу даёт очередную цифру справа налево. Сравните с карточками выше.</p>
+        <ol class="binary-trace">
+          <li><strong>14 = 7 · 2 + 0.</strong> Пропускаем 23. Сумма пока 0.</li>
+          <li><strong>7 = 3 · 2 + 1.</strong> Прибавляем 46. Сумма 46.</li>
+          <li><strong>3 = 1 · 2 + 1.</strong> Прибавляем 92. Сумма 138.</li>
+          <li><strong>1 = 0 · 2 + 1.</strong> Прибавляем 184. Сумма 322.</li>
+        </ol>
+        <p>На каждом шаге остаток говорит, прибавлять ли текущее число. Если частное ещё положительное, удваиваем текущее число и продолжаем с частным.</p>
+      </details>
+      <figcaption class="source">Двоичная запись даёт современное объяснение выбора удвоений. Пример древнеегипетского счёта удвоениями есть в задаче 79 папируса Ринда. <a href="https://en.wikisource.org/wiki/Page:The_Rhind_Mathematical_Papyrus,_Volume_I.pdf/20">Папирус Ринда, комментарий к задаче 79</a></figcaption>
     </figure>
+
+    <section class="note binary-stage" id="binary-power" aria-labelledby="binary-power-title">
+      <h3 id="binary-power-title">От удвоений к быстрому возведению в степень</h3>
+      <p>Теперь найдём 3<sup>14</sup>. Двоичные цифры числа 14 указывают, какие <strong>показатели</strong> взять. При умножении степеней с одним основанием их показатели складываются.</p>
+      <p class="scheme-equation">3<sup>14</sup> = 3<sup>8 + 4 + 2</sup> = 3<sup>8</sup> · 3<sup>4</sup> · 3<sup>2</sup></p>
+      <p>Чтобы удвоить показатель, возводим предыдущую степень в квадрат. Из 3 получаем 3<sup>2</sup>, затем (3<sup>2</sup>)<sup>2</sup> = 3<sup>4</sup> и (3<sup>4</sup>)<sup>2</sup> = 3<sup>8</sup>.</p>
+      <ul class="binary-cards" role="list" aria-label="Те же цифры 1110 выбирают множители для 3 в степени 14">
+        <li class="selected"><span class="bit" aria-label="Цифра 1">1</span><small class="bit-weight">Вес 8</small><strong>3<sup>8</sup></strong><small>Берём</small></li>
+        <li class="selected"><span class="bit" aria-label="Цифра 1">1</span><small class="bit-weight">Вес 4</small><strong>3<sup>4</sup></strong><small>Берём</small></li>
+        <li class="selected"><span class="bit" aria-label="Цифра 1">1</span><small class="bit-weight">Вес 2</small><strong>3<sup>2</sup></strong><small>Берём</small></li>
+        <li><span class="bit" aria-label="Цифра 0">0</span><small class="bit-weight">Вес 1</small><strong>3<sup>1</sup></strong><small>Пропуск</small></li>
+      </ul>
+      <p>При умножении выбранные числа <strong>складывали</strong>. При возведении в степень выбранные степени <strong>перемножаем</strong>. Здесь понадобилось три возведения в квадрат и ещё два умножения. Для перемножения 14 троек по очереди понадобилось бы 13 умножений.</p>
+      <p>В обоих приёмах делаем по одному шагу на двоичную цифру множителя или показателя. Число шагов растёт вместе с длиной двоичной записи.</p>
+      <details class="binary-stage">
+        <summary>Почему деление пополам работает в обоих приёмах</summary>
+        <p>Пусть <i>n</i> — положительный целый множитель или показатель, а <i>a</i> — ненулевое число. После деления на 2 получаем частное <i>q</i> и остаток <i>r</i>, поэтому <i>n</i> = 2<i>q</i> + <i>r</i>, где <i>r</i> равен 0 или 1.</p>
+        <p class="formula"><i>a</i> · <i>n</i> = (2<i>a</i>) · <i>q</i> + <i>a</i> · <i>r</i></p>
+        <p>Для умножения продолжаем с удвоенным <i>a</i> и новым множителем <i>q</i>. Если <i>r</i> = 1, прибавляем одно <i>a</i>.</p>
+        <p class="formula"><i>a</i><sup><i>n</i></sup> = (<i>a</i><sup>2</sup>)<sup><i>q</i></sup> · <i>a</i><sup><i>r</i></sup></p>
+        <p>Для степени продолжаем с квадратом <i>a</i> и показателем <i>q</i>. Если <i>r</i> = 1, включаем множитель <i>a</i>. При <i>r</i> = 0 этот множитель пропускаем.</p>
+      </details>
+    </section>
   </div>
 </section>
 
