@@ -84,9 +84,11 @@ button[aria-disabled="true"] { opacity: .56; cursor: default; }
 }
 .calc-label { display: block; font-size: .72rem; color: var(--muted); font-weight: 650; }
 #equation { display: flex; flex-wrap: wrap; align-items: baseline; gap: .2rem .3rem; margin: .12rem 0 0; font-size: clamp(1rem,3.2vw,1.28rem); font-weight: 700; }
+.calc-group { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: .12rem .25rem; max-width: 100%; }
+.calc-link { align-self: center; padding-inline: .14rem; color: var(--muted); }
 .calc-token { display: inline-block; min-width: .8rem; text-align: center; border-radius: .28rem; padding-inline: .16rem; }
 .calc-token.result { background: #e0efdf; color: #235635; padding-inline: .28rem; }
-.calc-token.quotient { background: var(--blue-soft); color: #19468b; }
+.calc-token.quotient, .calc-token.carry-input { background: var(--blue-soft); color: #19468b; }
 #step-status { color: #263652; }
 .bench { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .45rem; }
 .bench-group {
@@ -228,12 +230,12 @@ function makeModel(first, second, base) {
     });
   }
 
-  function record(total, place, row, formula, focus, lookup = null, finished = false) {
+  function record(total, place, row, formulas, focus, lookup = null, finished = false) {
     const quotient = Math.floor(total / base);
     const remainder = total % base;
     const digit = inBase(remainder);
     const transfer = inBase(quotient);
-    const splitFormula = [inBase(total), '→', {text: transfer, quotient: true}, '│', out(digit)];
+    const reasoning = quotient ? [...formulas, [{text: transfer, quotient: true}, '│', out(digit)]] : formulas;
     const split = quotient ? [
       {kind: 'carry', title: 'Переносим влево', amount: quotient, weight: places[place + 1]},
       {kind: 'remainder', title: 'Пишем в столбец', amount: remainder, weight: places[place]},
@@ -241,7 +243,7 @@ function makeModel(first, second, base) {
     if (quotient) {
       step('Выделяем цифру и перенос',
         `В записи ${inBase(total)} последняя цифра ${digit} идёт в текущий столбец. Слева от неё стоит перенос ${transfer}.`,
-        {formula: splitFormula, focus, bench: split, lookup});
+        {formulas: reasoning, focus, bench: split, lookup});
     }
     lines[row][place] = digit;
     carryMark = quotient ? {place: place + 1, digit: transfer} : null;
@@ -252,13 +254,13 @@ function makeModel(first, second, base) {
       : `Пишем ${digit} в текущий столбец. Перенос не нужен.`;
     if (finished) note += ` Ответ ${resultRecord} в основании ${base}.`;
     step(quotient ? 'Пишем цифру и переносим' : 'Записываем цифру', note,
-      {formula: quotient ? splitFormula : formula, focus, bench: split, lookup, move, finished});
+      {formulas: reasoning, focus, bench: split, lookup, move, finished});
     return quotient;
   }
 
   step('Записываем числа по разрядам',
     'Начнём с правой цифры множителя. Для каждой цифры второго числа будет своя строка.',
-    {formula: [first, '×', second]});
+    {formulas: [[first, '×', second]]});
 
   b.forEach((digit, j) => {
     stage += 1;
@@ -272,7 +274,7 @@ function makeModel(first, second, base) {
     if (!digit) {
       lines[row][j] = '0';
       step('Записываем нулевую строку', 'Цифра множителя в этом разряде равна нулю, поэтому вся строка нулевая.', {
-        formula: [first, '×', take('bottom', j, digit), '=', out(0)],
+        formulas: [[first, '×', take('bottom', j, digit), '=', out(0)]],
         focus, mark,
       });
       return;
@@ -288,24 +290,27 @@ function makeModel(first, second, base) {
       const focus = [`top:${i}`, `bottom:${j}`];
       const lookup = [value, digit];
       const product = value * digit;
-      let formula = [take('top', i, value), '×', take('bottom', j, digit), '=', out(inBase(product))];
+      const multiplication = [take('top', i, value), '×', take('bottom', j, digit), '=', out(inBase(product))];
+      let formulas = [multiplication];
       step('Умножаем цифры', `В таблице берём строку ${inBase(value)} и столбец ${inBase(digit)}. На пересечении получаем ${inBase(product)}.`,
-        {formula, focus, lookup, fromTable: true});
+        {formulas, focus, lookup, fromTable: true});
 
       if (carry) {
-        formula = [inBase(product), '+', token(inBase(carry), `carry:${place}`), '=', out(inBase(product + carry))];
+        const addition = [inBase(product), '+', token(inBase(carry), `carry:${place}`), '=', out(inBase(product + carry))];
+        formulas = [multiplication, addition];
         step('Прибавляем входящий перенос', 'Перенос уже относится к текущему разряду. Прибавляем его к произведению цифр.', {
-          formula, focus, lookup,
+          formulas, focus, lookup,
         });
       }
-      carry = record(product + carry, place, row, formula, focus, lookup);
+      carry = record(product + carry, place, row, formulas, focus, lookup);
     });
     if (carry) {
       const place = j + a.length;
       lines[row][place] = alphabet[carry];
       carryMark = null;
+      const previous = steps.at(-1);
       step('Дописали последнюю цифру строки', 'Цифры первого числа закончились. Оставшийся перенос становится старшей цифрой этой строки.',
-        {formula: [token(alphabet[carry], `carry:${place}`), '→', out(alphabet[carry])], focus, move: [{row, place, from: `carry:${place}`}]});
+        {formulas: previous.formulas, focus: previous.focus, lookup: previous.lookup, move: [{row, place, from: `carry:${place}`}]});
     }
   });
 
@@ -330,9 +335,10 @@ function makeModel(first, second, base) {
     }
     if (!formula.length) formula.push('0');
     formula.push('=', out(inBase(total)));
+    const formulas = [formula];
     step('Складываем цифры столбца', `Складываем выделенные цифры${carry ? ' и прибавляем входящий перенос' : ''}.`,
-      {formula, focus});
-    carry = record(total, place, 'sum', formula, focus, null, place === resultRecord.length - 1);
+      {formulas, focus});
+    carry = record(total, place, 'sum', formulas, focus, null, place === resultRecord.length - 1);
   }
   return {first, second, base, places, rowNames, steps, phases};
 }
@@ -553,26 +559,37 @@ function render(index, forward = false) {
     }
   }
 
-  const tokens = (step.formula ?? []).map(part => {
-    const info = typeof part === 'string' ? {text: part} : part;
-    const style = info.result ? ' result' : info.quotient ? ' quotient' : info.from ? ' input' : '';
-    return {node: element('span', `calc-token${style}`, info.text), info};
+  const formulas = step.formulas ?? [];
+  const groups = formulas.map((formula, number) => {
+    const group = element('span', 'calc-group');
+    if (number > 0) group.append(element('span', 'calc-link', '→'));
+    const tokens = formula.map(part => {
+      const info = typeof part === 'string' ? {text: part} : part;
+      const node = element('span', 'calc-token', info.text);
+      if (info.result) node.classList.add('result');
+      if (info.quotient) node.classList.add('quotient');
+      if (info.from) node.classList.add(info.from.startsWith('carry:') ? 'carry-input' : 'input');
+      return {node, info};
+    });
+    group.append(...tokens.map(({node}) => node));
+    return {group, tokens};
   });
-  equation.replaceChildren(...tokens.map(({node}) => node));
-  calcLabel.textContent = step.formula ? `Вычисление в основании ${model.base}` : 'Подготовка строки';
-  if (!step.formula) equation.textContent = `…${'0'.repeat(step.mark.length)}`;
+  equation.replaceChildren(...groups.map(({group}) => group));
+  const {group: currentGroup, tokens = []} = groups.at(-1) ?? {};
+  calcLabel.textContent = currentGroup ? `Вычисление в основании ${model.base}` : 'Подготовка строки';
+  if (!currentGroup) equation.textContent = `…${'0'.repeat(step.mark.length)}`;
   byId('step-title').textContent = step.title;
   status.textContent = step.note;
   renderBench(step.bench ?? []);
   const lookupCell = showLookup(step.lookup);
 
   if (animate && step.move) {
-    const result = equation.querySelector('.result:last-child');
+    const result = currentGroup.querySelector('.result');
     for (const [number, move] of step.move.entries()) {
       const target = cells.get(`${move.row}:${move.place}`);
       const carried = move.row === 'carry';
       if (carried) {
-        const source = equation.querySelector('.quotient');
+        const source = currentGroup.querySelector('.quotient');
         fly(target.textContent, source?.getBoundingClientRect(), target.firstElementChild, true, number * 180);
       } else {
         target.classList.add('written');
@@ -595,10 +612,10 @@ function render(index, forward = false) {
     let resultFromTable = null;
     const origin = step.fromTable && lookupCell?.getBoundingClientRect();
     if (origin && origin.top >= 0 && origin.bottom <= innerHeight && innerWidth > 670) {
-      resultFromTable = equation.querySelector('.result');
+      resultFromTable = currentGroup.querySelector('.result');
       fly(lookupCell.textContent, origin, resultFromTable, false, wait);
     }
-    const animatedParts = [...equation.querySelectorAll('.result'), ...bench.children];
+    const animatedParts = [...tokens.filter(({info}) => info.result || info.quotient).map(({node}) => node), ...bench.children];
     for (const target of animatedParts) {
       if (target === resultFromTable) continue;
       motion.push(target.animate([{opacity: 0, transform: 'translateY(-3px)'}, {opacity: 1, transform: 'none'}],
