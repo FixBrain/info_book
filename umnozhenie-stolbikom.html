@@ -68,7 +68,10 @@ button[aria-disabled="true"] { opacity: .56; cursor: default; }
 .place-labels span:not(:first-child) { text-align: center; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; line-height: 1.1; }
 .place-labels .long-weight { font-size: .59rem; }
 .place-labels .active-weight { color: var(--warm); background: var(--warm-soft); border-radius: .25rem; font-weight: 800; }
-.place-labels .weight-factor { color: #19468b; background: var(--blue-soft); border-radius: .25rem; font-weight: 800; }
+.place-labels .weight-chip { min-height: 1rem; padding-block: .12rem; border-radius: .25rem; font-weight: 800; }
+.operand-weights { margin-top: .35rem; }
+.product-weight { margin-top: .32rem; }
+.weight-chip.product, .digit.row-start { color: #215638; background: #e7f4eb; }
 .row-name { line-height: 1.2; }
 .board-line[data-row$="-carry"] .row-name { color: #19468b; overflow-wrap: anywhere; }
 .row-name b { color: var(--ink); }
@@ -78,11 +81,16 @@ button[aria-disabled="true"] { opacity: .56; cursor: default; }
 .carry-slot { min-height: 1.38rem; }
 .move-chip { width: 100%; font-weight: 750; background: var(--blue-soft); color: #19468b; border: 1px solid #aac4ee; border-radius: .35rem; text-align: center; }
 .digit.active, .digit.written, .calc-token.input { background: var(--warm-soft); border-color: #d7a956; color: var(--warm); }
-.digit.row-start { outline: 2px solid #b67822; outline-offset: -2px; }
+.digit.row-start { outline: 2px solid #4a8a60; outline-offset: -2px; }
 .digit.placeholder { background: var(--blue-soft); border-color: #aac4ee; color: #174384; }
 .digit.done { background: #e7f4eb; border-color: #a2cbb1; color: #215638; }
-.partial-work + .partial-work { margin-top: .45rem; padding-top: .28rem; border-top: 1px solid var(--line); }
-.partial-work.complete .product-row, .partial-work.complete [data-row$="-carry"] { display: none; }
+.partial-panel { margin: .48rem 0; padding-block: .28rem; border-radius: .55rem; }
+.completed-panel { background: #eaf0f6; }
+.current-panel { box-shadow: 0 0 0 1px #8daeda; }
+.partial-heading { display: block; padding: 0 .3rem .15rem; color: #23466f; font-size: .82rem; font-weight: 750; overflow-wrap: anywhere; }
+.partial-panel .row-name, .partial-panel .place-labels > :first-child { padding-left: .24rem; }
+.completed-panel .product-row, .completed-panel .product-weight, .completed-panel [data-row$="-carry"] { display: none; }
+.completed-panel .partial-result .digit { background: #f4f7fa; color: var(--ink); border-color: var(--line); }
 .product-row .digit { background: #f1f6ff; }
 .product-row .digit.active { background: var(--warm-soft); }
 .product-row .digit.implied-zero { color: #4e6380; background: #f1f6ff; border-style: dashed; }
@@ -102,6 +110,8 @@ button[aria-disabled="true"] { opacity: .56; cursor: default; }
 .calc-token { display: inline-block; min-width: .8rem; text-align: center; border-radius: .28rem; padding-inline: .16rem; }
 .calc-token.result { background: #e0efdf; color: #235635; padding-inline: .28rem; }
 .calc-token.quotient, .calc-token.carry-input { background: var(--blue-soft); color: #19468b; }
+.digit.operand-first, .calc-token.operand-first, .weight-chip.operand-first { background: var(--blue-soft); color: #19468b; border-color: #6d9bdc; }
+.digit.operand-second, .calc-token.operand-second, .weight-chip.operand-second { background: var(--warm-soft); color: var(--warm); border-color: #d7a956; }
 .shift-explanation { display: flex; flex-wrap: wrap; align-items: center; gap: .28rem .48rem; margin-top: .4rem; padding-top: .4rem; border-top: 1px solid #c7d8f1; }
 .shift-part { display: grid; justify-items: center; align-self: start; padding: .18rem .34rem; border-radius: .3rem; background: #fff; }
 .shift-part b { font-variant-numeric: tabular-nums; }
@@ -180,7 +190,7 @@ footer { display: flex; flex-wrap: wrap; gap: .3rem 1rem; font-size: .88rem; mar
     <summary>Правило умножения столбиком</summary>
     <p>Для каждой цифры второго числа заводим свою строку. Если цифра стоит в разряде номер <i>j</i> (считаем справа с нуля), сразу ставим <i>j</i> нулей справа. Остальные цифры вписываем левее этих нулей.</p>
     <p>Двигаемся справа налево. Сначала смотрим на веса цифр. Если цифры стоят в разрядах <i>i</i> и <i>j</i>, дописываем справа <i>i</i> + <i>j</i> нулей. Затем берём произведение цифр из таблицы и записываем его левее этих нулей.</p>
-    <p>Каждое произведение записываем в свою строку. Первое сразу попадает в результат. Следующие прибавляем к нему по столбцам. Каждую цифру суммы сразу записываем в строку «Результат». Когда строка готова, сворачиваем промежуточные произведения.</p>
+    <p>Каждое произведение записываем в свою строку. Складываем произведения по столбцам, записывая каждую цифру в строку «Сумма вкладов». Когда частичное произведение готово, переносим его в блок «Готово».</p>
     <p>В конце складываем строки по столбцам и пользуемся тем же правилом переноса. Все вычисления записаны в выбранном основании.</p>
   </details>
   <footer><a href="umnozhenie-i-delenie-chernovik.html#multiply">Черновик об умножении</a><a href="index.html">Оглавление</a></footer>
@@ -218,8 +228,13 @@ let model;
 let current = 0;
 let cells;
 let weightLabels;
+let referenceWeights;
+let operandWeights;
 let productRows;
 let partialGroups;
+let completedRows;
+let activeRows;
+let activeHeading;
 let carryRows;
 let equation;
 let calcLabel;
@@ -252,6 +267,7 @@ function makeModel(first, second, base) {
   const phases = [{name: 'началу', index: 0}];
   let carryMarks = [];
   let stage = 0;
+  let showSubtotal = false;
   const token = (text, from = '') => ({text: String(text), from});
   const take = (row, index, value) => token(alphabet[value], `${row}:${index}`);
   const out = (value, zeros = 0) => ({text: String(value), result: true, zeros});
@@ -261,7 +277,7 @@ function makeModel(first, second, base) {
     steps.push({
       title, note, stage,
       lines: Object.fromEntries(Object.entries(lines).map(([name, digits]) => [name, [...digits]])),
-      carryMarks: [...carryMarks], ...opts,
+      carryMarks: [...carryMarks], showSubtotal, ...opts,
     });
   }
 
@@ -303,6 +319,7 @@ function makeModel(first, second, base) {
     const columnFormulas = [];
     lines[row].fill('', rightZeros);
     carryMarks = [];
+    showSubtotal = true;
     let carry = 0;
     const limit = Math.max(rightZeros + 1, total.length);
     for (let place = rightZeros; place < limit; place += 1) {
@@ -352,6 +369,7 @@ function makeModel(first, second, base) {
     phases.push({name: `строке ${j + 1}`, index: steps.length});
     const focus = [`bottom:${j}`];
     carryMarks = [];
+    showSubtotal = false;
     const mark = Array.from({length: j}, (_, place) => `${row}:${place}`);
     if (!digit) {
       lines[row].fill('0', 0, j);
@@ -373,16 +391,20 @@ function makeModel(first, second, base) {
       const product = value * digit;
       const productDigits = inBase(product);
       const increment = product * places[place];
-      const multiplication = [take('top', i, value), '×', take('bottom', j, digit), '=', out(productDigits)];
+      const multiplication = [{...take('top', i, value), operand: 'first'}, '×',
+        {...take('bottom', j, digit), operand: 'second'}, '=', out(productDigits)];
       const formulas = [multiplication];
+      const weightFactors = [i, j];
+      const placement = {productRow, place};
       if (place) {
         const weight = inBase(places[place]);
         lines[productRow].fill('0', 0, place);
         step('Дописываем нули справа',
           `После единицы в записи ${weight} — ${offsetWords[place]}. Столько же нулей дописываем справа в строке произведения. Цифры появятся левее.`, {
           operation: 'weights',
-          formulas: [[inBase(places[i]), '×', inBase(places[j]), '=', out(weight, place)]],
-          focus, weightFactors: [i, j], activePlace: place, zeroRow: productRow, startCell: `${productRow}:${place}`,
+          formulas: [[{text: inBase(places[i]), operand: 'first'}, '×',
+            {text: inBase(places[j]), operand: 'second'}, '=', out(weight, place)]],
+          focus, weightFactors, placement, zeroRow: productRow, startCell: `${productRow}:${place}`,
         });
       }
       const changed = [...productDigits].reverse().map((digit, index) => {
@@ -391,14 +413,13 @@ function makeModel(first, second, base) {
       });
       if (i === 0) {
         lines[row] = [...lines[productRow]];
-        const firstResult = lines[row].flatMap((digit, index) => digit ? [`${row}:${index}`] : []);
-        step('Умножаем и записываем', `В таблице получаем ${productDigits}. Это первое произведение, его сразу записываем и в результат.`,
-          {operation: 'digits', formulas, focus, lookup, fromTable: true, changed: [...changed, ...firstResult], activePlace: place, mark});
+        step('Умножаем и записываем', `В таблице получаем ${productDigits}. Записываем цифры ${place ? 'слева от нулей' : 'начиная с разряда единиц'}.`,
+          {operation: 'digits', formulas, focus, lookup, fromTable: true, changed, weightFactors, placement, mark});
         partial = increment;
         return;
       }
       step('Умножаем и записываем', `В таблице получаем ${productDigits}. Вписываем его слева от нулей.`,
-        {operation: 'digits', formulas, focus, lookup, fromTable: true, activePlace: place, changed});
+        {operation: 'digits', formulas, focus, lookup, fromTable: true, weightFactors, placement, changed});
       const firstProduct = i === 1 ? productLines[j][0].name : null;
       partial = addToPartial(row, partial, increment, j, productRow, place, firstProduct, {focus, lookup});
     });
@@ -533,26 +554,38 @@ function addRow(name, label, digits = [], carried = false, parent = board) {
   return line;
 }
 
+function makeWeightRow(title, classes = '', tone = '') {
+  const row = element('div', `place-labels ${classes}`);
+  const labels = [];
+  row.append(element('span', '', title));
+  for (const [place, weight] of [...model.places.entries()].reverse()) {
+    const record = numeral(weight, model.base);
+    const label = element('span', tone ? `weight-chip ${tone}` : '', record);
+    if (record.length > 4) label.classList.add('long-weight');
+    label.dataset.weightPlace = place;
+    labels[place] = label;
+    row.append(label);
+  }
+  return {row, labels};
+}
+
 function buildBoard() {
   cells = new Map();
-  weightLabels = [];
   productRows = new Map();
   partialGroups = [];
   carryRows = new Map();
   board.replaceChildren();
   board.style.setProperty('--columns', model.places.length);
   board.append(element('span', 'board-base', `Основание ${model.base}`));
-  const labels = element('div', 'place-labels');
-  labels.append(element('span', '', 'Вес'));
-  for (const [place, weight] of [...model.places.entries()].reverse()) {
-    const record = numeral(weight, model.base);
-    const label = element('span', record.length > 4 ? 'long-weight' : '', record);
-    label.dataset.weightPlace = place;
-    weightLabels[place] = label;
-    labels.append(label);
-  }
-  board.append(labels);
+  const reference = makeWeightRow('Вес');
+  referenceWeights = reference.row;
+  weightLabels = reference.labels;
+  board.append(referenceWeights);
+  operandWeights = [makeWeightRow('Вес первой цифры', 'operand-weights', 'operand-first'),
+    makeWeightRow('Вес второй цифры', 'operand-weights', 'operand-second')];
+  board.append(operandWeights[0].row);
   addRow('top', 'Первое', [...model.first].reverse());
+  board.append(operandWeights[1].row);
   addRow('bottom', '× Второе', [...model.second].reverse());
 
   const calculation = element('div', 'calculation');
@@ -563,20 +596,34 @@ function buildBoard() {
   shiftExplanation.id = 'shift-explanation';
   calculation.append(calcLabel, equation, shiftExplanation);
   board.append(calculation, element('div', 'board-rule'));
+  completedRows = element('div', 'partial-panel completed-panel');
+  completedRows.setAttribute('role', 'group');
+  completedRows.setAttribute('aria-label', 'Готовые частичные произведения');
+  completedRows.append(element('span', 'partial-heading', 'Готово'));
+  activeRows = element('div', 'partial-panel current-panel');
+  activeHeading = element('span', 'partial-heading');
+  activeHeading.id = 'active-partial-heading';
+  activeRows.setAttribute('role', 'group');
+  activeRows.setAttribute('aria-labelledby', activeHeading.id);
+  activeRows.append(activeHeading);
+  board.append(completedRows, activeRows);
   model.rowNames.forEach((name, index) => {
     const group = element('div', 'partial-work');
+    const factor = parseInt(model.second[model.second.length - 1 - index], model.base) * model.places[index];
+    const label = `${model.first} × ${numeral(factor, model.base)}`;
     group.setAttribute('role', 'group');
-    group.setAttribute('aria-label', `Частичное произведение ${index + 1}`);
-    board.append(group);
-    partialGroups.push(group);
+    group.setAttribute('aria-label', label);
     model.productLines[index].forEach(({name: key, label}, digitIndex) => {
+      const weight = makeWeightRow('Вес произведения', 'product-weight', 'product');
+      group.append(weight.row);
       const line = addRow(key, label, [], false, group);
       line.classList.add('product-row');
-      productRows.set(key, {line, offset: index + digitIndex});
+      productRows.set(key, {line, weight, offset: index + digitIndex});
     });
     carryRows.set(name, addRow(`${name}-carry`, 'Перенос', [], true, group));
-    const result = addRow(name, 'Результат', [], false, group);
+    const result = addRow(name, label, [], false, group);
     result.classList.add('partial-result');
+    partialGroups.push({group, result, label});
   });
   board.append(element('div', 'board-rule'));
   carryRows.set('sum', addRow('sum-carry', 'Перенос', [], true));
@@ -617,11 +664,49 @@ function renderBench(groups) {
   }
 }
 
+function showWeight({row, labels}, place) {
+  row.hidden = place === undefined;
+  labels.forEach((label, index) => { label.style.visibility = index === place ? '' : 'hidden'; });
+}
+
+function renderPartialPanels(step, pendingCompletion) {
+  const activeIndex = step.stage - 1;
+  const finished = step.partialComplete && !pendingCompletion;
+  let hasCompleted = false;
+  let hasCurrent = false;
+  partialGroups.forEach(({group, result, label}, index) => {
+    const complete = index < activeIndex || (index === activeIndex && finished);
+    const active = index === activeIndex && !finished;
+    const parent = complete ? completedRows : active ? activeRows : null;
+    if (!parent) group.remove();
+    else if (group.parentElement !== parent) parent.append(group);
+    hasCompleted ||= complete;
+    hasCurrent ||= active;
+    if (active) activeHeading.textContent = `Считаем ${label}`;
+    const rowTitle = complete ? label : 'Сумма вкладов';
+    result.firstElementChild.textContent = rowTitle;
+    result.setAttribute('aria-label', rowTitle);
+    result.hidden = !complete && !step.showSubtotal;
+  });
+  completedRows.hidden = !hasCompleted;
+  activeRows.hidden = !hasCurrent;
+}
+
 function renderShift(step) {
-  const {shift, activePlace, weightFactors, startCell} = step;
+  const {shift, activePlace, weightFactors, placement, startCell} = step;
+  const [topPlace, bottomPlace] = weightFactors ?? [];
+  referenceWeights.hidden = Boolean(weightFactors);
+  showWeight(operandWeights[0], topPlace);
+  showWeight(operandWeights[1], bottomPlace);
+  if (weightFactors) {
+    cells.get(`top:${topPlace}`).classList.add('operand-first');
+    cells.get(`bottom:${bottomPlace}`).classList.add('operand-second');
+  }
+  for (const [name, {weight}] of productRows) {
+    showWeight(weight, placement?.productRow === name ? placement.place : undefined);
+  }
   weightLabels.forEach((label, place) => {
     label.classList.toggle('active-weight', place === (activePlace ?? shift?.place));
-    label.classList.toggle('weight-factor', Boolean(weightFactors?.includes(place)));
   });
   if (startCell) cells.get(startCell).classList.add('row-start');
   shiftExplanation.hidden = !shift;
@@ -684,11 +769,7 @@ function render(index, forward = false) {
   const positions = animate ? new Map([...cells.entries()].map(([id, cell]) => [id, cell.getBoundingClientRect()])) : new Map();
   current = index;
 
-  const finishingGroup = step.partialComplete ? partialGroups[step.stage - 1] : null;
-  partialGroups.forEach((group, index) => {
-    group.hidden = index > 0 && step.stage <= index;
-    group.classList.toggle('complete', step.stage > index + 1 || (group === finishingGroup && !animate));
-  });
+  renderPartialPanels(step, animate);
   for (const [name, digits] of Object.entries(step.lines)) {
     const product = productRows.get(name);
     if (product) product.line.hidden = !digits.some(Boolean);
@@ -739,6 +820,7 @@ function render(index, forward = false) {
       if (info.result) node.classList.add('result');
       if (info.quotient) node.classList.add('quotient');
       if (info.from) node.classList.add(info.from.includes('-carry:') ? 'carry-input' : 'input');
+      if (info.operand) node.classList.add(`operand-${info.operand}`);
       return {node, info};
     });
     group.append(...tokens.map(({node}) => node));
@@ -833,11 +915,11 @@ function render(index, forward = false) {
     Promise.allSettled(motion.map(animation => animation.finished)).then(() => {
       if (generation !== version) return;
       locked = false;
-      finishingGroup?.classList.add('complete');
+      if (step.partialComplete) renderPartialPanels(step, false);
       updateControls(step);
     });
   } else {
-    finishingGroup?.classList.add('complete');
+    if (step.partialComplete) renderPartialPanels(step, false);
   }
   updateControls(step);
 }
