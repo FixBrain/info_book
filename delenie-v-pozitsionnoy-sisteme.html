@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Деление в позиционной системе</title>
+<style>
+:root {
+  color-scheme: light;
+  --ink: #1c2b42;
+  --muted: #526176;
+  --line: #d8e2ef;
+  --blue: #2458b4;
+  --blue-light: #edf4ff;
+  --paper: #fff;
+  --sand: #fbf7ed;
+  --amber: #ffedbe;
+  --green: #e3f0e6;
+  --page: #f7f8fa;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink); font: 1rem/1.6 system-ui, sans-serif; }
+main, body > nav, footer { width: min(100%, 65rem); margin: auto; padding-inline: clamp(.75rem, 3vw, 1.5rem); }
+body > nav, footer { display: flex; flex-wrap: wrap; gap: .25rem 1.25rem; padding-block: .65rem; font-size: .9rem; }
+body > nav { border-bottom: 1px solid var(--line); }
+footer { border-top: 1px solid var(--line); }
+main { padding-block: clamp(1rem, 3vw, 2rem); }
+h1, h2, h3, h4 { line-height: 1.25; }
+h1 { margin: .2rem 0 .6rem; font-size: clamp(1.65rem, 5vw, 2.35rem); }
+h2 { margin: 1.65rem 0 .65rem; padding-inline-start: .62rem; border-inline-start: 4px solid var(--blue); font-size: clamp(1.22rem, 3.5vw, 1.5rem); }
+h3 { margin: 0 0 .45rem; font-size: 1.08rem; }
+h4 { margin: .65rem 0 .4rem; }
+p { margin: .5em 0; }
+a { color: #174a9c; text-underline-offset: .16em; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+[hidden] { display: none !important; }
+.lead, .source { color: var(--muted); }
+.lead { max-width: 48rem; }
+.source { font-size: .9rem; }
+.chapter-jump { display: flex; flex-wrap: wrap; gap: .25em 1.2em; margin-block: .85rem; font-size: .9rem; }
+.example, .demo { min-width: 0; margin-block: .8rem; padding: clamp(.7rem, 2.5vw, 1.1rem); border: 1px solid var(--line); border-radius: .75rem; background: var(--paper); }
+.demo { background: var(--sand); border-color: #ebd7a7; }
+.rule { padding: .6rem .8rem; border-inline-start: 3px solid var(--blue); border-radius: 0 .45rem .45rem 0; background: var(--blue-light); }
+.formula { font: clamp(1.18rem, 4vw, 1.5rem)/1.4 Cambria, Georgia, serif; font-variant-numeric: tabular-nums; }
+.formula sub { font-size: .7em; }
+.term { white-space: nowrap; }
+.steps { padding-inline-start: 1.35em; }
+.steps li + li { margin-top: .4em; }
+.sharing { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: .7rem; }
+.sharing .example { margin-block: .45rem; }
+.chunks, .multiples { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .4rem; list-style: none; padding: 0; margin: .65rem 0; }
+.chunks li, .multiples li { display: grid; justify-items: center; align-content: start; text-align: center; padding: .4em .15em; border-radius: .5rem; background: var(--blue-light); }
+.chunks li:last-child { background: var(--amber); }
+.chunks small, .multiples small { font-size: .82rem; }
+.multiples { grid-template-columns: repeat(5, minmax(0, 1fr)); max-width: 27rem; }
+.multiples strong { font-variant-numeric: tabular-nums; }
+.demo-controls { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; margin-block: .7rem; }
+button { min-height: 2.6rem; padding: .3rem .75rem; border: 1px solid #b2c5e6; border-radius: .45rem; background: var(--blue-light); color: #174a9c; font: inherit; font-weight: 650; cursor: pointer; }
+button.primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+button:disabled { opacity: .48; cursor: default; }
+#division-progress { margin-inline: .15rem; font-size: .85rem; color: var(--muted); }
+.demo-layout { display: grid; gap: .75rem; align-items: start; }
+@media (min-width: 700px) { .demo-layout { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); } }
+.demo-panel { min-width: 0; padding: .65rem .8rem; border: 1px solid var(--line); border-radius: .65rem; background: var(--paper); }
+.workbench { display: grid; grid-template-columns: 5ch minmax(5ch, 1fr); gap: 0 .25em; width: min(100%, 13rem); margin: .3em 0; font: 650 clamp(1.22rem, 5vw, 1.6rem)/1.32 ui-monospace, Consolas, monospace; font-variant-numeric: tabular-nums; }
+.work-row { grid-column: 1; white-space: pre; }
+.is-current { color: #704009; background: var(--amber); border-radius: .2em; }
+.work-subtract { text-decoration: underline; text-underline-offset: .12em; }
+.work-divisor, .work-quotient { padding-inline-start: .45em; border-inline-start: 2px solid #60728e; }
+.work-divisor { grid-area: 1 / 2; border-bottom: 2px solid #60728e; }
+.work-quotient { grid-area: 2 / 2; min-height: 1.32em; white-space: pre; }
+.work-quotient span { background: var(--green); border-radius: .14em; }
+.work-quotient span + span { margin-inline-start: .1em; }
+.work-quotient .zero { background: var(--amber); }
+.work-caption { margin-block: .65rem 0; font-size: .9rem; color: var(--muted); }
+.model-label { display: inline-block; padding: .18em .47em; border-radius: .32em; background: var(--blue-light); color: #194783; font-weight: 650; font-size: .92rem; }
+.exchange { display: flex; align-items: center; flex-wrap: wrap; gap: .45rem; margin-block: .6rem; }
+.exchange > span:not(.exchange-arrow) { min-width: 5.5rem; padding: .35rem .5rem; border: 1px solid #d8b58b; border-radius: .44rem; background: #f8e9d1; text-align: center; }
+.exchange strong { display: block; color: #603b1d; }
+.exchange small { display: block; color: #674931; }
+.exchange-arrow { color: #775333; font-weight: 700; }
+.bundle-mark {
+  display: block;
+  position: relative;
+  width: 1.4rem;
+  height: 1.65rem;
+  margin: .15rem auto;
+  border-radius: .22rem;
+  background: repeating-linear-gradient(90deg, #9b432a 0 1px, #e7835e 1px 3px, #b85234 3px 4px);
+}
+.bundle-mark::after { content: ""; position: absolute; inset: 42% -.1rem auto; height: .28rem; border-radius: .12rem; background: #276289; }
+.bundle-mark.loose { width: 2.4rem; background: repeating-linear-gradient(90deg, #a23e29 0 1px, #ed976f 1px 3px, transparent 3px 5px); }
+.bundle-mark.loose::after { content: none; }
+.result { color: #245b3c; font-weight: 700; }
+details { border-top: 1px solid var(--line); margin-top: .65rem; padding-top: .5rem; }
+summary { width: fit-content; font-weight: 650; color: #174a9c; cursor: pointer; }
+    .division-traditions-layout {
+      display: grid;
+      gap: 1rem clamp(1rem, 3vw, 2rem);
+      margin-block: 1rem;
+    }
+    @media (min-width: 630px) {
+      .division-traditions-layout { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    .division-traditions-layout figure { min-width: 0; margin: 0; }
+    .division-tradition-example {
+      width: min(100%, 16rem);
+      margin: 0 0 .65rem;
+      padding: .65rem 1rem;
+      border: 1px solid #e9d8bc;
+      border-radius: 8px;
+      color: #392818;
+      background: #fff7e8;
+      font: 1.2rem/1.22 ui-monospace, Consolas, "Liberation Mono", monospace;
+    }
+    .division-tradition-example strong { color: #1647a8; }
+    .division-traditions-layout .source { overflow-wrap: anywhere; }
+</style>
+</head>
+<body>
+<nav aria-label="Навигация по учебнику">
+  <a href="index.html">Оглавление</a>
+  <a href="umnozhenie-vruchnuyu.html">Ручные способы умножения</a>
+</nav>
+<main>
+  <h1>Деление в позиционной системе</h1>
+  <p class="lead">При делении с остатком ищем, сколько полных групп можно собрать. Столбик помогает находить это количество по одной цифре, начиная со старшего разряда.</p>
+  <nav class="chapter-jump" aria-label="Разделы главы">
+    <a href="#meaning">Полные группы</a>
+    <a href="#column">Деление столбиком</a>
+    <a href="#base-five">Другое основание</a>
+    <a href="#practice">Задания</a>
+    <a href="#division-traditions">Две записи столбика</a>
+  </nav>
+
+  <section id="meaning" aria-labelledby="meaning-heading">
+    <h2 id="meaning-heading">Полные группы и остаток</h2>
+    <p>У нас 23 палочки. Запись <strong>23 : 5</strong> может отвечать на два разных вопроса.</p>
+    <div class="sharing">
+      <div class="example"><h3>Сколько в каждой группе?</h3><p>Раздаём палочки пятерым поровну. Каждый получит по 4 палочки, ещё 3 останутся.</p></div>
+      <div class="example"><h3>Сколько полных групп?</h3><p>Собираем пучки по 5 палочек. Получится 4 пучка и 3 отдельные палочки.</p></div>
+    </div>
+    <p class="rule"><strong>Делимое = делитель × частное + остаток.</strong> Остаток неотрицателен и строго меньше делителя. Иначе можно собрать ещё одну полную группу.</p>
+    <p>Например, равенство <span class="term">23 = 5 × 3 + 8</span> верно. Но из 8 палочек собирается ещё пятёрка, поэтому при делении получаем <span class="term"><strong>23 = 5 × 4 + 3</strong></span>.</p>
+  </section>
+
+  <section id="partial-quotients" aria-labelledby="partial-heading">
+    <h2 id="partial-heading">Вычитаем удобные кратные</h2>
+    <p>Разберём <strong>1301 : 12</strong>. Можно убирать сразу несколько групп по 12. Каждый раз записываем, сколько групп взяли и сколько ещё осталось.</p>
+    <div class="example">
+      <ul class="chunks" role="list" aria-label="Три порции по 12 и остаток">
+        <li><strong>960</strong><small>80 групп</small></li>
+        <li><strong>240</strong><small>20 групп</small></li>
+        <li><strong>96</strong><small>8 групп</small></li>
+        <li><strong>5</strong><small>остаток</small></li>
+      </ul>
+      <p class="formula">1301 → 341 → 101 → 5</p>
+      <p>Убрали <span class="term">80 + 20 + 8 = 108</span> групп. Можно было сразу взять 100 групп. Столбик как раз подсказывает, сколько сотен групп, десятков групп и отдельных групп взять.</p>
+    </div>
+    <p class="source">Примеры перехода от удобных кратных к разрядному делению. <a href="https://www.fi.uu.nl/publicaties/literatuur/4966.pdf#page=7">Ван ден Хёвел-Панхёйзен, рис. 4</a> · <a href="https://ca.accessim.org/k-5/grade-5/unit-4/section-b/lesson-11?a=teacher">Illustrative Mathematics, частичные частные</a></p>
+  </section>
+
+  <section id="column" aria-labelledby="column-heading">
+    <h2 id="column-heading">От разрядов к столбику</h2>
+    <p>Читаем делимое слева направо, по одной цифре. В каждом разряде собираем группы по 12. Например, одна группа из 12 сотен — это 100 групп по 12 единиц. Поэтому ей соответствует цифра 1 в разряде сотен частного.</p>
+    <ol class="steps">
+      <li><strong>Подбираем цифру.</strong> Берём наибольшее кратное делителя, которое помещается в неполное делимое.</li>
+      <li><strong>Умножаем и вычитаем.</strong> Убираем выбранные группы. Остаток должен быть меньше делителя.</li>
+      <li><strong>Переходим к младшему разряду.</strong> Размениваем остаток и прибавляем следующую цифру делимого.</li>
+    </ol>
+
+    <div class="demo" id="division-demo">
+      <h3>Делим 1301 на 12</h3>
+      <div class="demo-controls" hidden>
+        <button type="button" id="division-back" disabled>Назад</button>
+        <button type="button" id="division-next" class="primary">Следующий шаг</button>
+        <button type="button" id="division-reset" disabled>Сначала</button>
+        <span id="division-progress" role="status" aria-live="polite">Шаг 0 из 6</span>
+      </div>
+      <div class="demo-layout">
+        <div class="demo-panel">
+          <h4>Столбик</h4>
+          <div class="workbench" id="division-work">
+            <div class="work-row"> <span data-current="0 1">1</span><span data-current="1">3</span>01</div><div class="work-divisor">12</div>
+            <div class="work-row work-subtract" data-reveal="2">−12</div>
+            <div class="work-quotient" aria-label="Цифры частного"><span data-reveal="2">1</span><span class="zero" data-reveal="4">0</span><span data-reveal="6">8</span></div>
+            <div class="work-row" data-reveal="2" data-until="3" data-current="2">  1</div>
+            <div class="work-row" data-reveal="3" data-current="3">  10</div>
+            <div class="work-row work-subtract" data-reveal="4">  −0</div>
+            <div class="work-row" data-reveal="4" data-until="5" data-current="4">  10</div>
+            <div class="work-row" data-reveal="5" data-current="5">  101</div>
+            <div class="work-row work-subtract" data-reveal="6">  −96</div>
+            <div class="work-row result" data-reveal="6" data-current="6">    5</div>
+          </div>
+          <p class="work-caption">Справа записываем цифры частного. Слева остаются произведения и разности.</p>
+        </div>
+        <div class="demo-panel" id="division-explanation" aria-live="polite">
+          <div data-step="0" hidden>
+            <span class="model-label">Тысячи</span>
+            <h4>Первый разряд</h4>
+            <p>Начинаем с 1 тысячи. Это меньше 12 тысяч, поэтому в частном нет тысяч. Ведущий ноль можно опустить.</p>
+          </div>
+          <div data-step="1" hidden>
+            <span class="model-label">Сотни</span>
+            <h4>Получаем первое неполное делимое</h4>
+            <div class="exchange"><span><span class="bundle-mark" aria-hidden="true"></span><strong>1</strong><small>тысяча</small></span><span class="exchange-arrow">→</span><span><span class="bundle-mark loose" aria-hidden="true"></span><strong>10 + 3 = 13</strong><small>сотен</small></span></div>
+            <p>Размениваем тысячу на десять сотен и добавляем ещё 3 сотни из делимого.</p>
+          </div>
+          <div data-step="2" hidden>
+            <span class="model-label">Сотни</span>
+            <h4>Записываем 1 сотню в частном</h4>
+            <p class="formula">13 = 12 × 1 + 1</p>
+            <p>В 13 сотнях помещается одна группа из 12 сотен. Остаётся 1 сотня.</p>
+          </div>
+          <div data-step="3" hidden>
+            <span class="model-label">Десятки</span>
+            <h4>Размениваем остаток</h4>
+            <div class="exchange"><span><span class="bundle-mark" aria-hidden="true"></span><strong>1</strong><small>сотня</small></span><span class="exchange-arrow">→</span><span><span class="bundle-mark loose" aria-hidden="true"></span><strong>10 + 0 = 10</strong><small>десятков</small></span></div>
+            <p>Размениваем оставшуюся сотню на 10 десятков. Следующая цифра делимого — 0, поэтому новых десятков не добавляем.</p>
+          </div>
+          <div data-step="4" hidden>
+            <span class="model-label">Десятки</span>
+            <h4>Записываем 0 десятков в частном</h4>
+            <p class="formula">10 = 12 × 0 + 10</p>
+            <p>Группа из 12 десятков не помещается. Частное уже началось с сотен, поэтому место десятков нужно сохранить. Все 10 десятков остаются.</p>
+          </div>
+          <div data-step="5" hidden>
+            <span class="model-label">Единицы</span>
+            <h4>Получаем 101 единицу</h4>
+            <div class="exchange"><span><span class="bundle-mark" aria-hidden="true"></span><strong>10</strong><small>десятков</small></span><span class="exchange-arrow">→</span><span><span class="bundle-mark loose" aria-hidden="true"></span><strong>100 + 1 = 101</strong><small>единица</small></span></div>
+            <p>В каждом десятке 10 единиц. После размена их 100, а последняя цифра делимого добавляет ещё одну.</p>
+          </div>
+          <div data-step="6">
+            <span class="model-label">Единицы</span>
+            <h4>Записываем 8 единиц в частном</h4>
+            <p class="formula">101 = 12 × 8 + 5</p>
+            <p>Восемь групп занимают 96 единиц, а девять заняли бы 108. Записываем 8 и оставляем 5.</p>
+            <p class="result">Частное 108, остаток 5.</p>
+          </div>
+        </div>
+      </div>
+      <noscript><p>Последовательность неполных делимых — 13 сотен, 10 десятков, 101 единица. Цифры частного — 1, 0 и 8 соответственно.</p></noscript>
+    </div>
+    <p class="formula"><strong>Проверка</strong> <span class="term">1301 = 12 × 108 + 5</span> и <span class="term">0 ≤ 5 &lt; 12</span>.</p>
+    <details>
+      <summary>Как исправить пробную цифру</summary>
+      <ul class="steps">
+        <li>Для 101 пробуем 9. Получаем <span class="term">12 × 9 = 108</span>, что больше 101. Нужно уменьшить цифру.</li>
+        <li>Если взять 7, после вычитания 84 останется 17. Это не меньше 12, поэтому можно взять ещё одну группу.</li>
+        <li>Подходит 8. Выполняется <span class="term">12 × 8 ≤ 101 &lt; 12 × 9</span>.</li>
+      </ul>
+    </details>
+  </section>
+
+  <section id="other-base" aria-labelledby="other-base-heading">
+    <h2 id="other-base-heading">Почему работает в любом основании</h2>
+    <p>В десятичной системе одна единица старшего разряда равна десяти единицам соседнего младшего. В системе с основанием <var>N</var> таких единиц <var>N</var>. Поэтому при сносе цифры <var>a</var> к остатку <var>r</var> новое неполное делимое равно <strong><var>N</var>·<var>r</var> + <var>a</var></strong>.</p>
+    <details>
+      <summary>Почему всегда хватает одной цифры частного</summary>
+      <p>Пусть делитель равен <var>D</var>. После вычитания <span class="term">0 ≤ <var>r</var> &lt; <var>D</var></span>, а следующая цифра <span class="term">0 ≤ <var>a</var> ≤ <var>N</var> − 1</span>. Даже если взять наибольшие возможные <var>r</var> и <var>a</var>, получится только <span class="term"><var>N</var>(<var>D</var> − 1) + (<var>N</var> − 1)</span>, то есть <span class="term"><var>N</var>·<var>D</var> − 1</span>. Поместится меньше <var>N</var> групп по <var>D</var>. Их количество — цифра от 0 до <span class="term"><var>N</var> − 1</span>.</p>
+    </details>
+    <div class="example" id="base-five">
+      <h3>Делим 1310<sub>5</sub> на 12<sub>5</sub></h3>
+      <p>Строим строку кратных делителя, как строку таблицы умножения. Начинаем с нуля и каждый раз прибавляем 12<sub>5</sub>. Строка заканчивается на цифре 4.</p>
+      <ul class="multiples" role="list" aria-label="Кратные 12 в основании 5">
+        <li><small>× 0</small><strong>0</strong></li>
+        <li><small>× 1</small><strong>12<sub>5</sub></strong></li>
+        <li><small>× 2</small><strong>24<sub>5</sub></strong></li>
+        <li><small>× 3</small><strong>41<sub>5</sub></strong></li>
+        <li><small>× 4</small><strong>103<sub>5</sub></strong></li>
+      </ul>
+      <ol class="steps">
+        <li>Первая цифра 1 меньше делителя. Берём <strong>13<sub>5</sub></strong>. Помещается <span class="term">1 × 12<sub>5</sub></span>, остаток 1.</li>
+        <li>Переходим к пятёркам. Из оставшейся единицы старшего разряда получаем <span class="term">10<sub>5</sub></span> пятёрок и добавляем 1 пятёрку из делимого. Получается <strong>11<sub>5</sub></strong>. Это меньше <span class="term">12<sub>5</sub></span>, поэтому цифра частного 0.</li>
+        <li>Размениваем <span class="term">11<sub>5</sub></span> пятёрок и получаем <strong>110<sub>5</sub></strong> единиц. Из строки кратных берём <span class="term">4 × 12<sub>5</sub> = 103<sub>5</sub></span>. После вычитания остаётся 2.</li>
+      </ol>
+      <p class="formula"><strong>Проверка</strong> <span class="term">1310<sub>5</sub> = 12<sub>5</sub> × 104<sub>5</sub> + 2</span> и <span class="term">2 &lt; 12<sub>5</sub></span>.</p>
+    </div>
+  </section>
+
+  <section id="practice" aria-labelledby="practice-heading">
+    <h2 id="practice-heading">Проверяем себя</h2>
+    <div class="example">
+      <h3>1. Подбери цифру</h3>
+      <p>Очередное неполное делимое равно 94, делитель 13. Какую цифру запишешь в частном? Какой остаток получится?</p>
+      <details><summary>Проверить</summary><p>Цифра 7. <span class="term">13 × 7 = 91</span>, а <span class="term">13 × 8 = 104 &gt; 94</span>. Остаток 3.</p></details>
+    </div>
+    <div class="example">
+      <h3>2. Объясни ноль</h3>
+      <p>Выполни <span class="term">1633 : 8</span>. В каком разряде частного появляется ноль и почему?</p>
+      <details><summary>Проверить</summary><p><span class="term">1633 = 8 × 204 + 1</span>. Из 16 сотен получаем 2 сотни в частном. 3 десятков на группу из 8 десятков не хватает. Пишем 0 и переходим к 33 единицам.</p></details>
+    </div>
+    <div class="example">
+      <h3>3. Проверь остаток</h3>
+      <p>Ученик записал <span class="term">1301 = 12 × 107 + 17</span>. Какими будут частное и остаток?</p>
+      <details><summary>Проверить</summary><p>17 больше делителя. Из остатка выделяем ещё одну группу и получаем частное 108 и остаток 5.</p></details>
+    </div>
+  </section>
+  <section id="division-traditions" aria-labelledby="division-traditions-heading">
+    <h2 id="division-traditions-heading">Как записывают деление</h2>
+    <p>Сравним две записи для 1301 : 12. Вычитания в обеих схемах стоят под делимым. Положение делителя и частного зависит от выбранной записи.</p>
+
+    <div class="division-traditions-layout">
+      <figure>
+        <h3>Делитель справа</h3>
+        <pre class="division-tradition-example" role="img" aria-label="Делимое 1301 слева. Делитель 12 справа. Частное 108 стоит под делителем. Под делимым вычитания 13 минус 12, 10 минус 0, 101 минус 96. Остаток 5."><span aria-hidden="true">&nbsp;
+&nbsp;</span>
+ 1301 │ 12
+−12   ├────
+ ──   │ <strong>108</strong>
+  10
+ − 0
+  ──
+  101
+  −96
+  ───
+    <strong>5</strong></pre>
+        <figcaption>Делитель 12 стоит справа от 1301, частное 108 — под делителем.</figcaption>
+        <p class="source"><a href="https://medialib.qlgd.edu.vn/Uploads/THU_VIEN/shp/1/1992/UserFiles/Sach-giao-khoa-Toan-3-Tap-1---Ket-noi-tri-thuc-voi-cuoc-song-f430eefb-b437-4b39-af3f-55f0eb959e91.pdf#page=100">Вьетнамский учебник «Toán 3», урок 37</a></p>
+      </figure>
+      <figure>
+        <h3>Делитель слева</h3>
+        <pre class="division-tradition-example" role="img" aria-label="Делитель 12 слева. Делимое 1301 справа. Частное 108 над делимым. Под делимым вычитания 13 минус 12, 10 минус 0, 101 минус 96. Остаток 5.">      <strong>108</strong>
+   ┌─────
+12 │ 1301
+    −12
+     ──
+      10
+     − 0
+      ──
+      101
+      −96
+      ───
+        <strong>5</strong></pre>
+        <figcaption>Делитель 12 стоит слева от 1301, частное 108 — над делимым. Его единицы стоят над единицами делимого.</figcaption>
+        <p class="source"><a href="https://www.kyoiku-shuppan.co.jp/textbook/shou/sansu/files/hana4n_02.pdf#page=3">Япония, Kyoiku Shuppan, примеры для 4 класса</a> · <a href="https://proj14.ipst.ac.th/p4/p4-math-book1/math-p4b1-031/">Таиланд, урок IPST</a> · <a href="https://dltv.ac.th/utils/files/download/65170#page=3">Разбор DLTV, с. 3 PDF</a></p>
+      </figure>
+    </div>
+
+    <details>
+      <summary>Как делили счётными палочками в Китае</summary>
+      <p>В «Сунь-цзы суань цзин» делят 6561 на 9 в трёх рядах. Сверху собирают частное, из среднего ряда постепенно убирают 6300, 180 и 81, а снизу сдвигают делитель по разрядам. Сверху получается 700 + 20 + 9 = 729, в середине остаётся 0.</p>
+      <p class="source"><a href="https://yawnoc.github.io/sun-tzu/i/14">«Сунь-цзы суань цзин», книга I, § 14</a></p>
+    </details>
+  </section>
+</main>
+<footer aria-label="Навигация по учебнику">
+  <a href="umnozhenie-v-pozitsionnoy-sisteme.html">Умножение в позиционной системе</a>
+  <a href="index.html">Оглавление</a>
+</footer>
+<script>
+(() => {
+  const demo = document.querySelector('#division-demo');
+  const back = demo.querySelector('#division-back');
+  const next = demo.querySelector('#division-next');
+  const reset = demo.querySelector('#division-reset');
+  const progress = demo.querySelector('#division-progress');
+  const explanations = Array.from(demo.querySelectorAll('[data-step]'));
+  const work = Array.from(demo.querySelectorAll('[data-reveal]'));
+  const highlights = Array.from(demo.querySelectorAll('[data-current]'));
+  const lastStep = explanations.length - 1;
+  let step = 0;
+
+  function showStep(index) {
+    step = index;
+    for (const explanation of explanations) {
+      explanation.hidden = Number(explanation.dataset.step) !== step;
+    }
+    for (const item of work) {
+      item.hidden = Number(item.dataset.reveal) > step ||
+        (item.dataset.until !== undefined && Number(item.dataset.until) <= step);
+    }
+    for (const item of highlights) {
+      item.classList.toggle('is-current', item.dataset.current.split(' ').includes(String(step)));
+    }
+    back.disabled = step === 0;
+    reset.disabled = step === 0;
+    next.disabled = step === lastStep;
+    progress.textContent = 'Шаг ' + step + ' из ' + lastStep;
+  }
+
+  back.addEventListener('click', () => showStep(step - 1));
+  next.addEventListener('click', () => showStep(step + 1));
+  reset.addEventListener('click', () => showStep(0));
+  showStep(0);
+  demo.querySelector('.demo-controls').hidden = false;
+})();
+</script>
+</body>
+</html>
