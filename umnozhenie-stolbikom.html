@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>Умножение столбиком · пошаговая анимация</title>
+<script>
+if (window.parent !== window && new URLSearchParams(window.location.search).get('embed') === '1') {
+  document.documentElement.classList.add('is-embedded');
+}
+</script>
 <style>
 :root {
   color-scheme: light;
@@ -144,6 +149,10 @@ footer { display: flex; flex-wrap: wrap; gap: .3rem 1rem; font-size: .88rem; mar
   .controls { position: sticky; top: 0; z-index: 5; padding-block: .28rem; background: var(--bg); }
   .phase-control { margin-left: 0; }
 }
+.is-embedded body { background: transparent; }
+.is-embedded main { width: 100%; padding: .2rem .35rem .6rem; }
+.is-embedded h1, .is-embedded .intro, .is-embedded .read-more, .is-embedded footer { display: none; }
+.is-embedded .controls { position: static; z-index: auto; background: transparent; }
 </style>
 </head>
 <body>
@@ -949,6 +958,19 @@ phase.addEventListener('change', () => render(Number(phase.value)));
 
 byId('preview').hidden = false;
 makeExample(firstField.value, secondField.value, Number(baseField.value));
+
+if (document.documentElement.classList.contains('is-embedded')) {
+  const main = document.querySelector('main');
+  const targetOrigin = window.location.protocol === 'file:' ? '*' : window.location.origin;
+  let previousHeight = 0;
+  const observer = new ResizeObserver(() => {
+    const height = Math.ceil(main.getBoundingClientRect().height);
+    if (height === previousHeight) return;
+    previousHeight = height;
+    window.parent.postMessage({ type: 'info-book:multiplication-height', height }, targetOrigin);
+  });
+  observer.observe(main, { box: 'border-box' });
+}
 </script>
 </body>
 </html>

@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Умножение в позиционной системе</title>
+<style>
+:root{color-scheme:light;--ink:#1c2b42;--muted:#526176;--line:#d8e2ef;--blue:#2458b4;--blue-light:#edf4ff;--green:#245b3c;--red:#982e35;--bg:#f7f8fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:1rem/1.6 system-ui,sans-serif}
+main,body>nav,footer{width:min(100%,65rem);margin:auto;padding-inline:clamp(.75rem,3vw,1.5rem)}
+body>nav,footer{display:flex;flex-wrap:wrap;gap:.25rem 1.25rem;padding-block:.65rem;font-size:.87rem}
+body>nav{border-bottom:1px solid var(--line)}
+main{padding-block:clamp(1rem,3vw,2rem)}
+footer{border-top:1px solid var(--line)}
+h1,h2,h3{line-height:1.25}
+h1{margin:.2rem 0 .6rem;font-size:clamp(1.65rem,5vw,2.35rem)}
+h2{margin:1.6rem 0 .65rem;padding-inline-start:.62rem;border-inline-start:4px solid var(--blue);font-size:clamp(1.2rem,3.5vw,1.5rem)}
+h3{margin:0 0 .45rem;font-size:1.08rem}
+p{margin:.55rem 0}
+a{color:#174a9c;text-underline-offset:.16em}
+a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid #2458b4;outline-offset:2px}
+.lead,.hint{color:var(--muted)}
+.lead{max-width:52rem}
+.chapter-jump{display:flex;flex-wrap:wrap;gap:.3rem 1rem;margin:1rem 0;font-size:.88rem}
+.example,.task{min-width:0;padding:clamp(.65rem,2.5vw,1.1rem);border:1px solid var(--line);border-radius:.75rem;background:#fff}
+.example{margin:.8rem 0}
+.table-wrap{max-width:100%;overflow:auto;margin:.6rem 0}
+.times{border-collapse:separate;border-spacing:2px;font-variant-numeric:tabular-nums;text-align:center}
+.times caption{font-size:.9rem;font-weight:650;text-align:left;margin-bottom:.25rem}
+.times th,.times td{width:2.5rem;min-width:2.15rem;padding:.17rem .2rem;border-radius:.26rem}
+.times th{background:var(--blue-light);color:#174785}
+.times td{background:#f4f7fb}
+.times .guide{background:#fff2d6;color:#694107}
+.times .hit{background:#e2f1e7;color:var(--green);font-weight:800}
+.formula{font:clamp(1.15rem,3.4vw,1.45rem)/1.5 Cambria,Georgia,serif;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.formula sub{font-size:.68em}
+.contributions{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr));gap:.65rem;margin:.85rem 0}
+.contributions div{background:var(--blue-light);border-radius:.55rem;padding:.6rem .75rem}
+.contributions span{display:block}
+.rule{padding:.6rem .8rem;border-left:3px solid var(--blue);background:var(--blue-light);border-radius:0 .45rem .45rem 0}
+.animation{display:block;width:100%;height:46rem;border:1px solid var(--line);border-radius:.75rem;background:#fff}
+.frame-link{margin:.35rem 0 .7rem;font-size:.9rem}
+.tasks{display:grid;gap:.75rem}
+.task .times input{width:100%;min-width:1.65rem;padding:.16rem .1rem;text-align:center}
+input,button{min-height:2.35rem;font:inherit;border:1px solid #a8bbd7;border-radius:.4rem}
+input{padding:.26rem .45rem;color:var(--ink);background:#fff}
+button{padding:.24rem .65rem;background:var(--blue);color:#fff;border-color:var(--blue);font-weight:650;cursor:pointer}
+input.correct{border-color:#569a74;background:#e2f1e7}
+input.incorrect{border:1px dashed #ab5559;background:#fff2f2}
+.answer-controls{display:flex;flex-wrap:wrap;align-items:end;gap:.45rem .7rem;margin:.55rem 0}
+.answer-controls label{display:grid;gap:.13rem;font-size:.9rem;font-weight:650}
+.answer-controls input{width:7rem;max-width:100%}
+.feedback{min-height:0;font-size:.9rem;font-weight:650}
+.feedback:empty{display:none}
+.feedback[data-correct="true"]{color:var(--green)}
+.feedback[data-correct="false"]{color:var(--red)}
+details{border-top:1px solid var(--line);margin-top:.65rem;padding-top:.5rem}
+summary{font-weight:650;color:#174a9c;cursor:pointer}
+@media(max-width:430px){.animation{height:56rem}.times th,.times td{width:2.05rem;min-width:1.85rem}}
+</style>
+</head>
+<body>
+<nav aria-label="Навигация по учебнику">
+  <a href="index.html">Оглавление</a>
+  <a href="umnozhenie-vruchnuyu.html">Ручные способы умножения</a>
+</nav>
+<main>
+  <h1>Умножение в позиционной системе</h1>
+  <p class="lead">Таблица даёт произведение двух цифр. Чтобы собрать из таких произведений ответ, нужно учесть веса разрядов и сложить полученные вклады.</p>
+  <nav class="chapter-jump" aria-label="Разделы главы">
+    <a href="#table">Составляем таблицу</a><a href="#lookup">Пользуемся таблицей</a><a href="#animation">Умножаем столбиком</a><a href="#practice">Тренировка</a>
+  </nav>
+
+  <section aria-labelledby="table">
+    <h2 id="table">1.1. Составляем таблицу умножения</h2>
+    <p>В системе с основанием <i>N</i> в заголовках строк и столбцов пишем все <i>N</i> цифр алфавита. В каждой клетке записываем произведение в той же системе. В пятеричной системе используем цифры от 0 до 4.</p>
+    <p>Заполним строку для цифры <strong>3</strong>. Начинаем с нуля. При переходе к следующему столбцу добавляем ещё одну тройку, как при сложении в главе о сложении столбиком.</p>
+    <div class="example">
+      <p class="formula" aria-label="Ноль, три, один один, один четыре, два два в основании пять"><strong>0 → 3 → 11<sub>5</sub> → 14<sub>5</sub> → 22<sub>5</sub></strong></p>
+      <p>Например, (3 + 3) даёт одну пятёрку и одну единицу, поэтому пишем <strong>11<sub>5</sub></strong>. В конце строки получаем две пятёрки и две единицы, то есть <strong>22<sub>5</sub></strong>.</p>
+      <div class="table-wrap">
+        <table class="times">
+          <caption>Таблица умножения в основании 5</caption>
+          <thead><tr><th scope="col">×</th><th scope="col">0</th><th scope="col">1</th><th scope="col">2</th><th scope="col">3</th><th class="guide" scope="col">4</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">0</th><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+            <tr><th scope="row">1</th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td></tr>
+            <tr><th scope="row">2</th><td>0</td><td>2</td><td>4</td><td>11</td><td>13</td></tr>
+            <tr><th class="guide" scope="row">3</th><td class="guide">0</td><td class="guide">3</td><td class="guide">11</td><td class="guide">14</td><td class="hit">22</td></tr>
+            <tr><th scope="row">4</th><td>0</td><td>4</td><td>13</td><td>22</td><td>31</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <p>Строка для 0 целиком состоит из нулей, а строка для 1 повторяет цифры заголовка. Когда меняем множители местами, произведение сохраняется. Поэтому клетку (4 × 3) можно заполнить по клетке (3 × 4).</p>
+  </section>
+
+  <section aria-labelledby="lookup">
+    <h2 id="lookup">1.2. Пользуемся таблицей</h2>
+    <p>Посчитаем <strong>23<sub>5</sub> × 4</strong>. Из строки 3 и столбца 4 берём <strong>22<sub>5</sub></strong>. Из строки 2 и того же столбца берём <strong>13<sub>5</sub></strong>. У тройки и двойки в числе <strong>23<sub>5</sub></strong> разные веса.</p>
+    <div class="contributions">
+      <div><strong>Тройка в разряде единиц</strong><span>Вес пары цифр равен 1 × 1 = 1.</span><span class="formula">22<sub>5</sub> × 1 = 22<sub>5</sub></span></div>
+      <div><strong>Двойка в разряде пятёрок</strong><span>Вес пары цифр равен 10<sub>5</sub> × 1 = 10<sub>5</sub>.</span><span class="formula">13<sub>5</sub> × 10<sub>5</sub> = 130<sub>5</sub></span></div>
+    </div>
+    <p>Во втором вкладе считаем пятёрки, поэтому начинаем запись с разряда пятёрок и ставим ноль в единицах.</p>
+    <p class="formula"><strong>23<sub>5</sub> × 4 = 22<sub>5</sub> + 130<sub>5</sub> = 202<sub>5</sub></strong></p>
+    <p class="rule"><strong>Произведение цифр показывает, сколько групп берём. Произведение весов показывает размер каждой группы.</strong></p>
+  </section>
+
+  <section aria-labelledby="animation">
+    <h2 id="animation">1.3. Умножаем столбиком</h2>
+    <p>В примере <strong>23<sub>5</sub> × 124<sub>5</sub></strong> разложим множитель по разрядам. Сначала умножаем на 4, затем на 20<sub>5</sub> и на 100<sub>5</sub>. Полученные строки складываем.</p>
+    <p class="formula">202<sub>5</sub> + 1010<sub>5</sub> + 2300<sub>5</sub> = <strong>4012<sub>5</sub></strong></p>
+    <p>В анимации проследи за второй строкой. Когда перемножаются две двойки, каждый вес равен 10<sub>5</sub>. Их произведение равно 100<sub>5</sub>, поэтому перед записью цифры 4 в этой строке появляются два нуля справа.</p>
+    <p class="frame-link"><a href="umnozhenie-stolbikom.html">Открыть анимацию на отдельной странице</a></p>
+    <iframe id="multiplication-frame" class="animation" src="umnozhenie-stolbikom.html?embed=1" title="Пошаговое умножение столбиком"></iframe>
+  </section>
+
+  <section aria-labelledby="practice">
+    <h2 id="practice">1.4. Тренировка</h2>
+    <div class="tasks">
+      <article class="task" aria-labelledby="table-four">
+        <h3 id="table-four">1. Составь таблицу в основании 4</h3>
+        <p>Начни со строки для цифры 3. Объясни, почему за тройкой следует 12<sub>4</sub>, а затем заполни остальные клетки.</p>
+        <form data-table-base="4" novalidate>
+          <div class="table-wrap"><table class="times"><caption>Произведения в основании 4</caption></table></div>
+          <button type="submit">Проверить таблицу</button>
+          <p class="feedback" role="status"></p>
+        </form>
+        <details><summary>Ответ и разбор</summary><p>В строку тройки записываем 0, 3, 12<sub>4</sub>, 21<sub>4</sub>. Сумма 3 + 3 даёт одну четвёрку и две единицы.</p><ul><li>Для 0 получаем 0, 0, 0, 0.</li><li>Для 1 получаем 0, 1, 2, 3.</li><li>Для 2 получаем 0, 2, 10<sub>4</sub>, 12<sub>4</sub>.</li></ul></details>
+      </article>
+      <article class="task" aria-labelledby="table-six">
+        <h3 id="table-six">2. Восстанови пропуски в основании 6</h3>
+        <p>Вычисли произведения 3 × 5, 4 × 5 и 5 × 5. Затем используй симметрию таблицы для остальных пропусков.</p>
+        <form data-table-base="6" novalidate>
+          <div class="table-wrap"><table class="times"><caption>Произведения в основании 6</caption></table></div>
+          <button type="submit">Проверить таблицу</button>
+          <p class="feedback" role="status"></p>
+        </form>
+        <details><summary>Ответ и разбор</summary><p>В строке пятёрки после 14<sub>6</sub> идут 23<sub>6</sub>, 32<sub>6</sub> и 41<sub>6</sub>. Каждый раз прибавляем 5. Те же значения 23<sub>6</sub> и 32<sub>6</sub> вписываем в клетки 3 × 5 и 4 × 5.</p></details>
+      </article>
+      <article class="task" aria-labelledby="one-digit">
+        <h3 id="one-digit">3. Умножь на одну цифру</h3>
+        <p class="formula">34<sub>5</sub> × 4</p>
+        <form data-product="34,4" data-base="5" novalidate>
+          <div class="answer-controls"><label>Ответ в основании 5<input inputmode="numeric" type="text" maxlength="8" autocomplete="off"></label><button type="submit">Проверить ответ</button></div>
+          <p class="feedback" role="status"></p>
+        </form>
+        <details><summary>Ответ и разбор</summary><p>Из таблицы берём 4 × 4 = 31<sub>5</sub> и 3 × 4 = 22<sub>5</sub>. Во втором вкладе дописываем ноль справа. При сложении 31<sub>5</sub> + 220<sub>5</sub> в разряде пятёрок получаем 3 + 2 = 10<sub>5</sub>. Пишем 0 и переносим 1 в следующий разряд. Ответ <strong>301<sub>5</sub></strong>.</p></details>
+      </article>
+      <article class="task" aria-labelledby="two-digits">
+        <h3 id="two-digits">4. Умножь на двузначное число</h3>
+        <p class="formula">26<sub>7</sub> × 13<sub>7</sub></p>
+        <form data-product="26,13" data-base="7" novalidate>
+          <div class="answer-controls"><label>Ответ в основании 7<input inputmode="numeric" type="text" maxlength="8" autocomplete="off"></label><button type="submit">Проверить ответ</button></div>
+          <p class="feedback" role="status"></p>
+        </form>
+        <details><summary>Ответ и разбор</summary><p>Умножение на 3 даёт 114<sub>7</sub>, умножение на 10<sub>7</sub> даёт 260<sub>7</sub>. При сложении в разряде семёрок получаем 1 + 6 = 10<sub>7</sub>. Пишем 0 и переносим 1. Ответ <strong>404<sub>7</sub></strong>.</p></details>
+      </article>
+      <article class="task" aria-labelledby="zero-digit">
+        <h3 id="zero-digit">5. Умножь на число с нулём в записи</h3>
+        <p class="formula">23<sub>5</sub> × 104<sub>5</sub></p>
+        <p>Подпиши в тетради, какое частичное произведение даёт ноль и с какого разряда начинается вклад старшей единицы.</p>
+        <form data-product="23,104" data-base="5" novalidate>
+          <div class="answer-controls"><label>Ответ в основании 5<input inputmode="numeric" type="text" maxlength="8" autocomplete="off"></label><button type="submit">Проверить ответ</button></div>
+          <p class="feedback" role="status"></p>
+        </form>
+        <details><summary>Ответ и разбор</summary><p>Младшая цифра даёт 202<sub>5</sub>. Средняя цифра 0 даёт нулевую строку. Старшая единица имеет вес 100<sub>5</sub>, поэтому в её строке записываем 2300<sub>5</sub> с двумя нулями справа. Складываем и получаем <strong>3002<sub>5</sub></strong>.</p></details>
+      </article>
+    </div>
+    <noscript><p>Для проверки ответов нужен JavaScript. Разборы можно открыть прямо под задачами.</p></noscript>
+  </section>
+</main>
+<footer><a href="index.html">Оглавление</a><a href="umnozhenie-vruchnuyu.html">Дальше. Ручные способы умножения</a></footer>
+<script>
+'use strict';
+
+const frame = document.getElementById('multiplication-frame');
+addEventListener('message', event => {
+  const {data, origin, source} = event;
+  const sameOrigin = origin === location.origin || (location.protocol === 'file:' && origin === 'null');
+  if (source !== frame.contentWindow || !sameOrigin) return;
+  if (data?.type === 'info-book:multiplication-height' && Number.isInteger(data.height) && data.height > 0) {
+    frame.style.height = (data.height + 4) + 'px';
+  }
+});
+
+function makeCell(row, tag, text) {
+  const cell = document.createElement(tag);
+  cell.textContent = text;
+  row.append(cell);
+  return cell;
+}
+
+function matches(input, answer, base) {
+  const value = input.value.trim();
+  return value.length > 0 && [...value].every(digit => /^[0-9]$/.test(digit) && Number(digit) < base)
+    && value.replace(/^0+(?=.)/, '') === answer;
+}
+
+function showFeedback(form, text, correct) {
+  const feedback = form.querySelector('.feedback');
+  feedback.textContent = text;
+  feedback.dataset.correct = String(correct);
+}
+
+function markInput(input, correct) {
+  input.classList.toggle('correct', correct);
+  input.classList.toggle('incorrect', !correct);
+  input.setAttribute('aria-invalid', String(!correct));
+}
+
+function resetOnEdit(form) {
+  form.addEventListener('input', event => {
+    event.target.classList.remove('correct', 'incorrect');
+    event.target.removeAttribute('aria-invalid');
+    form.querySelector('.feedback').textContent = '';
+  });
+}
+
+const gaps = new Set(['3,5', '4,5', '5,3', '5,4', '5,5']);
+
+for (const form of document.querySelectorAll('[data-table-base]')) {
+  const base = Number(form.dataset.tableBase);
+  const table = form.querySelector('table');
+  const heading = table.createTHead().insertRow();
+  makeCell(heading, 'th', '×').scope = 'col';
+  for (let right = 0; right < base; right += 1) makeCell(heading, 'th', right).scope = 'col';
+  const tbody = table.createTBody();
+  const entries = [];
+  for (let left = 0; left < base; left += 1) {
+    const row = tbody.insertRow();
+    makeCell(row, 'th', left).scope = 'row';
+    for (let right = 0; right < base; right += 1) {
+      const answer = (left * right).toString(base);
+      const key = left + ',' + right;
+      const cell = makeCell(row, 'td', '');
+      if (base === 6 && !gaps.has(key)) {
+        cell.textContent = answer;
+        continue;
+      }
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.inputMode = 'numeric';
+      input.maxLength = 2;
+      input.autocomplete = 'off';
+      input.dataset.factors = key;
+      input.setAttribute('aria-label', left + ' × ' + right + ' в основании ' + base);
+      cell.append(input);
+      entries.push({input, answer});
+    }
+  }
+  resetOnEdit(form);
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    let correctCount = 0;
+    for (const {input, answer} of entries) {
+      const correct = matches(input, answer, base);
+      markInput(input, correct);
+      correctCount += Number(correct);
+    }
+    const complete = correctCount === entries.length;
+    const text = complete ? 'Все клетки заполнены верно.' : 'Верно ' + correctCount + ' из ' + entries.length + '. Проверь клетки с пунктирной рамкой.';
+    showFeedback(form, text, complete);
+  });
+}
+
+for (const form of document.querySelectorAll('[data-product]')) {
+  const base = Number(form.dataset.base);
+  const [first, second] = form.dataset.product.split(',');
+  const answer = (parseInt(first, base) * parseInt(second, base)).toString(base);
+  const input = form.querySelector('input');
+  resetOnEdit(form);
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    const correct = matches(input, answer, base);
+    markInput(input, correct);
+    showFeedback(form, correct ? 'Верно!' : 'Проверь произведения цифр, их веса и переносы при сложении.', correct);
+  });
+}
+</script>
+</body>
+</html>
