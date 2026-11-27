@@ -84,6 +84,7 @@ button[aria-disabled="true"] { opacity: .56; cursor: default; }
 .digit.row-start { outline: 2px solid #4a8a60; outline-offset: -2px; }
 .digit.placeholder { background: var(--blue-soft); border-color: #aac4ee; color: #174384; }
 .digit.done { background: #e7f4eb; border-color: #a2cbb1; color: #215638; }
+.answer-row .row-name { color: #215638; font-size: .82rem; font-weight: 800; }
 .partial-panel { margin: .48rem 0; padding-block: .28rem; border-radius: .55rem; }
 .completed-panel { background: #eaf0f6; }
 .current-panel { box-shadow: 0 0 0 1px #8daeda; }
@@ -235,6 +236,7 @@ let partialGroups;
 let completedRows;
 let activeRows;
 let activeHeading;
+let sumRow;
 let carryRows;
 let equation;
 let calcLabel;
@@ -302,10 +304,9 @@ function makeModel(first, second, base) {
       carryMarks.push({row, place: place + 1, digit: transfer});
       move.push({row: `${row}-carry`, place: place + 1, carry: true});
     }
-    let note = quotient
+    const note = quotient
       ? `Вписываем цифру ${digit}. В соседний разряд слева переносим ${transfer}.`
       : `Пишем ${digit} в текущий столбец. Перенос не нужен.`;
-    if (finished) note += ` Ответ ${resultRecord} в основании ${base}.`;
     step(quotient ? 'Пишем цифру и переносим' : 'Записываем цифру', note,
       {operation: 'addition', formulas: reasoning, focus, bench: split, lookup, move, finished});
     return quotient;
@@ -628,7 +629,7 @@ function buildBoard() {
   board.append(element('div', 'board-rule'));
   carryRows.set('sum', addRow('sum-carry', 'Перенос', [], true));
   for (const row of carryRows.values()) row.hidden = true;
-  addRow('sum', '+ Сумма');
+  sumRow = addRow('sum', '+ Сумма');
 
   phase.replaceChildren(...model.phases.map(({name, index}) => new Option(name, String(index))));
 }
@@ -752,7 +753,7 @@ function fly(text, origin, target, blue, delay = 0) {
 
 function updateControls(step) {
   byId('step-count').textContent = `Шаг ${current + 1} из ${model.steps.length}`;
-  next.textContent = step.finished ? 'Готово' : 'Следующий шаг';
+  next.textContent = step.finished && !locked ? 'Готово' : 'Следующий шаг';
   next.setAttribute('aria-disabled', String(locked || Boolean(step.finished)));
   back.setAttribute('aria-disabled', String(current === 0));
   reset.setAttribute('aria-disabled', String(current === 0));
@@ -797,12 +798,9 @@ function render(index, forward = false) {
   if (step.writeDigit) {
     cells.get(`${step.writeDigit.row}:${step.writeDigit.place}`).classList.add('written');
   }
-  if (step.finished) {
-    for (let place = 0; place < model.places.length; place += 1) {
-      const cell = cells.get(`sum:${place}`);
-      if (cell.textContent) cell.classList.add('done');
-    }
-  }
+  sumRow.classList.remove('answer-row');
+  sumRow.firstElementChild.textContent = '+ Сумма';
+  sumRow.setAttribute('aria-label', '+ Сумма');
 
   const formulas = step.formulas ?? [];
   const groups = formulas.map((formula, number) => {
@@ -910,18 +908,30 @@ function render(index, forward = false) {
       {duration: 220, delay, fill: 'backwards'}));
   }
 
-  if (motion.length && !step.finished) {
+  function finishStep() {
+    locked = false;
+    if (step.partialComplete) renderPartialPanels(step, false);
+    if (step.finished) {
+      sumRow.classList.add('answer-row');
+      sumRow.firstElementChild.textContent = 'Ответ';
+      sumRow.setAttribute('aria-label', 'Ответ');
+      for (const cell of sumRow.querySelectorAll('[data-digit]')) {
+        if (cell.textContent) cell.classList.add('done');
+      }
+      const answer = [...step.lines.sum].reverse().join('');
+      status.textContent = `Ответ ${answer} в основании ${model.base}.`;
+    }
+    updateControls(step);
+  }
+  if (motion.length) {
     locked = true;
+    updateControls(step);
     Promise.allSettled(motion.map(animation => animation.finished)).then(() => {
-      if (generation !== version) return;
-      locked = false;
-      if (step.partialComplete) renderPartialPanels(step, false);
-      updateControls(step);
+      if (generation === version) finishStep();
     });
   } else {
-    if (step.partialComplete) renderPartialPanels(step, false);
+    finishStep();
   }
-  updateControls(step);
 }
 
 function readInput(field, base) {
