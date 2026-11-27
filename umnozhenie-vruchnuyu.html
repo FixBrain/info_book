@@ -55,6 +55,11 @@
     .column .carry td { color: #174181; font-size: .95rem; }
     .column .carry th { color: #174181; }
     .rule-top { border-top: 2px solid #405574; }
+    .subsection { border-top: 1px solid var(--line); margin-top: 1.1rem; padding-top: 1rem; }
+    .card h4 { margin: 0 0 .4rem; font-size: 1rem; }
+    .column .omitted-zero { outline: 1px dashed #8195b4; outline-offset: -3px; background: #f4f7fc; }
+    .source-list { padding-inline-start: 1.35em; }
+    .source-list li + li { margin-top: .5em; }
     .steps { display: grid; gap: .45em; margin: .5em 0 .8em; }
     details { margin-top: 1rem; }
     summary { cursor: pointer; font-weight: 650; }
@@ -85,13 +90,96 @@
     .binary-grid .selected { background: var(--green); color: #19472d; font-weight: 700; }
     .binary-grid .chosen td { font-size: .85rem; }
     .source { color: var(--muted); font-size: .875rem; margin-top: .85em; }
+    .rod-accumulation {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      list-style: none;
+      padding-left: 0;
+    }
+    @media (min-width: 580px) {
+      .rod-accumulation { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    }
+    .rod-accumulation li {
+      display: grid;
+      justify-items: center;
+      padding: .45rem .3rem;
+      border: 1px solid #e9d8bc;
+      border-radius: 8px;
+      background: #fff7e8;
+      color: #603b16;
+      font-variant-numeric: tabular-nums;
+    }
+    .rod-accumulation strong { font-size: 1.32rem; }
+    .soroban-states {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: .45rem;
+      width: min(100%, 25rem);
+      margin-block: .3rem .7rem;
+    }
+    .soroban-state {
+      min-width: 0;
+      padding: .35rem .15rem .42rem;
+      border: 1px solid #e9d8bc;
+      border-radius: 8px;
+      background: #fff7e8;
+      text-align: center;
+    }
+    .soroban-state > strong { color: #603b16; font-size: .9rem; }
+    .soroban-frame {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      max-width: 9rem;
+      margin: .25rem auto 0;
+    }
+    .soroban-frame::before {
+      content: "";
+      position: absolute;
+      z-index: 1;
+      inset: 1rem 0 auto;
+      height: .14rem;
+      background: #6e4724;
+    }
+    .soroban-axis {
+      position: relative;
+      display: grid;
+      justify-items: center;
+      color: #603b16;
+      line-height: 1.2;
+    }
+    .soroban-axis::before {
+      content: "";
+      position: absolute;
+      inset: .05rem calc(50% - .05rem) auto;
+      height: 3.5rem;
+      background: #b98c55;
+    }
+    .soroban-upper, .soroban-lower {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .soroban-upper { width: 100%; height: 1rem; }
+    .soroban-upper .counted { margin-top: auto; }
+    .soroban-lower { gap: .1rem; height: 2.65rem; padding-top: .19rem; }
+    .soroban-upper span, .soroban-lower span {
+      width: 1.1rem;
+      height: .39rem;
+      border: 1px solid #96724e;
+      border-radius: 45%;
+      background: #e7cfae;
+    }
+    .soroban-axis .counted { border-color: #8b3620; background: #d7663b; }
+    .soroban-lower .counted + span:not(.counted) { margin-top: .47rem; }
+    .soroban-axis small { font-size: .68rem; }
     @media print { .card, .note { break-inside: avoid; } }
   </style>
 </head>
 <body>
 <main>
   <h1>Ручные способы умножения</h1>
-  <p class="lead">В предыдущей главе мы построили таблицу умножения и научились умножать в столбик. Теперь вычислим 47 × 28 тремя способами и проследим, где в каждой записи учитываются разряды.</p>
+  <p class="lead">Вычислим 47 × 28 несколькими способами и проследим, где каждый из них учитывает разряды. Затем посмотрим, как умножение записывают в школьных пособиях и как его выполняли на счётных инструментах.</p>
 
   <section class="card" id="rectangle" aria-labelledby="rectangle-heading">
     <h2 id="rectangle-heading">Прямоугольник и столбик</h2>
@@ -130,6 +218,41 @@
       <li><strong>Складываем 376 и 940.</strong> Справа получаем 6 единиц. В десятках 7 + 4 = 11, пишем 1 и переносим сотню. В сотнях 3 + 9 + 1 = 13, пишем 3 и переносим тысячу. Пишем 1 в разряде тысяч. Ответ 1316.</li>
     </ol>
     <p class="source">Частичные произведения и запись столбиком в пособии <a href="https://www.ncetm.org.uk/classroom-resources/primm-223-multiplication-strategies-for-larger-numbers-and-long-multiplication/">NCETM, § 2.23</a>.</p>
+    <div class="subsection" id="column-variants">
+      <h3>Две записи одной строки</h3>
+      <p>При умножении 47 на 20 получаем 94 десятка. Их можно записать как <strong>940</strong> или как <strong>94</strong>, оставив клетку единиц пустой. В обоих столбиках цифра 4 стоит в разряде десятков.</p>
+      <div class="scheme-layout">
+        <figure>
+          <h4>Полная запись</h4>
+          <table class="column" aria-label="Сложение 376 и 940. Ноль в разряде единиц записан">
+            <thead><tr><th scope="col">Вес</th><th scope="col">1000</th><th scope="col">100</th><th scope="col">10</th><th scope="col">1</th></tr></thead>
+            <tbody>
+              <tr class="carry"><th scope="row">Переносы</th><td>1</td><td>1</td><td></td><td></td></tr>
+              <tr class="units-row"><th scope="row">47 × 8</th><td></td><td>3</td><td>7</td><td>6</td></tr>
+              <tr class="tens-row"><th scope="row">47 × 20, +</th><td></td><td>9</td><td>4</td><td>0</td></tr>
+              <tr class="rule-top"><th scope="row">Ответ</th><td>1</td><td>3</td><td>1</td><td>6</td></tr>
+            </tbody>
+          </table>
+        </figure>
+        <figure>
+          <h4>Сокращённая запись</h4>
+          <table class="column" aria-label="Сложение 376 и 940. Во второй строке клетка единиц пуста">
+            <thead><tr><th scope="col">Вес</th><th scope="col">1000</th><th scope="col">100</th><th scope="col">10</th><th scope="col">1</th></tr></thead>
+            <tbody>
+              <tr class="carry"><th scope="row">Переносы</th><td>1</td><td>1</td><td></td><td></td></tr>
+              <tr class="units-row"><th scope="row">47 × 8</th><td></td><td>3</td><td>7</td><td>6</td></tr>
+              <tr class="tens-row"><th scope="row">47 × 20, +</th><td></td><td>9</td><td>4</td><td class="omitted-zero" aria-label="Пропущенный ноль"></td></tr>
+              <tr class="rule-top"><th scope="row">Ответ</th><td>1</td><td>3</td><td>1</td><td>6</td></tr>
+            </tbody>
+          </table>
+        </figure>
+      </div>
+      <ul class="source-list">
+        <li><strong>Таиланд.</strong> В уроке для 3-го класса при вычислении 25 × 17 записывают 85 и 340, затем складывают их и получают 425. <a href="https://dltv.ac.th/utils/files/download/224039#page=8">DLTV, слайд 8</a></li>
+        <li><strong>Вьетнам.</strong> В примере 34 × 12 под строкой 68 пишут 34 со сдвигом влево. При сложении 6 десятков и 4 десятков перенос в сотни объясняют рядом со столбиком. Ответ 408. <a href="https://medialib.qlgd.edu.vn/Uploads/THU_VIEN/shn/1/158/UserFiles/SHS-Toan-4---Tap-2---KNTT-bf42c3c9-622e-41ff-8cfd-53e8d992a818.pdf#page=22">«Toán 4», с. 20</a></li>
+        <li><strong>Южная Корея.</strong> В пособии EBS рядом показаны обе записи для 226 × 34 = 7684. Вместо 6780 во втором варианте пишут 678 в разрядах тысяч, сотен и десятков. <a href="https://livedown2.ebs.co.kr/ebsvod/elmt/live/%EC%B4%88%EB%93%B1%EB%A7%8C%EC%A0%90%EC%99%95_%EC%88%98%ED%95%994-1_2%EC%A3%BC%EC%B0%A8.pdf#page=32">EBS, с. 60</a></li>
+      </ul>
+    </div>
   </section>
 
   <section class="card" id="lattice" aria-labelledby="lattice-heading">
@@ -157,7 +280,102 @@
     </div>
     <p class="formula">47 × 28 = 1316</p>
     <p>Каждая диагональ собирает цифры одного веса. Например, клетка для 7 × 8 даёт 5 десятков и 6 единиц, а клетка для 4 × 8 даёт 3 сотни и 2 десятка. В прямоугольнике это те же вклады 56 и 320.</p>
-    <p class="source">Исторический пример решётки из <a href="https://archimede.dimai.unifi.it/archimede/archimede/note_storia/numeri/numeri1/node8.html">«Арифметики Тревизо», 1478, Университет Флоренции</a>.</p>
+    <div class="subsection" id="lattice-sources">
+      <h3>Решётка в разных традициях</h3>
+      <p>В решётках из разных источников множитель может стоять слева или справа. Диагонали в каждой записи помогают собрать цифры одного веса.</p>
+      <ul class="source-list">
+        <li><strong>Самарканд.</strong> В «Ключе к арифметике» ал-Каши (1427) множитель 175 записан слева от решётки. В примере 7806 × 175 = 1 366 050 клетки разделены диагоналями на десятки и единицы. <a href="https://cjournal.hep.com.cn/1001-8735/CN/1207255798415426188">Го и Ма, § 1, рис. 3</a></li>
+        <li><strong>Индия.</strong> В комментарии Ганеши к «Лилавати» XVI века для 135 × 12 цифры числа 135 стоят сверху, а цифры числа 12 — справа. <a href="https://rarebooksocietyofindia.org/book_archive/History-of-Hindu-Mathematics.pdf#page=159">Датта и Сингх, с. 145</a></li>
+        <li><strong>Китай.</strong> В трактате Чэн Давэя 1592 года множитель также стоит справа. Цифры собираются вдоль диагоналей от правого нижнего угла. <a href="https://cjournal.hep.com.cn/1001-8735/CN/1207255798415426188">Го и Ма, § 3, рис. 12</a></li>
+        <li><strong>Италия.</strong> Несколько вариантов решётки приведены в «Арифметике Тревизо» 1478 года. <a href="https://archimede.dimai.unifi.it/archimede/archimede/note_storia/numeri/numeri1/node8.html">Университет Флоренции</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="card" id="near-round" aria-labelledby="near-round-heading">
+    <h2 id="near-round-heading">Умножаем через круглое число</h2>
+    <p>В индийской «Лилавати» Бхаскара II предлагает вычислить 135 × 12 несколькими способами. В одном из них представляем 12 как 20 − 8. Сначала берём 20 групп по 135, потом убираем 8 лишних групп.</p>
+    <p class="formula">135 × (20 − 8) = 2700 − 1080 <span class="formula-result">= 1620</span></p>
+    <p>Так же можно поступить с числом 28. До 30 не хватает двух, поэтому берём 30 групп по 47 и убираем две группы.</p>
+    <p class="formula">47 × (30 − 2) = 1410 − 94 <span class="formula-result">= 1316</span></p>
+    <p class="source"><a href="https://www.vpmthane.org/bhaskara900/books/Colebrooke-lilavati_of_bhaskaracharya%20_with_notes_by_hara.pdf">«Лилавати», пример 16 в переводе Колбрука</a></p>
+  </section>
+
+  <section class="card" id="counting-instruments" aria-labelledby="counting-instruments-heading">
+    <h2 id="counting-instruments-heading">Счётные палочки и соробан</h2>
+
+    <article aria-labelledby="chinese-rods-heading">
+      <h3 id="chinese-rods-heading">Китай. Как растёт произведение 81 × 81</h3>
+      <p>В трактате «Сунь-цзы суань цзин» два множителя выкладывают палочками в верхнем и нижнем рядах. Сначала работают с десятками верхнего множителя, затем сдвигают нижний ряд на один разряд вправо и переходят к единицам верхнего.</p>
+      <figure>
+        <ol class="steps rod-accumulation" aria-label="Четыре состояния среднего ряда">
+          <li><span>80 × 80</span><strong>6400</strong></li>
+          <li><span>+ 80 × 1</span><strong>6480</strong></li>
+          <li><span>+ 1 × 80</span><strong>6560</strong></li>
+          <li><span>+ 1 × 1</span><strong>6561</strong></li>
+        </ol>
+        <figcaption>В каждой ячейке показано, что прибавили и сколько стало в среднем ряду. Для этой схемы используем привычные цифры.</figcaption>
+      </figure>
+      <p class="source"><a href="https://yawnoc.github.io/sun-tzu/i/13">«Сунь-цзы суань цзин», книга I, § 13</a> · <a href="https://www.cambridge.org/core/journals/science-in-context/article/interplay-between-textual-procedures-and-material-operations-from-the-viewpoint-of-chinese-mathematical-texts/7E654BC8863452F26F2E0C43892699F4">Ивэнь Чжу, исследование счёта палочками</a></p>
+      <p>В коллекции Университета Цинхуа есть китайская десятичная таблица умножения. Она записана на 21 бамбуковой планке и относится к периоду Сражающихся царств. <a href="https://www.tsinghua.edu.cn/info/1182/45969.htm">Фотография и описание Университета Цинхуа</a></p>
+    </article>
+
+    <article class="subsection" aria-labelledby="japanese-soroban-heading">
+      <h3 id="japanese-soroban-heading">Япония. 16 × 4 на соробане и в столбик</h3>
+      <p>Начинаем с единиц. Из 6 × 4 = 24 получаем 2 десятка и 4 единицы. Умножение 10 × 4 добавляет ещё 4 десятка, поэтому всего получается 6 десятков и 4 единицы.</p>
+      <div class="scheme-layout">
+        <figure aria-labelledby="soroban-steps-heading">
+          <h4 id="soroban-steps-heading">На соробане</h4>
+          <div class="soroban-states">
+            <div class="soroban-state">
+              <strong>6 × 4 = 24</strong>
+              <div class="soroban-frame" role="img" aria-label="Число 24. В десятках к перекладине подвинуты две нижние косточки, в единицах — четыре.">
+                <div class="soroban-axis" aria-hidden="true">
+                  <div class="soroban-upper"><span></span></div>
+                  <div class="soroban-lower"><span class="counted"></span><span class="counted"></span><span></span><span></span></div>
+                  <b>2</b><small>десятки</small>
+                </div>
+                <div class="soroban-axis" aria-hidden="true">
+                  <div class="soroban-upper"><span></span></div>
+                  <div class="soroban-lower"><span class="counted"></span><span class="counted"></span><span class="counted"></span><span class="counted"></span></div>
+                  <b>4</b><small>единицы</small>
+                </div>
+              </div>
+            </div>
+            <div class="soroban-state">
+              <strong>24 + 40 = 64</strong>
+              <div class="soroban-frame" role="img" aria-label="Число 64. В десятках к перекладине подвинуты верхняя косточка с весом пять и одна нижняя, в единицах — четыре нижние.">
+                <div class="soroban-axis" aria-hidden="true">
+                  <div class="soroban-upper"><span class="counted"></span></div>
+                  <div class="soroban-lower"><span class="counted"></span><span></span><span></span><span></span></div>
+                  <b>6</b><small>десятки</small>
+                </div>
+                <div class="soroban-axis" aria-hidden="true">
+                  <div class="soroban-upper"><span></span></div>
+                  <div class="soroban-lower"><span class="counted"></span><span class="counted"></span><span class="counted"></span><span class="counted"></span></div>
+                  <b>4</b><small>единицы</small>
+                </div>
+              </div>
+            </div>
+          </div>
+          <figcaption>Считаем косточки у перекладины. Верхняя даёт 5, каждая нижняя — 1. Здесь показаны две спицы, на которых набирается результат.</figcaption>
+        </figure>
+        <figure aria-labelledby="soroban-column-heading">
+          <h4 id="soroban-column-heading">На бумаге</h4>
+          <table class="column" aria-label="Умножение 16 на 4 с переносом двух десятков">
+            <thead><tr><th scope="col">Разряд</th><th scope="col">10</th><th scope="col">1</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Множимое</th><td>1</td><td>6</td></tr>
+              <tr><th scope="row">Множитель ×</th><td></td><td>4</td></tr>
+              <tr class="carry rule-top"><th scope="row">Перенос</th><td>2</td><td></td></tr>
+              <tr><th scope="row">Ответ</th><td>6</td><td>4</td></tr>
+            </tbody>
+          </table>
+          <figcaption>Пишем 4 в единицах и помечаем 2 десятка маленькой цифрой. В десятках получаем 1 × 4 + 2 = 6.</figcaption>
+        </figure>
+      </div>
+      <p class="source"><a href="https://www.mext.go.jp/content/20240327-mxt_tokubetu01-000034750_19.pdf#page=38">Пособие MEXT по соробану, с. 38 PDF</a> · <a href="https://faq.tokyo-shoseki.co.jp/fa/customer/web/knowledge8283.html">Tokyo Shoseki, школьный столбик, § 3</a></p>
+    </article>
   </section>
 
   <section class="card" id="doubling" aria-labelledby="doubling-heading">
@@ -193,6 +411,49 @@
     <p>Чтобы быстро найти 3<sup>28</sup>, снова используем 28 = 16 + 8 + 4. При умножении степеней с одним основанием показатели складываются.</p>
     <p class="formula">3<sup>28</sup> = 3<sup>16 + 8 + 4</sup> = 3<sup>16</sup> · 3<sup>8</sup> · 3<sup>4</sup></p>
     <p>Составляем цепочку 3, 3<sup>2</sup>, 3<sup>4</sup>, 3<sup>8</sup>, 3<sup>16</sup>. Каждый следующий член получаем возведением предыдущего в квадрат. Двоичные единицы снова указывают, что взять. В примере с 47 выбранные кратные складывали. Здесь выбранные степени перемножаем.</p>
+  </section>
+
+  <section class="card" id="decompositions" aria-labelledby="decompositions-heading">
+    <h2 id="decompositions-heading">Как способы умножения раскладывают множители</h2>
+    <p>На примере 12 × 36 сравним, как раскладывают множители и собирают ответ. Когда множитель записан как сумма или разность, применяется распределительный закон.</p>
+
+    <article class="subsection">
+      <h3>Сумма частей одного множителя</h3>
+      <p>В столбике удобно разложить по разрядам тот множитель, цифры которого задают строки. Если работаем с цифрами числа 12, получаем строки для 10 и для 2.</p>
+      <p class="formula">12 × 36 = (10 + 2) × 36<br>= 10 × 36 + 2 × 36 <span class="formula-result">= 360 + 72</span> <span class="formula-result">= 432</span></p>
+      <p>Можно взять и другие слагаемые. В «Лилавати» для 135 × 12 есть разложение 12 = 8 + 4. Тогда считают 135 × 8 и 135 × 4. <a href="https://assets.super.so/e745dfd7-232e-47c1-a806-753f45b941ba/files/9b336695-0368-44c9-97bc-cb392265f4d2.pdf#page=22">«Лилавати», перевод с пояснениями, с. 15</a></p>
+    </article>
+
+    <article class="subsection">
+      <h3>Разрядные слагаемые обоих множителей</h3>
+      <p>Разложим по разрядам и число 36. Теперь видно, из каких произведений цифр с их весами состоит каждая строка столбика.</p>
+      <p class="formula">(10 + 2) × (30 + 6)<br>= <span class="formula-result">(10 × 30 + 10 × 6)</span> + <span class="formula-result">(2 × 30 + 2 × 6)</span><br>= <span class="formula-result">(300 + 60)</span> + <span class="formula-result">(60 + 12)</span> <span class="formula-result">= 432</span></p>
+      <ul class="source-list">
+        <li><strong>Прямоугольник.</strong> Каждое из четырёх произведений занимает свою часть схемы.</li>
+        <li><strong>Столбик.</strong> В первой строке объединяем 60 и 12, во второй — 300 и 60. Затем складываем 72 и 360.</li>
+        <li><strong>Решётка.</strong> Произведение 2 × 6 = 12 даёт 2 единицы и 1 десяток на разных диагоналях. На диагонали десятков складываем 6 + 6 + 1 = 13, записываем 3 и переносим сотню.</li>
+        <li><strong>Счётные палочки и соробан.</strong> По схеме с палочками для нашего примера получаем 300 → 360 → 420 → 432. Если повторить порядок действий с соробаном из японского пособия, получим 60 → 72 → 372 → 432. В обоих случаях прибавляем те же четыре вклада. <a href="https://www.mext.go.jp/content/20240327-mxt_tokubetu01-000034750_19.pdf#page=43">Пособие MEXT, пример 12 × 23</a></li>
+      </ul>
+    </article>
+
+    <article class="subsection">
+      <h3>Разность круглого числа и поправки</h3>
+      <p>Представим 36 как 40 − 4. Берём 40 групп по 12 и убираем четыре лишние группы.</p>
+      <p class="formula">12 × (40 − 4) = 12 × 40 − 12 × 4<br>= 480 − 48 <span class="formula-result">= 432</span></p>
+    </article>
+
+    <article class="subsection">
+      <h3>Сумма степеней двойки</h3>
+      <p>При удвоении слагаемые берём из двоичной записи одного множителя. Единицы в записи 100100<sub>2</sub> стоят на местах с весами 32 и 4. Последовательно удваиваем 12 и складываем полученные кратные 12 × 32 и 12 × 4.</p>
+      <p class="formula">12 × (32 + 4) = 12 × 32 + 12 × 4<br>= 384 + 48 <span class="formula-result">= 432</span></p>
+    </article>
+
+    <article class="subsection">
+      <h3>Разложение на множители</h3>
+      <p>Представим 12 как 3 × 4. По сочетательному закону можно сначала умножить 36 на 3, затем полученное число умножить на 4.</p>
+      <p class="formula">36 × (3 × 4) = (36 × 3) × 4<br>= 108 × 4 <span class="formula-result">= 432</span></p>
+      <p>Точно так же в «Лилавати» сначала умножают 135 на 3, потом 405 на 4. <a href="https://assets.super.so/e745dfd7-232e-47c1-a806-753f45b941ba/files/9b336695-0368-44c9-97bc-cb392265f4d2.pdf#page=22">«Лилавати», перевод с пояснениями, с. 15</a></p>
+    </article>
   </section>
 </main>
 <footer aria-label="Переходы по учебнику">
