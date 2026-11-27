@@ -912,6 +912,7 @@ function render(index, forward = false) {
     locked = false;
     if (step.partialComplete) renderPartialPanels(step, false);
     if (step.finished) {
+      carryRows.get('sum').hidden = true;
       sumRow.classList.add('answer-row');
       sumRow.firstElementChild.textContent = 'Ответ';
       sumRow.setAttribute('aria-label', 'Ответ');
@@ -919,6 +920,8 @@ function render(index, forward = false) {
         if (cell.textContent) cell.classList.add('done');
       }
       const answer = [...step.lines.sum].reverse().join('');
+      calcLabel.textContent = `Вычисление в основании ${model.base}`;
+      equation.replaceChildren(element('span', 'calc-group', `${model.first} × ${model.second} = ${answer}`));
       status.textContent = `Ответ ${answer} в основании ${model.base}.`;
     }
     updateControls(step);
