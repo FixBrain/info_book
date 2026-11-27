@@ -283,33 +283,32 @@ function makeModel(first, second, base) {
     });
   }
 
-  function record(total, place, row, formulas, focus, lookup = null, finished = false) {
-    const quotient = Math.floor(total / base);
+  function writeColumn(row, place, total, terms, reasoning, options = {}) {
+    const {focus, lookup, prefix = '', suffix = '', finished = false} = options;
+    const carry = Math.floor(total / base);
     const remainder = total % base;
     const digit = inBase(remainder);
-    const transfer = inBase(quotient);
-    const reasoning = quotient ? [...formulas, [{text: transfer, quotient: true}, '│', out(digit)]] : formulas;
-    const split = quotient ? [
-      {kind: 'carry', title: 'Переносим влево', amount: quotient, weight: places[place + 1]},
+    const transfer = inBase(carry);
+    const column = terms.flatMap((term, index) => index ? ['+', term] : [term]);
+    if (!column.length) column.push('0');
+    column.push('=', out(inBase(total)));
+    if (carry) column.push('→', {text: transfer, quotient: true}, '│', out(digit));
+    reasoning.push(column);
+
+    const newCarry = carry ? {row, place: place + 1, digit: transfer} : null;
+    if (newCarry) carryMarks.push(newCarry);
+    lines[row][place] = digit;
+    const label = inBase(places[place]);
+    const instruction = carry ? `Получили ${inBase(total)}. Пишем ${digit}, переносим ${transfer} влево.` : `Пишем ${digit} в этом разряде.`;
+    const split = row === 'sum' && carry ? [
+      {kind: 'carry', title: 'Переносим влево', amount: carry, weight: places[place + 1]},
       {kind: 'remainder', title: 'Пишем в столбец', amount: remainder, weight: places[place]},
     ] : [];
-    if (quotient) {
-      step('Выделяем цифру и перенос',
-        `В записи ${inBase(total)} последняя цифра ${digit} идёт в текущий столбец. Слева от неё стоит перенос ${transfer}.`,
-        {operation: 'addition', formulas: reasoning, focus, bench: split, lookup});
-    }
-    lines[row][place] = digit;
-    const move = [{row, place}];
-    if (quotient) {
-      carryMarks.push({row, place: place + 1, digit: transfer});
-      move.push({row: `${row}-carry`, place: place + 1, carry: true});
-    }
-    const note = quotient
-      ? `Вписываем цифру ${digit}. В соседний разряд слева переносим ${transfer}.`
-      : `Пишем ${digit} в текущий столбец. Перенос не нужен.`;
-    step(quotient ? 'Пишем цифру и переносим' : 'Записываем цифру', note,
-      {operation: 'addition', formulas: reasoning, focus, bench: split, lookup, move, finished});
-    return quotient;
+    step('Складываем по столбцам', `Разряд веса ${label}. ${prefix}${instruction}${suffix}`, {
+      operation: 'addition', formulas: [...reasoning], focus, activePlace: place, lookup, bench: split,
+      writeDigit: {row, place}, newCarry, finished,
+    });
+    return carry;
   }
 
   function addToPartial(row, previous, increment, rightZeros, productRow, shift, firstProduct, context) {
@@ -317,7 +316,7 @@ function makeModel(first, second, base) {
     const original = inBase(previous);
     const heading = [original, '+', out(inBase(increment), increment ? shift : 0)];
     const previousDigits = [...lines[row]];
-    const columnFormulas = [];
+    const reasoning = [heading];
     lines[row].fill('', rightZeros);
     carryMarks = [];
     showSubtotal = true;
@@ -333,27 +332,13 @@ function makeModel(first, second, base) {
       if (right) terms.push(take(productRow, place, b));
       else if (left) terms.push('0');
       if (carry) terms.push(token(inBase(carry), `${row}-carry:${place}`));
-      const column = terms.flatMap((term, index) => index ? ['+', term] : [term]);
-      if (!column.length) column.push('0');
       const sum = a + b + carry;
-      carry = Math.floor(sum / base);
-      const digit = inBase(sum % base);
-      const transfer = inBase(carry);
       const focus = [...context.focus, `${productRow}:${place}`];
       if (firstProduct && left) focus.push(`${firstProduct}:${place}`);
-      column.push('=', out(inBase(sum)));
-      if (carry) column.push('→', {text: transfer, quotient: true}, '│', out(digit));
-      columnFormulas.push(column);
-      const newCarry = carry ? {row, place: place + 1, digit: transfer} : null;
-      if (newCarry) carryMarks.push(newCarry);
-      lines[row][place] = digit;
-      const label = inBase(places[place]);
       const prefix = place < shift ? 'Прибавляем дописанный ноль. ' : '';
-      const instruction = carry ? `Получили ${inBase(sum)}. Пишем ${digit}, переносим ${transfer} влево.` : `Пишем ${digit} в этом разряде.`;
-      const subtotal = place === limit - 1 ? ` Получаем ${total}.` : '';
-      step('Складываем по столбцам', `Разряд веса ${label}. ${prefix}${instruction}${subtotal}`, {
-        ...context, operation: 'addition', formulas: [heading, ...columnFormulas], focus, activePlace: place,
-        writeDigit: {row, place}, newCarry,
+      const suffix = place === limit - 1 ? ` Получаем ${total}.` : '';
+      carry = writeColumn(row, place, sum, terms, reasoning, {
+        ...context, focus, prefix, suffix,
       });
     }
     carryMarks = [];
@@ -444,23 +429,14 @@ function makeModel(first, second, base) {
       {row, value: alphabet.indexOf(lines[row][place])},
     ]);
     const focus = terms.map(({row}) => `${row}:${place}`);
-    const formula = [];
+    const addends = [];
     let total = carry;
     for (const {row, value} of terms) {
-      if (formula.length) formula.push('+');
-      formula.push(take(row, place, value));
+      addends.push(take(row, place, value));
       total += value;
     }
-    if (carry) {
-      if (formula.length) formula.push('+');
-      formula.push(token(inBase(carry), `sum-carry:${place}`));
-    }
-    if (!formula.length) formula.push('0');
-    formula.push('=', out(inBase(total)));
-    const formulas = [formula];
-    step('Складываем цифры столбца', `Складываем выделенные цифры${carry ? ' и прибавляем входящий перенос' : ''}.`,
-      {operation: 'addition', formulas, focus});
-    carry = record(total, place, 'sum', formulas, focus, null, place === resultRecord.length - 1);
+    if (carry) addends.push(token(inBase(carry), `sum-carry:${place}`));
+    carry = writeColumn('sum', place, total, addends, [], {focus, finished: place === resultRecord.length - 1});
   }
   return {first, second, base, places, rowNames, productLines, steps, phases};
 }
@@ -843,19 +819,7 @@ function render(index, forward = false) {
     }
   }
 
-  if (animate && step.move) {
-    const result = currentGroup.querySelector('.result');
-    for (const [number, move] of step.move.entries()) {
-      const target = cells.get(`${move.row}:${move.place}`);
-      if (move.carry) {
-        const source = currentGroup.querySelector('.quotient');
-        fly(target.textContent, source?.getBoundingClientRect(), target.firstElementChild, true, number * 180);
-      } else {
-        target.classList.add('written');
-        fly(target.textContent, move.from ? positions.get(move.from) : result?.getBoundingClientRect(), target, false);
-      }
-    }
-  } else if (animate) {
+  if (animate) {
     for (const id of step.fromTable || step.zeroRow ? [] : step.mark ?? []) {
       const target = cells.get(id);
       motion.push(target.animate([{opacity: 0, transform: 'scale(.85)'}, {opacity: 1, transform: 'none'}],
