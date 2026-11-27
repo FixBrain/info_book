@@ -49,7 +49,8 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px soli
 .steps li + li { margin-top: .4em; }
 .sharing { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: .7rem; }
 .sharing .example { margin-block: .45rem; }
-.chunks, .multiples { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .4rem; list-style: none; padding: 0; margin: .65rem 0; }
+.chunks, .multiples { display: grid; gap: .4rem; list-style: none; padding: 0; margin: .65rem 0; }
+.chunks { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .chunks li, .multiples li { display: grid; justify-items: center; align-content: start; text-align: center; padding: .4em .15em; border-radius: .5rem; background: var(--blue-light); }
 .chunks li:last-child { background: var(--amber); }
 .chunks small, .multiples small { font-size: .82rem; }
@@ -147,16 +148,15 @@ summary { width: fit-content; font-weight: 650; color: #174a9c; cursor: pointer;
 
   <section id="partial-quotients" aria-labelledby="partial-heading">
     <h2 id="partial-heading">Вычитаем удобные кратные</h2>
-    <p>Разберём <strong>1301 : 12</strong>. Можно убирать сразу несколько групп по 12. Каждый раз записываем, сколько групп взяли и сколько ещё осталось.</p>
+    <p>Разберём <strong>1301 : 12</strong>. Удобно сразу взять 100 групп по 12. Они занимают <span class="term">12 × 100 = 1200</span>, остаётся <span class="term">1301 − 1200 = 101</span>. Из 101 можно собрать ещё 8 групп. Они занимают <span class="term">12 × 8 = 96</span>, остаётся 5.</p>
     <div class="example">
-      <ul class="chunks" role="list" aria-label="Три порции по 12 и остаток">
-        <li><strong>960</strong><small>80 групп</small></li>
-        <li><strong>240</strong><small>20 групп</small></li>
+      <ul class="chunks" role="list" aria-label="Два кратных 12 и остаток">
+        <li><strong>1200</strong><small>100 групп</small></li>
         <li><strong>96</strong><small>8 групп</small></li>
         <li><strong>5</strong><small>остаток</small></li>
       </ul>
-      <p class="formula">1301 → 341 → 101 → 5</p>
-      <p>Убрали <span class="term">80 + 20 + 8 = 108</span> групп. Можно было сразу взять 100 групп. Столбик как раз подсказывает, сколько сотен групп, десятков групп и отдельных групп взять.</p>
+      <p class="formula">1301 → 101 → 5</p>
+      <p>Всего получили <span class="term">100 + 8 = 108</span> групп. После вычитания 1200 остаётся 101, а на 10 групп нужно 120. Поэтому в столбике в разряде десятков частного пишем ноль.</p>
     </div>
     <p class="source">Примеры перехода от удобных кратных к разрядному делению. <a href="https://www.fi.uu.nl/publicaties/literatuur/4966.pdf#page=7">Ван ден Хёвел-Панхёйзен, рис. 4</a> · <a href="https://ca.accessim.org/k-5/grade-5/unit-4/section-b/lesson-11?a=teacher">Illustrative Mathematics, частичные частные</a></p>
   </section>
