@@ -77,7 +77,7 @@ button:disabled { opacity: .48; cursor: default; }
 .division-calculation { display: grid; align-items: start; gap: .65rem .85rem; }
 @media (min-width: 1000px) { .division-calculation { grid-template-columns: minmax(12.5rem, auto) minmax(0, 1fr); } }
 .division-calculation > div { min-width: 0; }
-.division-lookup h4 { margin-bottom: .5rem; }
+.division-lookup h3 { margin-bottom: .5rem; }
 .division-lookup .multiples { grid-template-columns: minmax(0, 1fr); max-width: 100%; margin-block: .4rem; gap: .13rem; }
 .division-lookup .multiples.many { max-height: 16rem; overflow-y: auto; scrollbar-gutter: stable; }
 .division-lookup .multiples li { grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; justify-items: start; gap: .5rem; padding: .18rem .48rem; border: 1px solid transparent; border-radius: .3rem; text-align: start; }
@@ -157,7 +157,8 @@ summary { width: fit-content; font-weight: 650; color: #174a9c; cursor: pointer;
   <nav class="chapter-jump" aria-label="Разделы главы">
     <a href="#meaning">Полные группы</a>
     <a href="#column">Деление столбиком</a>
-    <a href="#base-five">Другое основание</a>
+    <a href="#other-base">Другое основание</a>
+    <a href="#division-demo">Пошаговое деление</a>
     <a href="#practice">Задания</a>
     <a href="#division-traditions">Две записи столбика</a>
   </nav>
@@ -190,82 +191,24 @@ summary { width: fit-content; font-weight: 650; color: #174a9c; cursor: pointer;
 
   <section id="column" aria-labelledby="column-heading">
     <h2 id="column-heading">Деление столбиком по списку кратных</h2>
-    <p>Читаем делимое слева направо, по одной цифре. В каждом разряде собираем группы по 12. Например, одна группа из 12 сотен — это 100 групп по 12 единиц. Поэтому ей соответствует цифра 1 в разряде сотен частного.</p>
+    <p>Читаем делимое слева направо, по одной цифре. Число, с которым работаем на текущем шаге, называют <strong>неполным делимым</strong>. На первом шаге это первая цифра делимого.</p>
     <p>Перед делением выписываем произведения делителя на все цифры выбранной системы. Начинаем с нуля и каждый раз прибавляем делитель. Этот список используем до конца примера.</p>
     <ol class="steps">
       <li><strong>Находим цифру по списку.</strong> Сравниваем неполное делимое с готовыми кратными. Берём наибольшее кратное, которое не превышает его. Цифра слева в выбранной строке идёт в частное, даже если это ведущий ноль.</li>
       <li><strong>Вычитаем выбранное кратное.</strong> Остаток должен быть меньше делителя.</li>
-      <li><strong>Переходим к младшему разряду.</strong> Размениваем остаток и прибавляем следующую цифру делимого.</li>
+      <li><strong>Переходим к младшему разряду.</strong> Размениваем остаток и прибавляем следующую цифру делимого. Когда цифры заканчиваются, получаем окончательный остаток.</li>
     </ol>
 
-    <div class="demo" id="division-demo">
-      <h3>Пошаговое деление</h3>
-      <form class="division-form" id="division-form" hidden>
-        <div class="division-fields">
-          <label>Основание <select id="division-base" aria-describedby="division-input-help"><option value="10">10</option></select></label>
-          <label>Делимое <input id="division-dividend" value="1301" inputmode="numeric" autocapitalize="characters" autocomplete="off" spellcheck="false" aria-describedby="division-input-help division-error"></label>
-          <label>Делитель <input id="division-divisor" value="12" inputmode="numeric" autocapitalize="characters" autocomplete="off" spellcheck="false" aria-describedby="division-input-help division-error"></label>
-          <button type="submit" class="primary">Начать деление</button>
-        </div>
-        <p class="division-help" id="division-input-help">До 6 знаков в каждом числе. Цифры от 0 до 9.</p>
-        <p class="division-error" id="division-error" role="alert"></p>
-      </form>
-      <div class="demo-controls" hidden>
-        <button type="button" id="division-back" disabled>Назад</button>
-        <button type="button" id="division-next" class="primary">Следующий шаг</button>
-        <button type="button" id="division-reset" disabled>Сначала</button>
-        <span id="division-progress" role="status" aria-live="polite"></span>
-      </div>
-      <p class="model-label" id="division-expression">1301 : 12 · основание 10</p>
-      <div class="demo-layout">
-        <div class="demo-panel division-calculation">
-          <div>
-            <h4>Столбик</h4>
-            <div class="workbench" id="division-work">
-              <div class="work-row"> 1301</div><div class="work-divisor">12</div>
-              <div class="work-row work-subtract">−0</div>
-              <div class="work-quotient" aria-label="Рабочая запись частного"><span class="leading">0</span><span>1</span><span class="zero">0</span><span>8</span></div>
-              <div class="work-row"> 13</div>
-              <div class="work-row work-subtract">−12</div>
-              <div class="work-row">  10</div>
-              <div class="work-row work-subtract">  −0</div>
-              <div class="work-row">  101</div>
-              <div class="work-row work-subtract">  −96</div>
-              <div class="work-row result">    5</div>
-            </div>
-          </div>
-          <div class="division-lookup">
-            <h4 id="division-multiples-heading">Кратные 12</h4>
-            <ul class="multiples" id="division-multiples" role="list" aria-labelledby="division-multiples-heading">
-              <li><small>0 × 12</small><strong>0</strong></li>
-              <li><small>1 × 12</small><strong>12</strong></li>
-              <li><small>2 × 12</small><strong>24</strong></li>
-              <li><small>3 × 12</small><strong>36</strong></li>
-              <li><small>4 × 12</small><strong>48</strong></li>
-              <li><small>5 × 12</small><strong>60</strong></li>
-              <li><small>6 × 12</small><strong>72</strong></li>
-              <li><small>7 × 12</small><strong>84</strong></li>
-              <li class="lookup-fit"><small>8 × 12</small><strong>96</strong></li>
-              <li class="lookup-limit"><small>9 × 12</small><strong>108</strong></li>
-            </ul>
-            <p class="lookup-comparison" id="division-comparison"><span class="lookup-fit">96</span> ≤ <strong>101</strong> &lt; <span class="lookup-limit">108</span></p>
-            <p class="lookup-key">Слева — кратное, которое берём. Справа — следующее, уже слишком большое.</p>
-            <p class="lookup-key" id="division-boundary" hidden>Следующая граница — делитель, умноженный на основание.</p>
-          </div>
-        </div>
-        <div class="demo-panel" id="division-explanation" aria-live="polite">
-          <h4 id="division-explanation-title">Получаем ответ</h4>
-          <div class="exchange" id="division-exchange" hidden>
-            <span><span class="bundle-mark" aria-hidden="true"></span><strong id="division-exchange-from"></strong><small>остаток в старшем разряде</small></span>
-            <span class="exchange-arrow" aria-hidden="true">→</span>
-            <span><span class="bundle-mark loose" aria-hidden="true"></span><strong id="division-exchange-to"></strong><small>количество в новом разряде</small></span>
-          </div>
-          <p class="formula" id="division-calculation-line">1301 = 12 × 108 + 5</p>
-          <p id="division-description">Рабочая запись 0108 сохраняет все цифры, которые получились по ходу деления. В ответе ведущий ноль опускаем.</p>
-          <p class="result" id="division-result">Частное <strong id="division-answer">108</strong>, остаток <strong id="division-remainder">5</strong>.</p>
-        </div>
-      </div>
-      <noscript><p>Для выбора своих чисел включите JavaScript. Выше показан столбик для готового примера.</p></noscript>
+    <div class="example">
+      <h3>Как получаем каждую цифру в 1301 : 12</h3>
+      <p>В списке кратных 12 есть 0, 12, 24 и так далее до 108. На каждом шаге найдём, между какими соседними значениями находится неполное делимое.</p>
+      <ol class="steps">
+        <li>Начинаем с <strong>1</strong>. Из <span class="term">0 ≤ 1 &lt; 12</span> получаем цифру <strong>0</strong>. Остаётся 1 тысяча.</li>
+        <li>Из 1 тысячи получаем 10 сотен, добавляем 3 сотни. Из <span class="term">12 ≤ 13 &lt; 24</span> получаем цифру <strong>1</strong>. После вычитания 12 остаётся 1 сотня.</li>
+        <li>Из 1 сотни получаем 10 десятков и сносим 0. Из <span class="term">0 ≤ 10 &lt; 12</span> получаем цифру <strong>0</strong>. Все 10 десятков остаются.</li>
+        <li>Из 10 десятков получаем 100 единиц, добавляем последнюю единицу. Из <span class="term">96 ≤ 101 &lt; 108</span> получаем цифру <strong>8</strong>. После вычитания 96 остаётся <strong>5</strong>.</li>
+      </ol>
+      <p>В рабочей записи частного получилось <strong>0108</strong>. В итоговом ответе ведущий ноль опускаем и пишем <strong>108</strong>.</p>
     </div>
     <p class="formula"><strong>Проверка</strong> <span class="term">1301 = 12 × 108 + 5</span> и <span class="term">0 ≤ 5 &lt; 12</span>.</p>
     <p class="source">Пример деления с заранее выписанными кратными. <a href="https://amsi.org.au/teacher_modules/Whole_number_arithmetic.html#:~:text=Long%20division%20by%20numbers%20with%20two%20or%20more%20digits">Пособие Австралийского института математических наук</a></p>
@@ -295,6 +238,79 @@ summary { width: fit-content; font-weight: 650; color: #174a9c; cursor: pointer;
       </ol>
       <p>В рабочей записи получилось 0104<sub>5</sub>. Частное 104<sub>5</sub>, остаток 2.</p>
       <p class="formula"><strong>Проверка</strong> <span class="term">1310<sub>5</sub> = 12<sub>5</sub> × 104<sub>5</sub> + 2</span> и <span class="term">2 &lt; 12<sub>5</sub></span>.</p>
+    </div>
+  </section>
+
+  <section id="division-demo" aria-labelledby="division-demo-heading">
+    <h2 id="division-demo-heading">Пошаговое деление</h2>
+    <p>Пройдите разобранный пример или введите свои числа. По подсветке кратных проследите, как заполняется частное.</p>
+    <div class="demo">
+      <form class="division-form" id="division-form" hidden>
+        <div class="division-fields">
+          <label>Основание <select id="division-base" aria-describedby="division-input-help"><option value="10">10</option></select></label>
+          <label>Делимое <input id="division-dividend" value="1301" inputmode="numeric" autocapitalize="characters" autocomplete="off" spellcheck="false" aria-describedby="division-input-help division-error"></label>
+          <label>Делитель <input id="division-divisor" value="12" inputmode="numeric" autocapitalize="characters" autocomplete="off" spellcheck="false" aria-describedby="division-input-help division-error"></label>
+          <button type="submit" class="primary">Начать деление</button>
+        </div>
+        <p class="division-help" id="division-input-help">До 6 знаков в каждом числе. Цифры от 0 до 9.</p>
+        <p class="division-error" id="division-error" role="alert"></p>
+      </form>
+      <div class="demo-controls" hidden>
+        <button type="button" id="division-back" disabled>Назад</button>
+        <button type="button" id="division-next" class="primary">Следующий шаг</button>
+        <button type="button" id="division-reset" disabled>Сначала</button>
+        <span id="division-progress" role="status" aria-live="polite"></span>
+      </div>
+      <p class="model-label" id="division-expression">1301 : 12 · основание 10</p>
+      <div class="demo-layout">
+        <div class="demo-panel division-calculation">
+          <div>
+            <h3>Столбик</h3>
+            <div class="workbench" id="division-work">
+              <div class="work-row"> 1301</div><div class="work-divisor">12</div>
+              <div class="work-row work-subtract">−0</div>
+              <div class="work-quotient" aria-label="Рабочая запись частного"><span class="leading">0</span><span>1</span><span class="zero">0</span><span>8</span></div>
+              <div class="work-row"> 13</div>
+              <div class="work-row work-subtract">−12</div>
+              <div class="work-row">  10</div>
+              <div class="work-row work-subtract">  −0</div>
+              <div class="work-row">  101</div>
+              <div class="work-row work-subtract">  −96</div>
+              <div class="work-row result">    5</div>
+            </div>
+          </div>
+          <div class="division-lookup">
+            <h3 id="division-multiples-heading">Кратные 12</h3>
+            <ul class="multiples" id="division-multiples" role="list" aria-labelledby="division-multiples-heading">
+              <li><small>0 × 12</small><strong>0</strong></li>
+              <li><small>1 × 12</small><strong>12</strong></li>
+              <li><small>2 × 12</small><strong>24</strong></li>
+              <li><small>3 × 12</small><strong>36</strong></li>
+              <li><small>4 × 12</small><strong>48</strong></li>
+              <li><small>5 × 12</small><strong>60</strong></li>
+              <li><small>6 × 12</small><strong>72</strong></li>
+              <li><small>7 × 12</small><strong>84</strong></li>
+              <li class="lookup-fit"><small>8 × 12</small><strong>96</strong></li>
+              <li class="lookup-limit"><small>9 × 12</small><strong>108</strong></li>
+            </ul>
+            <p class="lookup-comparison" id="division-comparison"><span class="lookup-fit">96</span> ≤ <strong>101</strong> &lt; <span class="lookup-limit">108</span></p>
+            <p class="lookup-key">Слева — кратное, которое берём. Справа — следующее, уже слишком большое.</p>
+            <p class="lookup-key" id="division-boundary" hidden>Следующая граница — делитель, умноженный на основание.</p>
+          </div>
+        </div>
+        <div class="demo-panel" id="division-explanation" aria-live="polite">
+          <h3 id="division-explanation-title">Получаем ответ</h3>
+          <div class="exchange" id="division-exchange" hidden>
+            <span><span class="bundle-mark" aria-hidden="true"></span><strong id="division-exchange-from"></strong><small>остаток в старшем разряде</small></span>
+            <span class="exchange-arrow" aria-hidden="true">→</span>
+            <span><span class="bundle-mark loose" aria-hidden="true"></span><strong id="division-exchange-to"></strong><small>количество в новом разряде</small></span>
+          </div>
+          <p class="formula" id="division-calculation-line">1301 = 12 × 108 + 5</p>
+          <p id="division-description">Рабочая запись 0108 сохраняет все цифры, которые получились по ходу деления. В ответе ведущий ноль опускаем.</p>
+          <p class="result" id="division-result">Частное <strong id="division-answer">108</strong>, остаток <strong id="division-remainder">5</strong>.</p>
+        </div>
+      </div>
+      <noscript><p>Для выбора своих чисел включите JavaScript. Выше показан столбик для готового примера.</p></noscript>
     </div>
   </section>
 
