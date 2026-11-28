@@ -138,6 +138,9 @@ summary { width: fit-content; font-weight: 650; color: #174a9c; cursor: pointer;
     @media (min-width: 630px) {
       .division-traditions-layout { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
+    @media (min-width: 900px) {
+      .division-traditions-layout.full { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
     .division-traditions-layout figure { min-width: 0; margin: 0; }
     .division-tradition-example {
       width: min(100%, 16rem);
@@ -150,6 +153,13 @@ summary { width: fit-content; font-weight: 650; color: #174a9c; cursor: pointer;
       font: 1.2rem/1.22 ui-monospace, Consolas, "Liberation Mono", monospace;
     }
     .division-tradition-example strong { color: #1647a8; }
+    .division-tradition-example .under-divisor { border-top: 1px solid #8a6e4b; }
+    .division-tradition-example mark { background: var(--green); color: #245b3c; }
+    .division-tradition-example del { color: var(--muted); }
+    .rod-registers { width: 100%; max-width: 33rem; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+    .rod-registers td, .rod-registers th { padding: .28rem .3rem; border-bottom: 1px solid var(--line); text-align: right; }
+    .rod-registers th:first-child { text-align: left; }
+    .rod-registers tr:last-child td { background: var(--green); }
     .division-traditions-layout .source { overflow-wrap: anywhere; }
 </style>
 </head>
@@ -168,7 +178,7 @@ summary { width: fit-content; font-weight: 650; color: #174a9c; cursor: pointer;
     <a href="#division-demo">Пошаговое деление</a>
     <a href="#practice">Задания</a>
     <a href="#hand-division">Ручные способы</a>
-    <a href="#division-traditions">Две записи столбика</a>
+    <a href="#division-traditions">Запись в разных странах</a>
   </nav>
 
   <section id="meaning" aria-labelledby="meaning-heading">
@@ -400,49 +410,103 @@ summary { width: fit-content; font-weight: 650; color: #174a9c; cursor: pointer;
 
   <section id="division-traditions" aria-labelledby="division-traditions-heading">
     <h2 id="division-traditions-heading">Как записывают деление</h2>
-    <p>Сравним две записи для 1301 : 12. Вычитания в обеих схемах стоят под делимым. Положение делителя и частного зависит от выбранной записи.</p>
+    <p>В одних записях частное пишут сверху, в других — справа. Можно также сократить сами вычисления на бумаге. Сравним эти отличия на примерах из учебных материалов разных стран.</p>
+    <h3>Где стоит частное</h3>
+    <p>В каждой из трёх схем выполняем одни и те же вычитания для 1301 : 12. Частное выделено синим.</p>
 
-    <div class="division-traditions-layout">
+    <div class="division-traditions-layout full">
       <figure>
-        <h3>Делитель справа</h3>
-        <pre class="division-tradition-example" role="img" aria-label="Делимое 1301 слева. Делитель 12 справа. Частное 108 стоит под делителем. Под делимым вычитания 13 минус 12, 10 минус 0, 101 минус 96. Остаток 5."><span aria-hidden="true">&nbsp;
-&nbsp;</span>
- 1301 │ 12
-−12   ├────
- ──   │ <strong>108</strong>
+        <h4>Справа под чертой</h4>
+        <pre class="division-tradition-example" role="img" aria-label="Делимое 1301 слева, делитель 12 справа, частное 108 под делителем. Остаток 5 внизу слева."> 1301 │ 12
+−12   │<strong class="under-divisor"> 108</strong>
+ ──   │
   10
- − 0
+  −0
   ──
   101
   −96
   ───
-    <strong>5</strong></pre>
-        <figcaption>Делитель 12 стоит справа от 1301, частное 108 — под делителем.</figcaption>
-        <p class="source"><a href="https://medialib.qlgd.edu.vn/Uploads/THU_VIEN/shp/1/1992/UserFiles/Sach-giao-khoa-Toan-3-Tap-1---Ket-noi-tri-thuc-voi-cuoc-song-f430eefb-b437-4b39-af3f-55f0eb959e91.pdf#page=100">Вьетнамский учебник «Toán 3», урок 37</a></p>
+    <mark>5</mark></pre>
+        <figcaption>Справа делитель 12 и под ним частное 108.</figcaption>
+        <p class="source"><a href="https://medialib.qlgd.edu.vn/Uploads/THU_VIEN/shp/1/1992/UserFiles/Sach-giao-khoa-Toan-3-Tap-1---Ket-noi-tri-thuc-voi-cuoc-song-f430eefb-b437-4b39-af3f-55f0eb959e91.pdf#page=100">Вьетнам, учебник «Toán 3», с. 99</a> · <a href="https://eduscol.education.gouv.fr/sites/default/files/document/2024evaluationdebutcm2mathematiquesficheinterventionposercalculeradditionssoustractionsmultiplicationsdivisionsnombresentierpdf-108102.pdf#page=12">Франция, пособие Éduscol, с. 12</a></p>
       </figure>
       <figure>
-        <h3>Делитель слева</h3>
-        <pre class="division-tradition-example" role="img" aria-label="Делитель 12 слева. Делимое 1301 справа. Частное 108 над делимым. Под делимым вычитания 13 минус 12, 10 минус 0, 101 минус 96. Остаток 5.">      <strong>108</strong>
+        <h4>Сверху над делимым</h4>
+        <pre class="division-tradition-example" role="img" aria-label="Делитель 12 слева от делимого 1301, частное 108 над делимым, остаток 5 внизу.">      <strong>108</strong>
    ┌─────
 12 │ 1301
     −12
      ──
       10
-     − 0
+      −0
       ──
       101
       −96
       ───
-        <strong>5</strong></pre>
-        <figcaption>Делитель 12 стоит слева от 1301, частное 108 — над делимым. Его единицы стоят над единицами делимого.</figcaption>
-        <p class="source"><a href="https://www.kyoiku-shuppan.co.jp/textbook/shou/sansu/files/hana4n_02.pdf#page=3">Япония, Kyoiku Shuppan, примеры для 4 класса</a> · <a href="https://proj14.ipst.ac.th/p4/p4-math-book1/math-p4b1-031/">Таиланд, урок IPST</a> · <a href="https://dltv.ac.th/utils/files/download/65170#page=3">Разбор DLTV, с. 3 PDF</a></p>
+        <mark>5</mark></pre>
+        <figcaption>Единицы частного стоят над единицами делимого.</figcaption>
+        <p class="source"><a href="https://www.kyoiku-shuppan.co.jp/textbook/shou/sansu/files/hana4n_02.pdf#page=3">Япония, пособие Kyoiku Shuppan</a> · <a href="https://dltv.ac.th/utils/files/download/65170#page=3">Таиланд, урок DLTV, с. 3 PDF</a> · <a href="https://cter.bnu.edu.cn/zygtt/msjd/mszxjxalfx/89365.html">Китай, урок на портале Пекинского педагогического университета, приложение 3</a></p>
+      </figure>
+      <figure>
+        <h4>После знака равенства</h4>
+        <pre class="division-tradition-example" role="img" aria-label="Первая строка 1301 разделить на 12 равно 108, остаток 5. Вычитания записаны под делимым."> 1301 : 12 = <strong>108</strong>
+−12
+ ──
+  10
+  −0
+  ──
+  101
+  −96
+  ───
+    <mark>5</mark></pre>
+        <figcaption>Результат записывают в строку, а вычитания — под делимым.</figcaption>
+        <p class="source"><a href="https://c.wgr.de/f/emailing/files/13_Schriftliches_Dividieren_2__4290.pdf#page=1">Германия, пособие Westermann, задание 2</a></p>
+      </figure>
+    </div>
+    <p>В нидерландском пособии частное тоже стоит в строке, а делимое отделяют косыми чертами. Пример <strong>12 / 552 \ 46</strong> означает <span class="term">552 : 12 = 46</span>. <a href="https://www.fisme.science.uu.nl/toepassingen/00467/documents/module1_Hoofdbewerkingen.pdf#page=16">Утрехтский университет, с. 16 PDF</a></p>
+    <p>Одна и та же форма может служить разным способам счёта. В мексиканском уроке над делимым 53 пишут <strong>10 + 3</strong>. Это частичные частные при делении на 4. <a href="https://aprendeencasa.sep.gob.mx/primaria/y-si-necesitamos-agrupar-2/">Образовательный портал SEP, Мексика</a></p>
+
+    <h3>Что можно записать короче</h3>
+    <p>Теперь возьмём 847 : 5. Частное 169, остаток 2. В обеих записях произведения 5, 30 и 45 вычисляют устно.</p>
+    <div class="division-traditions-layout">
+      <figure>
+        <h4>Оставляем неполные делимые</h4>
+        <pre class="division-tradition-example" role="img" aria-label="847 слева, делитель 5 справа, частное 169 под делителем. Под делимым остаются строки 34, 47 и окончательный остаток 2."> 847 │ 5
+  34 │<strong class="under-divisor"> 169</strong>
+   47
+    <mark>2</mark></pre>
+        <figcaption>Пишем 34, 47 и окончательный остаток 2. Каждый новый ряд уже включает снесённую цифру.</figcaption>
+        <p class="source"><a href="https://centros.edu.xunta.gal/ceipmanuelsueiro/aulavirtual/pluginfile.php/2895/mod_folder/content/0/reforzo/Unidad%204.%20Divisio%C2%B4n/4M_U04_refuerzo_SOL.pdf?forcedownload=1">Испания, школьный лист Edelvives, задание 3</a></p>
+      </figure>
+      <figure>
+        <h4>Пишем остатки маленькими цифрами</h4>
+        <pre class="division-tradition-example" role="img" aria-label="Частное 169 над делимым 847. Маленькая тройка перед четвёркой даёт 34, маленькая четвёрка перед семёркой даёт 47. Остаток 2.">    <strong>1 6 9</strong>
+   ┌─────
+ 5 │8³4⁴7   ост. <mark>2</mark></pre>
+        <figcaption>Маленькая 3 перед 4 образует 34. Маленькая 4 перед 7 образует 47. Дополнительных строк под делимым нет.</figcaption>
+        <p class="source"><a href="https://mtcrosbyss.eq.edu.au/SupportAndResources/FormsAndDocuments/Documents/Information%20for%20Parents/information-booklet-for-parents-numeracy-year-5.pdf#page=5">Австралия, памятка школы Mt Crosby, с. 5 PDF</a></p>
       </figure>
     </div>
 
     <details>
-      <summary>Как делили счётными палочками в Китае</summary>
-      <p>В «Сунь-цзы суань цзин» делят 6561 на 9 в трёх рядах. Сверху собирают частное, из среднего ряда постепенно убирают 6300, 180 и 81, а снизу сдвигают делитель по разрядам. Сверху получается 700 + 20 + 9 = 729, в середине остаётся 0.</p>
+      <summary>Счётные палочки в Китае</summary>
+      <p>В «Сунь-цзы суань цзин» делят 6561 на 9 в трёх рядах. Сверху растёт частное, средний ряд обновляют после вычитания, а снизу сдвигают делитель. Здесь состояния верхнего и среднего рядов переданы современными цифрами.</p>
+      <table class="rod-registers">
+        <thead><tr><th scope="col">Ряд</th><th scope="col">Старт</th><th scope="col">−6300</th><th scope="col">−180</th><th scope="col">−81</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Частное</th><td>—</td><td>700</td><td>720</td><td>729</td></tr>
+          <tr><th scope="row">Осталось</th><td>6561</td><td>261</td><td>81</td><td>0</td></tr>
+        </tbody>
+      </table>
       <p class="source"><a href="https://yawnoc.github.io/sun-tzu/i/14">«Сунь-цзы суань цзин», книга I, § 14</a></p>
+    </details>
+    <details>
+      <summary>Деление «галерой» в венецианской рукописи</summary>
+      <p>В рукописи Михаила Родосского делят 31 185 на 800. Делитель пишут под делимым, а частное — справа. Использованные цифры зачёркивают. Новые цифры остатка вписывают над ними, поэтому остаток читается по нескольким строкам.</p>
+      <pre class="division-tradition-example" role="img" aria-label="Промежуточный остаток 7185. Цифра 7 над зачёркнутым 31 читается вместе с 185 в строке делимого. Справа первая цифра частного 3."> <mark>7</mark>
+<del>31</del>185 │ <strong>3</strong></pre>
+      <p>Показан момент после вычитания <span class="term">30 × 800</span>. Над зачёркнутым 31 появляется 7. Вместе с оставшимися цифрами 185 это даёт 7185. Затем вычитают ещё <span class="term">8 × 800</span> и получают частное 38, остаток 785.</p>
+      <p class="source"><a href="https://brunelleschi.imss.fi.it/michaelofrhodes/math_toolkit_galera.html">Museo Galileo, рукопись и разбор по шагам</a></p>
     </details>
   </section>
   <section id="trial-digit" aria-labelledby="trial-digit-heading">
