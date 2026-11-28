@@ -189,11 +189,11 @@ summary { width: fit-content; font-weight: 650; color: #174a9c; cursor: pointer;
   </section>
 
   <section id="column" aria-labelledby="column-heading">
-    <h2 id="column-heading">От разрядов к столбику</h2>
+    <h2 id="column-heading">Деление столбиком по списку кратных</h2>
     <p>Читаем делимое слева направо, по одной цифре. В каждом разряде собираем группы по 12. Например, одна группа из 12 сотен — это 100 групп по 12 единиц. Поэтому ей соответствует цифра 1 в разряде сотен частного.</p>
     <p>Перед делением выписываем произведения делителя на все цифры выбранной системы. Начинаем с нуля и каждый раз прибавляем делитель. Этот список используем до конца примера.</p>
     <ol class="steps">
-      <li><strong>Находим цифру по списку.</strong> Выбираем наибольшее кратное, которое не превышает неполное делимое. Записываем соответствующую цифру частного, даже если получился ведущий ноль.</li>
+      <li><strong>Находим цифру по списку.</strong> Сравниваем неполное делимое с готовыми кратными. Берём наибольшее кратное, которое не превышает его. Цифра слева в выбранной строке идёт в частное, даже если это ведущий ноль.</li>
       <li><strong>Вычитаем выбранное кратное.</strong> Остаток должен быть меньше делителя.</li>
       <li><strong>Переходим к младшему разряду.</strong> Размениваем остаток и прибавляем следующую цифру делимого.</li>
     </ol>
@@ -269,14 +269,6 @@ summary { width: fit-content; font-weight: 650; color: #174a9c; cursor: pointer;
     </div>
     <p class="formula"><strong>Проверка</strong> <span class="term">1301 = 12 × 108 + 5</span> и <span class="term">0 ≤ 5 &lt; 12</span>.</p>
     <p class="source">Пример деления с заранее выписанными кратными. <a href="https://amsi.org.au/teacher_modules/Whole_number_arithmetic.html#:~:text=Long%20division%20by%20numbers%20with%20two%20or%20more%20digits">Пособие Австралийского института математических наук</a></p>
-    <details>
-      <summary>Как исправить пробную цифру</summary>
-      <ul class="steps">
-        <li>Для 101 пробуем 9. Получаем <span class="term">12 × 9 = 108</span>, что больше 101. Нужно уменьшить цифру.</li>
-        <li>Если взять 7, после вычитания 84 останется 17. Это не меньше 12, поэтому можно взять ещё одну группу.</li>
-        <li>Подходит 8. Выполняется <span class="term">12 × 8 ≤ 101 &lt; 12 × 9</span>.</li>
-      </ul>
-    </details>
   </section>
 
   <section id="other-base" aria-labelledby="other-base-heading">
@@ -297,10 +289,11 @@ summary { width: fit-content; font-weight: 650; color: #174a9c; cursor: pointer;
         <li><small>× 4</small><strong>103<sub>5</sub></strong></li>
       </ul>
       <ol class="steps">
-        <li>Первая цифра 1 меньше делителя. Берём <strong>13<sub>5</sub></strong>. Помещается <span class="term">1 × 12<sub>5</sub></span>, остаток 1.</li>
+        <li>Первая цифра 1 меньше делителя. По списку берём нулевое кратное и записываем ведущий 0. После сноса цифры 3 получаем <strong>13<sub>5</sub></strong>. В списке <span class="term">12<sub>5</sub> ≤ 13<sub>5</sub> &lt; 24<sub>5</sub></span>. Записываем 1, остаток 1.</li>
         <li>Переходим к пятёркам. Из оставшейся единицы старшего разряда получаем <span class="term">10<sub>5</sub></span> пятёрок и добавляем 1 пятёрку из делимого. Получается <strong>11<sub>5</sub></strong>. Это меньше <span class="term">12<sub>5</sub></span>, поэтому цифра частного 0.</li>
         <li>Размениваем <span class="term">11<sub>5</sub></span> пятёрок и получаем <strong>110<sub>5</sub></strong> единиц. Из строки кратных берём <span class="term">4 × 12<sub>5</sub> = 103<sub>5</sub></span>. После вычитания остаётся 2.</li>
       </ol>
+      <p>В рабочей записи получилось 0104<sub>5</sub>. Частное 104<sub>5</sub>, остаток 2.</p>
       <p class="formula"><strong>Проверка</strong> <span class="term">1310<sub>5</sub> = 12<sub>5</sub> × 104<sub>5</sub> + 2</span> и <span class="term">2 &lt; 12<sub>5</sub></span>.</p>
     </div>
   </section>
@@ -308,9 +301,9 @@ summary { width: fit-content; font-weight: 650; color: #174a9c; cursor: pointer;
   <section id="practice" aria-labelledby="practice-heading">
     <h2 id="practice-heading">Проверяем себя</h2>
     <div class="example">
-      <h3>1. Подбери цифру</h3>
-      <p>Очередное неполное делимое равно 94, делитель 13. Какую цифру запишешь в частном? Какой остаток получится?</p>
-      <details><summary>Проверить</summary><p>Цифра 7. <span class="term">13 × 7 = 91</span>, а <span class="term">13 × 8 = 104 &gt; 94</span>. Остаток 3.</p></details>
+      <h3>1. Найди цифру по кратным</h3>
+      <p>Неполное делимое равно 94, делитель 13. В списке есть соседние строки <span class="term">7 × 13 = 91</span> и <span class="term">8 × 13 = 104</span>. Какую строку выберешь? Какими будут цифра частного и остаток?</p>
+      <details><summary>Проверить</summary><p>Получаем <span class="term">91 ≤ 94 &lt; 104</span>. Берём строку с цифрой 7 и вычитаем 91. Остаток 3.</p></details>
     </div>
     <div class="example">
       <h3>2. Объясни ноль</h3>
@@ -368,6 +361,20 @@ summary { width: fit-content; font-weight: 650; color: #174a9c; cursor: pointer;
       <summary>Как делили счётными палочками в Китае</summary>
       <p>В «Сунь-цзы суань цзин» делят 6561 на 9 в трёх рядах. Сверху собирают частное, из среднего ряда постепенно убирают 6300, 180 и 81, а снизу сдвигают делитель по разрядам. Сверху получается 700 + 20 + 9 = 729, в середине остаётся 0.</p>
       <p class="source"><a href="https://yawnoc.github.io/sun-tzu/i/14">«Сунь-цзы суань цзин», книга I, § 14</a></p>
+    </details>
+  </section>
+  <section id="trial-digit" aria-labelledby="trial-digit-heading">
+    <h2 id="trial-digit-heading">Прикидка с пробной цифрой</h2>
+    <details>
+      <summary>Пример с делителем 23</summary>
+      <p>Если считаем кратные по ходу деления, можно прикинуть цифру частного и проверить её умножением. Остальные действия в столбике те же.</p>
+      <p>В десятичной системе пусть неполное делимое 157, а делитель 23. Для прикидки берём <span class="term">160 : 20 = 8</span>.</p>
+      <ol class="steps">
+        <li><span class="term">8 × 23 = 184</span>. Это больше 157, поэтому уменьшаем пробную цифру.</li>
+        <li><span class="term">7 × 23 = 161</span>. Всё ещё много. Уменьшаем ещё на 1.</li>
+        <li><span class="term">6 × 23 = 138</span>, а остаток <span class="term">157 − 138 = 19</span> меньше 23. Шестёрка подходит.</li>
+      </ol>
+      <p>Если выбранное кратное помещается, но остаток не меньше делителя, можно взять ещё одну полную группу. Тогда пробную цифру увеличиваем и снова проверяем.</p>
     </details>
   </section>
 </main>
@@ -447,7 +454,7 @@ summary { width: fit-content; font-weight: 650; color: #174a9c; cursor: pointer;
     const places = Array.from(dividend, (symbol, index) => {
       const previous = remainder;
       const partial = previous * radix + BigInt(alphabet.indexOf(symbol));
-      const digit = Number(partial / divisor);
+      const digit = multiples.findLastIndex(value => value <= partial);
       const product = multiples[digit];
       remainder = partial - product;
       if (digit !== 0) significant = true;
@@ -563,7 +570,7 @@ summary { width: fit-content; font-weight: 650; color: #174a9c; cursor: pointer;
       } else if (place.digit === 0) {
         description.textContent = 'Полных групп нет. Этот ноль сохраняет место разряда с весом ' + weight + ' и войдёт в ответ.';
       } else {
-        description.textContent = 'Вычитаем выбранное кратное. Новый остаток ' + format(place.remainder) + ' меньше делителя.';
+        description.textContent = 'Берём из списка ' + format(place.product) + ' и вычитаем. Остаток ' + format(place.remainder) + ' меньше делителя.';
       }
       return;
     }
