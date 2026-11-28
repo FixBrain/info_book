@@ -33,7 +33,7 @@ h3 { margin: 0 0 .45rem; font-size: 1.08rem; }
 h4 { margin: .65rem 0 .4rem; }
 p { margin: .5em 0; }
 a { color: #174a9c; text-underline-offset: .16em; }
-a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
 [hidden] { display: none !important; }
 .lead, .source { color: var(--muted); }
 .lead { max-width: 48rem; }
@@ -56,6 +56,16 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px soli
 .chunks small, .multiples small { font-size: .82rem; }
 .multiples { grid-template-columns: repeat(5, minmax(0, 1fr)); max-width: 27rem; }
 .multiples strong { font-variant-numeric: tabular-nums; }
+.division-form { margin-block: .65rem 1rem; }
+.division-fields { display: flex; flex-wrap: wrap; align-items: end; gap: .5rem .65rem; }
+.division-fields label { display: grid; gap: .18rem; font-size: .9rem; font-weight: 650; }
+.division-fields input, .division-fields select { min-height: 2.6rem; padding: .3rem .55rem; border: 1px solid #a8bbd7; border-radius: .45rem; color: var(--ink); background: white; font: inherit; }
+.division-fields input { width: 7rem; font-variant-numeric: tabular-nums; }
+.division-fields [aria-invalid="true"] { border-color: #9c3538; }
+.division-help, .division-error { margin: .35rem 0 0; font-size: .88rem; }
+.division-help { color: var(--muted); }
+.division-error { color: #952b31; font-weight: 650; }
+.division-error:empty { display: none; }
 .demo-controls { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; margin-block: .7rem; }
 button { min-height: 2.6rem; padding: .3rem .75rem; border: 1px solid #b2c5e6; border-radius: .45rem; background: var(--blue-light); color: #174a9c; font: inherit; font-weight: 650; cursor: pointer; }
 button.primary { background: var(--blue); color: #fff; border-color: var(--blue); }
@@ -65,11 +75,13 @@ button:disabled { opacity: .48; cursor: default; }
 @media (min-width: 700px) { .demo-layout { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); } }
 .demo-panel { min-width: 0; padding: .65rem .8rem; border: 1px solid var(--line); border-radius: .65rem; background: var(--paper); }
 .division-calculation { display: grid; align-items: start; gap: .65rem .85rem; }
-@media (min-width: 920px) { .division-calculation { grid-template-columns: minmax(8rem, .72fr) minmax(0, 1fr); } }
+@media (min-width: 1000px) { .division-calculation { grid-template-columns: minmax(12.5rem, auto) minmax(0, 1fr); } }
 .division-calculation > div { min-width: 0; }
 .division-lookup h4 { margin-bottom: .5rem; }
-.division-lookup .multiples { margin-block: .4rem; gap: .25rem; }
+.division-lookup .multiples { grid-template-columns: repeat(auto-fit, minmax(max(2.15rem, calc(var(--multiple-width, 3) * .55rem + .55rem)), 1fr)); margin-block: .4rem; gap: .25rem; }
+.division-lookup .multiples.many { max-height: 12rem; overflow-y: auto; scrollbar-gutter: stable; }
 .division-lookup .multiples li { border: 1px solid transparent; padding-block: .2rem; }
+.division-lookup .multiples strong { font: 700 .9rem/1.42 ui-monospace, Consolas, monospace; }
 .division-lookup .multiples .lookup-fit { background: var(--green); border-color: #3d7758; color: #245b3c; }
 .division-lookup .multiples .lookup-limit { background: var(--amber); border: 1px dashed #926518; color: #704009; }
 .lookup-comparison { margin-block: .5rem .2rem; font-size: 1.12rem; font-variant-numeric: tabular-nums; }
@@ -77,7 +89,8 @@ button:disabled { opacity: .48; cursor: default; }
 .lookup-comparison .lookup-fit { background: var(--green); color: #245b3c; }
 .lookup-comparison .lookup-limit { background: var(--amber); color: #704009; }
 .lookup-key { margin: 0; font-size: .82rem; color: var(--muted); }
-.workbench { display: grid; grid-template-columns: 5ch minmax(5ch, 1fr); gap: 0 .25em; width: min(100%, 13rem); margin: .3em 0; font: 650 clamp(1.22rem, 5vw, 1.6rem)/1.32 ui-monospace, Consolas, monospace; font-variant-numeric: tabular-nums; }
+.workbench { display: grid; gap: 0 .24em; width: max-content; max-width: 100%; margin: .3em 0; font: 650 clamp(1.15rem, 4.3vw, 1.4rem)/1.32 ui-monospace, Consolas, monospace; font-variant-numeric: tabular-nums; }
+.workbench { grid-template-columns: calc((var(--dividend-width, 4) + 1) * 1ch) minmax(calc(var(--result-width, 4) * 1ch + .5em), 1fr); }
 .work-row { grid-column: 1; white-space: pre; }
 .is-current { color: #704009; background: var(--amber); border-radius: .2em; }
 .work-subtract { text-decoration: underline; text-underline-offset: .12em; }
@@ -85,8 +98,9 @@ button:disabled { opacity: .48; cursor: default; }
 .work-divisor { grid-area: 1 / 2; border-bottom: 2px solid #60728e; }
 .work-quotient { grid-area: 2 / 2; min-height: 1.32em; white-space: pre; }
 .work-quotient span { background: var(--green); border-radius: .14em; }
-.work-quotient span + span { margin-inline-start: .1em; }
 .work-quotient .zero { background: var(--amber); }
+.work-quotient .leading { color: #586677; background: #edf0f4; }
+.work-quotient .active-digit { box-shadow: inset 0 -2px #2458b4; }
 .model-label { display: inline-block; padding: .18em .47em; border-radius: .32em; background: var(--blue-light); color: #194783; font-weight: 650; font-size: .92rem; }
 .exchange { display: flex; align-items: center; flex-wrap: wrap; gap: .45rem; margin-block: .6rem; }
 .exchange > span:not(.exchange-arrow) { min-width: 5.5rem; padding: .35rem .5rem; border: 1px solid #d8b58b; border-radius: .44rem; background: #f8e9d1; text-align: center; }
@@ -176,36 +190,47 @@ summary { width: fit-content; font-weight: 650; color: #174a9c; cursor: pointer;
   <section id="column" aria-labelledby="column-heading">
     <h2 id="column-heading">От разрядов к столбику</h2>
     <p>Читаем делимое слева направо, по одной цифре. В каждом разряде собираем группы по 12. Например, одна группа из 12 сотен — это 100 групп по 12 единиц. Поэтому ей соответствует цифра 1 в разряде сотен частного.</p>
-    <p>Перед делением выписываем произведения 12 на все цифры от 0 до 9. Начинаем с нуля и каждый раз прибавляем 12. Этот список используем до конца примера.</p>
+    <p>Перед делением выписываем произведения делителя на все цифры выбранной системы. Начинаем с нуля и каждый раз прибавляем делитель. Этот список используем до конца примера.</p>
     <ol class="steps">
-      <li><strong>Находим цифру по списку.</strong> Выбираем наибольшее кратное, которое не превышает неполное делимое. Цифра, на которую умножали 12, идёт в частное.</li>
+      <li><strong>Находим цифру по списку.</strong> Выбираем наибольшее кратное, которое не превышает неполное делимое. Записываем соответствующую цифру частного, даже если получился ведущий ноль.</li>
       <li><strong>Вычитаем выбранное кратное.</strong> Остаток должен быть меньше делителя.</li>
       <li><strong>Переходим к младшему разряду.</strong> Размениваем остаток и прибавляем следующую цифру делимого.</li>
     </ol>
 
     <div class="demo" id="division-demo">
-      <h3>Делим 1301 на 12</h3>
+      <h3>Пошаговое деление</h3>
+      <form class="division-form" id="division-form" hidden>
+        <div class="division-fields">
+          <label>Основание <select id="division-base" aria-describedby="division-input-help"><option value="10">10</option></select></label>
+          <label>Делимое <input id="division-dividend" value="1301" inputmode="numeric" autocapitalize="characters" autocomplete="off" spellcheck="false" aria-describedby="division-input-help division-error"></label>
+          <label>Делитель <input id="division-divisor" value="12" inputmode="numeric" autocapitalize="characters" autocomplete="off" spellcheck="false" aria-describedby="division-input-help division-error"></label>
+          <button type="submit" class="primary">Начать деление</button>
+        </div>
+        <p class="division-help" id="division-input-help">До 6 знаков в каждом числе. Цифры от 0 до 9.</p>
+        <p class="division-error" id="division-error" role="alert"></p>
+      </form>
       <div class="demo-controls" hidden>
         <button type="button" id="division-back" disabled>Назад</button>
         <button type="button" id="division-next" class="primary">Следующий шаг</button>
         <button type="button" id="division-reset" disabled>Сначала</button>
-        <span id="division-progress" role="status" aria-live="polite">Шаг 0 из 6</span>
+        <span id="division-progress" role="status" aria-live="polite"></span>
       </div>
+      <p class="model-label" id="division-expression">1301 : 12 · основание 10</p>
       <div class="demo-layout">
         <div class="demo-panel division-calculation">
           <div>
             <h4>Столбик</h4>
             <div class="workbench" id="division-work">
-              <div class="work-row"> <span data-current="0 1 2">1</span><span data-current="1 2">3</span>01</div><div class="work-divisor">12</div>
-              <div class="work-row work-subtract" data-reveal="2">−12</div>
-              <div class="work-quotient" aria-label="Цифры частного"><span data-reveal="2">1</span><span class="zero" data-reveal="4">0</span><span data-reveal="6">8</span></div>
-              <div class="work-row" data-reveal="2" data-until="3">  1</div>
-              <div class="work-row" data-reveal="3" data-current="3 4">  10</div>
-              <div class="work-row work-subtract" data-reveal="4">  −0</div>
-              <div class="work-row" data-reveal="4" data-until="5">  10</div>
-              <div class="work-row" data-reveal="5" data-current="5 6">  101</div>
-              <div class="work-row work-subtract" data-reveal="6">  −96</div>
-              <div class="work-row result" data-reveal="6">    5</div>
+              <div class="work-row"> 1301</div><div class="work-divisor">12</div>
+              <div class="work-row work-subtract">−0</div>
+              <div class="work-quotient" aria-label="Рабочая запись частного"><span class="leading">0</span><span>1</span><span class="zero">0</span><span>8</span></div>
+              <div class="work-row"> 13</div>
+              <div class="work-row work-subtract">−12</div>
+              <div class="work-row">  10</div>
+              <div class="work-row work-subtract">  −0</div>
+              <div class="work-row">  101</div>
+              <div class="work-row work-subtract">  −96</div>
+              <div class="work-row result">    5</div>
             </div>
           </div>
           <div class="division-lookup">
@@ -224,54 +249,22 @@ summary { width: fit-content; font-weight: 650; color: #174a9c; cursor: pointer;
             </ul>
             <p class="lookup-comparison" id="division-comparison"><span class="lookup-fit">96</span> ≤ <strong>101</strong> &lt; <span class="lookup-limit">108</span></p>
             <p class="lookup-key">Слева — кратное, которое берём. Справа — следующее, уже слишком большое.</p>
+            <p class="lookup-key" id="division-boundary" hidden>Следующая граница — делитель, умноженный на основание.</p>
           </div>
         </div>
         <div class="demo-panel" id="division-explanation" aria-live="polite">
-          <div data-step="0" data-partial="1" hidden>
-            <span class="model-label">Тысячи</span>
-            <h4>Первый разряд</h4>
-            <p>Начинаем с 1 тысячи. Это меньше 12 тысяч, поэтому в частном нет тысяч. Ведущий ноль можно опустить.</p>
+          <h4 id="division-explanation-title">Получаем ответ</h4>
+          <div class="exchange" id="division-exchange" hidden>
+            <span><span class="bundle-mark" aria-hidden="true"></span><strong id="division-exchange-from"></strong><small>остаток в старшем разряде</small></span>
+            <span class="exchange-arrow" aria-hidden="true">→</span>
+            <span><span class="bundle-mark loose" aria-hidden="true"></span><strong id="division-exchange-to"></strong><small>количество в новом разряде</small></span>
           </div>
-          <div data-step="1" data-partial="13" hidden>
-            <span class="model-label">Сотни</span>
-            <h4>Получаем первое неполное делимое</h4>
-            <div class="exchange"><span><span class="bundle-mark" aria-hidden="true"></span><strong>1</strong><small>тысяча</small></span><span class="exchange-arrow">→</span><span><span class="bundle-mark loose" aria-hidden="true"></span><strong>10 + 3 = 13</strong><small>сотен</small></span></div>
-            <p>Размениваем тысячу на десять сотен и добавляем ещё 3 сотни из делимого.</p>
-          </div>
-          <div data-step="2" data-partial="13" hidden>
-            <span class="model-label">Сотни</span>
-            <h4>Записываем 1 сотню в частном</h4>
-            <p class="formula">13 = 12 × 1 + 1</p>
-            <p>В 13 сотнях помещается одна группа из 12 сотен. Остаётся 1 сотня.</p>
-          </div>
-          <div data-step="3" data-partial="10" hidden>
-            <span class="model-label">Десятки</span>
-            <h4>Размениваем остаток</h4>
-            <div class="exchange"><span><span class="bundle-mark" aria-hidden="true"></span><strong>1</strong><small>сотня</small></span><span class="exchange-arrow">→</span><span><span class="bundle-mark loose" aria-hidden="true"></span><strong>10 + 0 = 10</strong><small>десятков</small></span></div>
-            <p>Размениваем оставшуюся сотню на 10 десятков. Следующая цифра делимого — 0, поэтому новых десятков не добавляем.</p>
-          </div>
-          <div data-step="4" data-partial="10" hidden>
-            <span class="model-label">Десятки</span>
-            <h4>Записываем 0 десятков в частном</h4>
-            <p class="formula">10 = 12 × 0 + 10</p>
-            <p>Группа из 12 десятков не помещается. Частное уже началось с сотен, поэтому место десятков нужно сохранить. Все 10 десятков остаются.</p>
-          </div>
-          <div data-step="5" data-partial="101" hidden>
-            <span class="model-label">Единицы</span>
-            <h4>Получаем 101 единицу</h4>
-            <div class="exchange"><span><span class="bundle-mark" aria-hidden="true"></span><strong>10</strong><small>десятков</small></span><span class="exchange-arrow">→</span><span><span class="bundle-mark loose" aria-hidden="true"></span><strong>100 + 1 = 101</strong><small>единица</small></span></div>
-            <p>В каждом десятке 10 единиц. После размена их 100, а последняя цифра делимого добавляет ещё одну.</p>
-          </div>
-          <div data-step="6" data-partial="101">
-            <span class="model-label">Единицы</span>
-            <h4>Записываем 8 единиц в частном</h4>
-            <p class="formula">101 = 12 × 8 + 5</p>
-            <p>Восемь групп занимают 96 единиц, а девять заняли бы 108. Записываем 8 и оставляем 5.</p>
-            <p class="result">Частное 108, остаток 5.</p>
-          </div>
+          <p class="formula" id="division-calculation-line">1301 = 12 × 108 + 5</p>
+          <p id="division-description">Рабочая запись 0108 сохраняет все цифры, которые получились по ходу деления. В ответе ведущий ноль опускаем.</p>
+          <p class="result" id="division-result">Частное <strong id="division-answer">108</strong>, остаток <strong id="division-remainder">5</strong>.</p>
         </div>
       </div>
-      <noscript><p>Последовательность неполных делимых — 13 сотен, 10 десятков, 101 единица. Цифры частного — 1, 0 и 8 соответственно.</p></noscript>
+      <noscript><p>Для выбора своих чисел включите JavaScript. Выше показан столбик для готового примера.</p></noscript>
     </div>
     <p class="formula"><strong>Проверка</strong> <span class="term">1301 = 12 × 108 + 5</span> и <span class="term">0 ≤ 5 &lt; 12</span>.</p>
     <p class="source">Пример деления с заранее выписанными кратными. <a href="https://amsi.org.au/teacher_modules/Whole_number_arithmetic.html#:~:text=Long%20division%20by%20numbers%20with%20two%20or%20more%20digits">Пособие Австралийского института математических наук</a></p>
@@ -384,55 +377,262 @@ summary { width: fit-content; font-weight: 650; color: #174a9c; cursor: pointer;
 <script>
 (() => {
   const demo = document.querySelector('#division-demo');
-  const back = demo.querySelector('#division-back');
-  const next = demo.querySelector('#division-next');
-  const reset = demo.querySelector('#division-reset');
-  const progress = demo.querySelector('#division-progress');
-  const explanations = Array.from(demo.querySelectorAll('[data-step]'));
-  const work = Array.from(demo.querySelectorAll('[data-reveal]'));
-  const highlights = Array.from(demo.querySelectorAll('[data-current]'));
-  const multipleCells = Array.from(demo.querySelectorAll('#division-multiples li'));
-  const multiples = multipleCells.map(cell => Number(cell.querySelector('strong').textContent));
-  const comparison = demo.querySelector('#division-comparison');
-  const lastStep = explanations.length - 1;
+  const find = (id) => demo.querySelector(id);
+  const form = find('#division-form');
+  const baseInput = find('#division-base');
+  const dividendInput = find('#division-dividend');
+  const divisorInput = find('#division-divisor');
+  const error = find('#division-error');
+  const back = find('#division-back');
+  const next = find('#division-next');
+  const reset = find('#division-reset');
+  const progress = find('#division-progress');
+  const work = find('#division-work');
+  const table = find('#division-multiples');
+  const comparison = find('#division-comparison');
+  const explanation = find('#division-explanation-title');
+  const exchange = find('#division-exchange');
+  const calculation = find('#division-calculation-line');
+  const description = find('#division-description');
+  const result = find('#division-result');
+  const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let run;
   let step = 0;
 
-  function showMultiples(partial) {
-    const nextIndex = multiples.findIndex(value => value > partial);
-    const fitIndex = nextIndex - 1;
-    for (const [index, cell] of multipleCells.entries()) {
-      cell.classList.toggle('lookup-fit', index === fitIndex);
-      cell.classList.toggle('lookup-limit', index === nextIndex);
+  function element(tag, className, text) {
+    const node = document.createElement(tag);
+    node.className = className;
+    node.textContent = text;
+    return node;
+  }
+
+  function showInputHint() {
+    const base = Number(baseInput.value);
+    const last = alphabet[base - 1];
+    let characters = 'от 0 до ' + last;
+    if (base === 11) characters = 'от 0 до 9 и A';
+    if (base > 11) characters = 'от 0 до 9 и от A до ' + last;
+    find('#division-input-help').textContent = 'До 6 знаков в каждом числе. Допустимые цифры ' + characters + '.';
+    for (const input of [dividendInput, divisorInput]) {
+      input.inputMode = base > 10 ? 'text' : 'numeric';
+      input.removeAttribute('aria-invalid');
     }
-    comparison.querySelector('.lookup-fit').textContent = multiples[fitIndex];
-    comparison.querySelector('strong').textContent = partial;
-    comparison.querySelector('.lookup-limit').textContent = multiples[nextIndex];
+    error.textContent = '';
+  }
+
+  function readNumber(input, label, base) {
+    const raw = input.value.trim();
+    const text = raw.toUpperCase();
+    if (!/^[0-9A-Za-z]{1,6}$/.test(raw)) {
+      throw new Error('Введите ' + label + ' длиной от 1 до 6 знаков. Используйте цифры или латинские буквы.');
+    }
+    let value = 0n;
+    for (const character of text) {
+      const digit = alphabet.indexOf(character);
+      if (digit >= base) {
+        throw new Error('Цифра «' + character + '» недопустима в основании ' + base + '.');
+      }
+      value = value * BigInt(base) + BigInt(digit);
+    }
+    return { text, value };
+  }
+
+  function makeRun(dividend, divisor, base) {
+    const radix = BigInt(base);
+    const format = (number) => number.toString(base).toUpperCase();
+    const multiples = Array.from({ length: base }, (_, digit) => divisor * BigInt(digit));
+    let remainder = 0n;
+    let significant = false;
+    const places = Array.from(dividend, (symbol, index) => {
+      const previous = remainder;
+      const partial = previous * radix + BigInt(alphabet.indexOf(symbol));
+      const digit = Number(partial / divisor);
+      const product = multiples[digit];
+      remainder = partial - product;
+      if (digit !== 0) significant = true;
+      const leading = !significant && index < dividend.length - 1;
+      return { index, symbol, previous, partial, digit, product, remainder, leading };
+    });
+    const rawQuotient = places.map(place => alphabet[place.digit]).join('');
+    return {
+      dividend, divisor, base, format, multiples, places, rawQuotient, remainder,
+      quotient: rawQuotient.replace(/^0+(?=.)/, ''),
+      upperBound: divisor * radix
+    };
+  }
+
+  function renderTable() {
+    const cells = run.multiples.map((value, digit) => {
+      const cell = document.createElement('li');
+      cell.append(element('small', '', '× ' + alphabet[digit]), element('strong', '', run.format(value)));
+      return cell;
+    });
+    table.replaceChildren(...cells);
+    table.style.setProperty('--multiple-width', String(run.format(run.multiples.at(-1)).length));
+    table.classList.toggle('many', run.base > 10);
+    table.tabIndex = run.base > 10 ? 0 : -1;
+    table.scrollTop = 0;
+    find('#division-multiples-heading').textContent = 'Кратные ' + run.format(run.divisor);
+  }
+
+  function showMultiples(place) {
+    const upperIndex = place.digit + 1;
+    const upper = run.multiples[upperIndex];
+    for (const [index, cell] of Array.from(table.children).entries()) {
+      cell.classList.toggle('lookup-fit', index === place.digit);
+      cell.classList.toggle('lookup-limit', index === upperIndex);
+    }
+    comparison.querySelector('.lookup-fit').textContent = run.format(place.product);
+    comparison.querySelector('strong').textContent = run.format(place.partial);
+    comparison.querySelector('.lookup-limit').textContent = run.format(upper ?? run.upperBound);
+    find('#division-boundary').hidden = upper !== undefined;
+    if (run.base > 10) {
+      const container = table.getBoundingClientRect();
+      const selected = table.children[place.digit].getBoundingClientRect();
+      const limit = table.children[upperIndex]?.getBoundingClientRect() ?? selected;
+      if (selected.top < container.top) table.scrollTop -= container.top - selected.top;
+      else if (limit.bottom > container.bottom) table.scrollTop += limit.bottom - container.bottom;
+    }
+  }
+
+  function renderColumn(current, recorded, finished) {
+    const { dividend, divisor, places, format } = run;
+    work.style.setProperty('--dividend-width', String(dividend.length));
+    work.style.setProperty('--result-width', String(Math.max(dividend.length, format(divisor).length)));
+    const header = element('div', 'work-row', ' ');
+    for (const [index, symbol] of Array.from(dividend).entries()) {
+      const active = !finished && index === current.index;
+      header.append(element('span', active ? 'is-current' : '', symbol));
+    }
+    const quotient = element('div', 'work-quotient', '');
+    quotient.setAttribute('aria-label', 'Рабочая запись частного');
+    const rows = [header, element('div', 'work-divisor', format(divisor)), quotient];
+
+    function addRow(position, text, className = '') {
+      const padded = text.padStart(position + 2);
+      rows.push(element('div', 'work-row ' + className, padded));
+    }
+
+    for (const place of places.slice(0, recorded)) {
+      const style = place.leading ? 'leading' : place.digit === 0 ? 'zero' : '';
+      const active = !finished && place.index === current.index;
+      const digit = element('span', active ? style + ' active-digit' : style, alphabet[place.digit]);
+      if (place.leading) digit.title = 'Ведущий ноль';
+      quotient.append(digit);
+    }
+
+    for (const place of places.slice(0, current.index + 1)) {
+      const active = !finished && place.index === current.index;
+      if (place.index > 0) {
+        addRow(place.index, format(place.partial), active ? 'is-current' : '');
+      }
+      if (place.index < recorded) {
+        addRow(place.index, '−' + format(place.product), 'work-subtract');
+        if (place.index === current.index) {
+          addRow(place.index, format(place.remainder), finished ? 'result' : '');
+        }
+      }
+    }
+
+    work.replaceChildren(...rows);
+  }
+
+  function renderExplanation(place, written, finished) {
+    const { places, format, quotient, remainder, rawQuotient } = run;
+    result.hidden = !finished;
+    exchange.hidden = finished || written || place.index === 0;
+    if (finished) {
+      explanation.textContent = 'Получаем ответ';
+      calculation.textContent = run.dividend + ' = ' + format(run.divisor) + ' × ' + quotient + ' + ' + format(remainder);
+      description.textContent = rawQuotient === quotient
+        ? 'Все цифры рабочей записи переходят в ответ.'
+        : 'В рабочей записи остаётся ' + rawQuotient + '. В ответе пишем ' + quotient + ', без лишних нулей слева.';
+      find('#division-answer').textContent = quotient;
+      find('#division-remainder').textContent = format(remainder);
+      return;
+    }
+    const weight = '1' + '0'.repeat(places.length - place.index - 1);
+    if (written) {
+      explanation.textContent = 'Записываем ' + alphabet[place.digit] + ' в частное';
+      calculation.textContent = format(place.partial) + ' − ' + format(place.product) + ' = ' + format(place.remainder);
+      if (place.leading) {
+        description.textContent = 'Полных групп нет. Записываем ведущий ноль серым в разряде веса ' + weight + '.';
+      } else if (quotient === '0') {
+        description.textContent = 'Полных групп нет. Записываем 0 в последнем разряде. В ответе останется один ноль.';
+      } else if (place.digit === 0) {
+        description.textContent = 'Полных групп нет. Этот ноль сохраняет место разряда с весом ' + weight + ' и войдёт в ответ.';
+      } else {
+        description.textContent = 'Вычитаем выбранное кратное. Новый остаток ' + format(place.remainder) + ' меньше делителя.';
+      }
+      return;
+    }
+    explanation.textContent = place.index === 0 ? 'Начинаем со старшего разряда' : 'Переходим на один разряд вправо';
+    if (place.index > 0) {
+      find('#division-exchange-from').textContent = format(place.previous);
+      find('#division-exchange-to').textContent = format(place.partial);
+    }
+    calculation.textContent = place.index === 0
+      ? 'Неполное делимое ' + format(place.partial)
+      : format(place.previous) + ' × 10 + ' + place.symbol + ' = ' + format(place.partial);
+    description.textContent = place.index === 0
+      ? 'Сравниваем первую цифру делимого с кратными. Заполним разряд частного с весом ' + weight + '.'
+      : 'Каждую единицу остатка меняем на ' + run.base + ' единиц младшего разряда и добавляем очередную цифру делимого.';
   }
 
   function showStep(index) {
     step = index;
-    for (const explanation of explanations) {
-      explanation.hidden = Number(explanation.dataset.step) !== step;
-    }
-    for (const item of work) {
-      item.hidden = Number(item.dataset.reveal) > step ||
-        (item.dataset.until !== undefined && Number(item.dataset.until) <= step);
-    }
-    for (const item of highlights) {
-      item.classList.toggle('is-current', item.dataset.current.split(' ').includes(String(step)));
-    }
-    showMultiples(Number(explanations[step].dataset.partial));
+    const lastStep = run.places.length * 2;
+    const finished = step === lastStep;
+    const place = run.places[Math.min(Math.floor(step / 2), run.places.length - 1)];
+    const recorded = Math.ceil(step / 2);
+    const written = step % 2 === 1;
+    renderColumn(place, recorded, finished);
+    showMultiples(place);
+    renderExplanation(place, written, finished);
     back.disabled = step === 0;
     reset.disabled = step === 0;
-    next.disabled = step === lastStep;
+    next.disabled = finished;
+    next.textContent = finished ? 'Готово' : step === lastStep - 1 ? 'Показать ответ' : 'Следующий шаг';
     progress.textContent = 'Шаг ' + step + ' из ' + lastStep;
   }
 
+  function startDivision() {
+    const base = Number(baseInput.value);
+    let input = dividendInput;
+    try {
+      const dividend = readNumber(input, 'делимое', base);
+      input = divisorInput;
+      const divisor = readNumber(input, 'делитель', base);
+      if (divisor.value === 0n) throw new Error('Делитель должен быть больше нуля.');
+      run = makeRun(dividend.text, divisor.value, base);
+      dividendInput.value = dividend.text;
+      divisorInput.value = run.format(divisor.value);
+    } catch (problem) {
+      input.setAttribute('aria-invalid', 'true');
+      error.textContent = problem.message;
+      input.focus();
+      return;
+    }
+    showInputHint();
+    find('#division-expression').textContent = run.dividend + ' : ' + run.format(run.divisor) + ' · основание ' + base;
+    renderTable();
+    showStep(0);
+  }
+
+  baseInput.replaceChildren(...Array.from({ length: 35 }, (_, index) => new Option(index + 2, index + 2)));
+  baseInput.value = '10';
+  baseInput.addEventListener('change', showInputHint);
+  for (const input of [dividendInput, divisorInput]) input.addEventListener('input', showInputHint);
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    startDivision();
+  });
   back.addEventListener('click', () => showStep(step - 1));
   next.addEventListener('click', () => showStep(step + 1));
   reset.addEventListener('click', () => showStep(0));
-  showStep(0);
+  form.hidden = false;
   demo.querySelector('.demo-controls').hidden = false;
+  startDivision();
 })();
 </script>
 </body>
