@@ -49,6 +49,13 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .steps li + li { margin-top: .4em; }
 .sharing { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: .7rem; }
 .sharing .example { margin-block: .45rem; }
+.method + .method { margin-top: 1rem; }
+.method-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: .7rem; align-items: start; }
+.method-pair p:first-child { margin-top: 0; }
+.doubling-table { width: 100%; max-width: 19rem; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.doubling-table caption { text-align: left; font-weight: 650; margin-bottom: .3em; }
+.doubling-table th, .doubling-table td { padding: .23rem .45rem; border-bottom: 1px solid var(--line); text-align: right; }
+.doubling-table .chosen { background: var(--green); }
 .chunks, .multiples { display: grid; gap: .4rem; list-style: none; padding: 0; margin: .65rem 0; }
 .chunks { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .chunks li, .multiples li { display: grid; justify-items: center; align-content: start; text-align: center; padding: .4em .15em; border-radius: .5rem; background: var(--blue-light); }
@@ -160,6 +167,7 @@ summary { width: fit-content; font-weight: 650; color: #174a9c; cursor: pointer;
     <a href="#other-base">Другое основание</a>
     <a href="#division-demo">Пошаговое деление</a>
     <a href="#practice">Задания</a>
+    <a href="#hand-division">Ручные способы</a>
     <a href="#division-traditions">Две записи столбика</a>
   </nav>
 
@@ -332,6 +340,64 @@ summary { width: fit-content; font-weight: 650; color: #174a9c; cursor: pointer;
       <details><summary>Проверить</summary><p>17 больше делителя. Из остатка выделяем ещё одну группу и получаем частное 108 и остаток 5.</p></details>
     </div>
   </section>
+  <section id="hand-division" aria-labelledby="hand-division-heading">
+    <h2 id="hand-division-heading">Ручные способы деления</h2>
+    <p>Сравним способы на примере <strong>1301 : 12</strong>. Во всех случаях проверяем одно равенство <span class="term">1301 = 12 × 108 + 5</span>. Способы различаются тем, как мы находим 108 и 5.</p>
+
+    <div class="example method">
+      <h3>Вычитаем кратные делителя</h3>
+      <p><strong>Удобные порции.</strong> Начинаем со 100 групп по 12, затем берём ещё 8. Те же 100 групп можно набрать двумя порциями по 50. Размер порции выбираем сами, а в конце складываем количества групп.</p>
+      <p><strong>По разрядам.</strong> Сначала берём столько сотен групп, сколько помещается, затем столько десятков, затем единицы. В нашем примере это <span class="term">100 + 0 + 8</span>. Так получается обычный столбик. Список кратных и пробная цифра помогают выбрать очередную цифру этого же столбика.</p>
+      <h4>Если строить кратные удвоением</h4>
+      <p>Начинаем с 12 и удваиваем, пока следующее кратное не станет больше делимого. Затем читаем таблицу снизу вверх. Берём строку, если её кратное помещается в текущий остаток.</p>
+      <div class="method-pair">
+        <table class="doubling-table">
+          <caption>Удваиваем 12</caption>
+          <thead><tr><th scope="col">Групп</th><th scope="col">Кратное</th><th scope="col">Берём</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>12</td><td>Нет</td></tr>
+            <tr><td>2</td><td>24</td><td>Нет</td></tr>
+            <tr class="chosen"><td>4</td><td>48</td><td>Да</td></tr>
+            <tr class="chosen"><td>8</td><td>96</td><td>Да</td></tr>
+            <tr><td>16</td><td>192</td><td>Нет</td></tr>
+            <tr class="chosen"><td>32</td><td>384</td><td>Да</td></tr>
+            <tr class="chosen"><td>64</td><td>768</td><td>Да</td></tr>
+          </tbody>
+        </table>
+        <div>
+          <p><strong>Убираем выбранные группы</strong></p>
+          <ol class="steps">
+            <li>Берём 64 группы. <span class="term">1301 − 768 = 533</span>.</li>
+            <li>Берём 32 группы. <span class="term">533 − 384 = 149</span>.</li>
+            <li>Пропускаем 16 групп, поскольку <span class="term">192 &gt; 149</span>. Берём 8 групп. <span class="term">149 − 96 = 53</span>.</li>
+            <li>Берём 4 группы. <span class="term">53 − 48 = 5</span>.</li>
+          </ol>
+          <p>Получаем <span class="term">64 + 32 + 8 + 4 = 108</span> и остаток 5. Выбранным строкам соответствуют единицы в записи <span class="term">1101100<sub>2</sub></span>.</p>
+        </div>
+      </div>
+      <p class="source">Удвоениями пользовались в Древнем Египте. Выше современный пример деления с остатком. <a href="https://www.open.edu/openlearn/science-maths-technology/mathematics-statistics/egyptian-mathematics/content-section-1.1.2">Открытый университет о папирусе Ринда</a></p>
+    </div>
+
+    <div class="example method">
+      <h3>Раскладываем делитель на множители</h3>
+      <p>Поскольку <span class="term">12 = 3 × 4</span>, сначала собираем группы по 3, а затем объединяем их по четыре. Так каждая укрупнённая группа содержит 12 единиц.</p>
+      <ol class="steps">
+        <li><span class="term">1301 = 3 × 433 + 2</span>. Получаем 433 тройки и ещё 2 единицы.</li>
+        <li><span class="term">433 = 4 × 108 + 1</span>. Получаем 108 групп по четыре тройки. Остаётся одна тройка.</li>
+      </ol>
+      <p>В остатке одна тройка и две единицы. Это <span class="term">3 × 1 + 2 = 5</span>.</p>
+      <p class="source">В комментарии к индийской «Лилавати» деление 1620 на 12 также разбито на деление на 3 и на 4. <a href="https://assets.super.so/e745dfd7-232e-47c1-a806-753f45b941ba/files/9b336695-0368-44c9-97bc-cb392265f4d2.pdf#page=24">«Лилавати», перевод с пояснениями, с. 18</a></p>
+    </div>
+
+    <div class="example method">
+      <h3>Умножаем на обратное число</h3>
+      <p>В вавилонской шестидесятеричной системе для деления пользовались таблицами обратных чисел. Например, <span class="term">1/12 = 5/60</span>, поэтому деление на 12 можно выполнить умножением на 5 и делением на 60. В основании 60 последнее действие сдвигает запись на один разряд.</p>
+      <p class="formula">1301 × 5 = 6505<br>6505/60 = 108 + 25/60</p>
+      <p>Целая часть даёт частное 108. Дробная часть <span class="term">25/60 = 5/12</span> показывает, что осталось 5 единиц из 12, нужных для ещё одной группы.</p>
+      <p class="source"><a href="https://www.open.edu/openlearn/mod/oucontent/view.php?id=1976&amp;section=1.3">Открытый университет о вавилонской таблице обратных чисел</a></p>
+    </div>
+  </section>
+
   <section id="division-traditions" aria-labelledby="division-traditions-heading">
     <h2 id="division-traditions-heading">Как записывают деление</h2>
     <p>Сравним две записи для 1301 : 12. Вычитания в обеих схемах стоят под делимым. Положение делителя и частного зависит от выбранной записи.</p>
